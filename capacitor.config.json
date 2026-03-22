@@ -1,5 +1,19 @@
 {
-  "appId": "com.mayu.aligner",
-  "appName": "SmileTracker",
-  "webDir": "www"
+  "appId": "app.smiletrack.app",
+  "appName": "SmileTrack",
+  "webDir": "www",
+  "ios": {
+    "contentInset": "automatic"
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_icon_config_sample",
+      "iconColor": "#98C8CC",
+      "sound": "default"
+    },
+    "Permissions": {
+      "camera": "矯正の経過写真を撮影するためにカメラを使用します",
+      "notifications": "マウスピースの交換日やタイマーのアラームをお知らせします"
+    }
+  }
 }
