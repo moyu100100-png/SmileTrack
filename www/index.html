@@ -13,6 +13,47 @@
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="capacitor.js"></script>
+  <script>
+  const Notif = {
+    async requestPermission(){
+      try{
+        const {LocalNotifications}=Capacitor.Plugins;
+        const perm=await LocalNotifications.requestPermissions();
+        return perm.display==="granted";
+      }catch(e){return false;}
+    },
+    async schedule(id,title,body,atMs){
+      try{
+        const {LocalNotifications}=Capacitor.Plugins;
+        await LocalNotifications.schedule({notifications:[{
+          id,title,body,
+          schedule:{at:new Date(atMs)},
+          smallIcon:"ic_stat_icon_config_sample",
+        }]});
+      }catch(e){console.warn("通知エラー:",e);}
+    },
+    async cancel(ids){
+      try{
+        const {LocalNotifications}=Capacitor.Plugins;
+        await LocalNotifications.cancel({notifications:ids.map(id=>({id}))});
+      }catch(e){}
+    },
+    isCapacitor(){return typeof Capacitor!=="undefined"&&Capacitor.isNativePlatform?.();},
+  async checkPermission(){
+    try{
+      const {LocalNotifications}=Capacitor.Plugins;
+      const r=await LocalNotifications.checkPermissions();
+      return r.display==="granted";
+    }catch(e){return false;}
+  },
+  async openSettings(){
+    try{
+      await Capacitor.Plugins.App.openUrl({url:"app-settings:"});
+    }catch(e){console.warn("設定を開けません",e);}
+  }
+  };
+  </script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { overflow: hidden; }
@@ -317,6 +358,56 @@ function playAlarmSound(soundId){
         play(880,"sine",0,0.2);
     }
   } catch(e){ console.warn("Audio error:", e); }
+}
+
+
+
+// 通知許可チェック（ONにした時だけ呼ぶ）
+async function ensureNotifPermission(){
+  if(!Notif.isCapacitor()) return true;
+  const granted = await Notif.checkPermission();
+  if(!granted){
+    await Notif.openSettings();
+    return false;
+  }
+  return true;
+}
+
+// ── NOTIFICATION SCHEDULER ───────────────────────────────────────────────────
+function scheduleExchangeNotif(state){
+  if(!Notif.isCapacitor()) return;
+  if(!state.settings?.reminderExchange) return;
+  if(!state.nextExchangeDate) return;
+  Notif.cancel([2001]);
+  const hour = state.exchangeNotifyHour??9;
+  const before = state.notifyBefore??1440; // 分（0=当日、1440=前日、2880=2日前）
+  const exchDate = new Date(state.nextExchangeDate+"T"+String(hour).padStart(2,"0")+":00:00");
+  // 通知日時 = 交換日のhour時 - before分（beforeが0なら当日、1440なら前日）
+  const notifMs = exchDate.getTime() - before*60000;
+  if(notifMs > Date.now()){
+    const msg = before===0 ? "今日は交換日です！" : before===1440 ? "明日は交換日です！" : `${before/1440}日後に交換日があります`;
+    Notif.schedule(2001,"💎 マウスピース交換",msg,notifMs);
+  }
+}
+
+function schedulePhotoNotif(state){
+  if(!Notif.isCapacitor()) return;
+  if(!state.settings?.reminderPhoto) return;
+  Notif.cancel([3001]);
+  const hour = state.photoNotifyHour??9;
+  const now = new Date();
+  // 翌週の指定曜日 or 交換日
+  let target;
+  if(state.photoReminderMode==="exchange"&&state.nextExchangeDate){
+    target = new Date(state.nextExchangeDate+"T"+String(hour).padStart(2,"0")+":00:00");
+  } else {
+    const day = state.photoReminderDay??0;
+    target = new Date();
+    target.setHours(hour,0,0,0);
+    const diff=(day-now.getDay()+7)%7||7;
+    target.setDate(target.getDate()+diff);
+  }
+  if(target>now) Notif.schedule(3001,"📸 写真リマインダー","矯正の経過写真を撮りましょう！",target.getTime());
 }
 
 // ── ICONS ────────────────────────────────────────────────────────────────────
@@ -1149,9 +1240,11 @@ function NotifyModal({T,state,onSave,onClose}){
       <div className="md" onClick={e=>e.stopPropagation()}>
         <div className="mdtitle">通知設定</div>
 
+
+
         {/* 交換リマインダー */}
         <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif",marginBottom:8}}>交換リマインダー</div>
-        <Toggle T={T} on={!!sf.reminderExchange} label="交換リマインダー" onToggle={()=>setSf(s=>({...s,reminderExchange:!s.reminderExchange}))}/>
+        <Toggle T={T} on={!!sf.reminderExchange} label="交換リマインダー" onToggle={async()=>{if(!sf.reminderExchange){const ok=await ensureNotifPermission();if(!ok)return;}setSf(s=>({...s,reminderExchange:!s.reminderExchange}));}}/>
         {sf.reminderExchange&&expandBox(
           <div>
             <div style={{fontSize:11,color:T.text+"77",marginBottom:10}}>通知タイミング・時間</div>
@@ -1168,7 +1261,7 @@ function NotifyModal({T,state,onSave,onClose}){
 
         {/* 写真リマインダー */}
         {sec("写真リマインダー")}
-        <Toggle T={T} on={!!sf.reminderPhoto} label="写真リマインダー" onToggle={()=>setSf(s=>({...s,reminderPhoto:!s.reminderPhoto}))}/>
+        <Toggle T={T} on={!!sf.reminderPhoto} label="写真リマインダー" onToggle={async()=>{if(!sf.reminderPhoto){const ok=await ensureNotifPermission();if(!ok)return;}setSf(s=>({...s,reminderPhoto:!s.reminderPhoto}));}}/>
         {sf.reminderPhoto&&expandBox(
           <div>
             <div style={{fontSize:11,color:T.text+"77",marginBottom:10}}>通知タイミング・時間</div>
@@ -1187,7 +1280,7 @@ function NotifyModal({T,state,onSave,onClose}){
 
         {/* タイマー放置防止 */}
         {sec("タイマー放置防止アラート")}
-        <Toggle T={T} on={f.forgetTimerAlert} label="放置防止アラートを使う" onToggle={()=>setF(x=>({...x,forgetTimerAlert:!x.forgetTimerAlert}))}/>
+        <Toggle T={T} on={f.forgetTimerAlert} label="放置防止アラートを使う" onToggle={async()=>{if(!f.forgetTimerAlert){const ok=await ensureNotifPermission();if(!ok)return;}setF(x=>({...x,forgetTimerAlert:!x.forgetTimerAlert}));}}/>
         {f.forgetTimerAlert&&expandBox(
           <div style={{display:"flex",alignItems:"center",gap:8}}>
             <span style={{fontSize:13,color:T.text+"88",flexShrink:0}}>取り外し中が</span>
@@ -2213,6 +2306,7 @@ function PhotoPage({T,state,update,todayStr}){
   const [stream,setStream]=useState(null);
   const [captured,setCaptured]=useState(null);
   const [capComment,setCapComment]=useState("");
+  const [capPiece,setCapPiece]=useState(state.currentPiece||null);
   const [filter,setFilter]=useState("all");
   const [unlocked,setUnlocked]=useState(false);
   const [showSlot2Gate,setShowSlot2Gate]=useState(false);
@@ -2227,6 +2321,7 @@ function PhotoPage({T,state,update,todayStr}){
   const [editDate,setEditDate]=useState("");
   const [editPiece,setEditPiece]=useState(1);
   const [viewPhoto,setViewPhoto]=useState(null);
+  const [deleteConfirmId,setDeleteConfirmId]=useState(null);
   const [overlayOpacity,setOverlayOpacity]=useState(0.35);
   const [showOverlay,setShowOverlay]=useState(true);
   const [showGuide,setShowGuide]=useState(true);
@@ -2263,7 +2358,7 @@ function PhotoPage({T,state,update,todayStr}){
 
   const openCam=async shotModeId=>{
     setCameraMode(shotModeId);
-    setCaptured(null);setCapComment("");
+    setCaptured(null);setCapComment("");setCapPiece(null);
     setShowColorPanel(false);setBrightness(50);setSaturation(50);
     setLiveZoom(1);
     setCameraOpen(true);
@@ -2276,7 +2371,7 @@ function PhotoPage({T,state,update,todayStr}){
 
   const closeCam=()=>{
     if(stream)stream.getTracks().forEach(t=>t.stop());
-    setStream(null);setCameraOpen(false);setCaptured(null);setCapComment("");
+    setStream(null);setCameraOpen(false);setCaptured(null);setCapComment("");setCapPiece(null);
     setShowColorPanel(false);setBrightness(50);setSaturation(50);setLiveZoom(1);
   };
 
@@ -2301,7 +2396,7 @@ function PhotoPage({T,state,update,todayStr}){
     const zoomedH=Math.round(baseSh/liveZoom);
     const sx=baseSx+Math.round((baseSw-zoomedW)/2);
     const sy=baseSy+Math.round((baseSh-zoomedH)/2);
-    const MAX_PX=1200;
+    const MAX_PX=800;
     const scale=Math.min(1,MAX_PX/Math.max(zoomedW,zoomedH));
     const outW=Math.round(zoomedW*scale);
     const outH=Math.round(zoomedH*scale);
@@ -2328,7 +2423,7 @@ function PhotoPage({T,state,update,todayStr}){
     update({photos:[...(state.photos||[]),{
       id:Date.now(),data:captured,mode:legacyMode,
       shotMode:cameraMode,shotLabel:modeInfo.labelJP,
-      piece:state.currentPiece,date:todayStr,
+      piece:capPiece||null,date:todayStr,
       comment:capComment,timestamp:Date.now()
     }]});
     closeCam();
@@ -2471,10 +2566,22 @@ function PhotoPage({T,state,update,todayStr}){
                       <rect width="100%" height="100%" fill="url(#wm-grid)"/>
                     </svg>}
                     <div style={{position:"absolute",bottom:0,left:0,right:0,background:"linear-gradient(transparent,rgba(0,0,0,0.72))",padding:"14px 8px 8px",pointerEvents:"none"}}>
-                      <div style={{color:"#fff",fontSize:11}}>#{p.piece} · {p.shotLabel||p.mode}</div>
+                      <div style={{color:"#fff",fontSize:11}}>{p.piece?"#"+p.piece:"ー"} · {p.shotLabel||p.mode}</div>
                       <div style={{color:"#ffffffbb",fontSize:11}}>{p.date}</div>
                       {p.comment&&<div style={{color:"#ffffffaa",fontSize:11,marginTop:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.comment}</div>}
                     </div>
+                    {!compareMode&&(
+                      <>
+                        <button onClick={e=>{e.stopPropagation();setEditId(p.id);setEditComment(p.comment||"");setEditDate(p.date||"");setEditPiece(p.piece||1);}}
+                          style={{position:"absolute",top:6,right:6,width:28,height:28,borderRadius:8,background:"rgba(0,0,0,0.5)",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",zIndex:2}}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </button>
+                        <button onClick={e=>{e.stopPropagation();setDeleteConfirmId(p.id);}}
+                          style={{position:"absolute",bottom:6,right:6,width:28,height:28,borderRadius:8,background:"rgba(0,0,0,0.5)",border:"none",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",zIndex:2}}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                        </button>
+                      </>
+                    )}
                   </div>
                 );
               });
@@ -2594,7 +2701,13 @@ function PhotoPage({T,state,update,todayStr}){
                 <img src={captured} alt="" style={{maxWidth:"100%",maxHeight:"100%",objectFit:"contain"}}/>
               </div>
               <div style={{padding:14,background:"#111",flexShrink:0}}>
-                <input value={capComment} onChange={e=>setCapComment(e.target.value)} placeholder="コメントを入力…" style={{background:"#222",color:"#fff",border:"1px solid #444",borderRadius:10,marginBottom:10}}/>
+                <input value={capComment} onChange={e=>setCapComment(e.target.value)} placeholder="コメントを入力…" style={{background:"#222",color:"#fff",border:"1px solid #444",borderRadius:10,marginBottom:6}}/>
+                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+                  <span style={{color:"#aaa",fontSize:13,flexShrink:0}}># マウスピース番号</span>
+                  <input type="number" min={1} max={100} value={capPiece||""} placeholder="ー"
+                    onChange={e=>setCapPiece(e.target.value?parseInt(e.target.value):null)}
+                    style={{background:"#222",color:"#fff",border:"1px solid #444",borderRadius:10,width:80,textAlign:"center"}}/>
+                </div>
                 <div style={{display:"flex",gap:8}}>
                   <button className="btn bs" style={{flex:1}} onClick={()=>{setCaptured(null);openCam(cameraMode);}}>撮り直し</button>
                   <button className="btn bp" style={{flex:1}} onClick={savePhoto}>保存</button>
@@ -2607,10 +2720,7 @@ function PhotoPage({T,state,update,todayStr}){
       )}
 
       {/* 写真ビューアー（スワイプ・スライドショー・動画保存） */}
-      {viewPhoto&&<PhotoViewer T={T} photos={filtered} initialId={viewPhoto.id} onClose={()=>setViewPhoto(null)} onEdit={(p)=>{setEditId(p.id);setEditComment(p.comment||"");setEditDate(p.date||"");setEditPiece(p.piece||1);setViewPhoto(null);}}/>
-      }{compareView&&<PhotoCompare T={T} a={compareView.a} b={compareView.b} onClose={()=>setCompareView(null)}/>}
-      {showComparePreview&&<ComparePreviewModal T={T} onClose={()=>setShowComparePreview(false)}/>}
-
+      {viewPhoto&&<PhotoViewer T={T} photos={filtered} initialId={viewPhoto.id} onClose={()=>setViewPhoto(null)}/>}
       {editId&&(
         <div className="mo" onClick={()=>setEditId(null)}>
           <div className="md" onClick={e=>e.stopPropagation()}>
@@ -2642,7 +2752,21 @@ function PhotoPage({T,state,update,todayStr}){
               <button className="btn bs" style={{flex:1}} onClick={()=>setEditId(null)}>キャンセル</button>
               <button className="btn bp" style={{flex:1}} onClick={()=>{update({photos:state.photos.map(p=>p.id===editId?{...p,comment:editComment,date:editDate,piece:editPiece}:p)});setEditId(null);}}>保存</button>
             </div>
-            <button style={{width:"100%",padding:"10px",border:"none",borderRadius:10,background:"#FFF0F0",color:"#E74C3C",cursor:"pointer",fontWeight:600,fontFamily:"'M PLUS Rounded 1c',sans-serif"}} onClick={()=>{update({photos:state.photos.filter(p=>p.id!==editId)});setEditId(null);}}>削除</button>
+
+          </div>
+        </div>
+      )}
+      {deleteConfirmId&&(
+        <div className="mo" onClick={()=>setDeleteConfirmId(null)}>
+          <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center"}}>
+            <div style={{fontSize:32,marginBottom:8}}>🗑</div>
+            <div className="mdtitle" style={{marginBottom:8}}>写真を削除</div>
+            <div style={{fontSize:14,color:T.text+"88",marginBottom:20}}>この写真を削除しますか？<br/>削除すると元に戻せません。</div>
+            <div style={{display:"flex",gap:8}}>
+              <button className="btn bs" style={{flex:1}} onClick={()=>setDeleteConfirmId(null)}>キャンセル</button>
+              <button style={{flex:1,padding:"10px",border:"none",borderRadius:12,background:"#E74C3C",color:"#fff",fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16}}
+                onClick={()=>{update({photos:state.photos.filter(p=>p.id!==deleteConfirmId)});setDeleteConfirmId(null);}}>削除する</button>
+            </div>
           </div>
         </div>
       )}
@@ -3185,10 +3309,6 @@ function PhotoViewer({T,photos,initialId,onClose,onEdit,state}){
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
         <span style={{color:"#fff",fontSize:12,fontWeight:600}}>{photo.shotLabel||photo.mode} · {photo.date} ({idx+1}/{photos.length})</span>
-        {/* ✏ 編集 */}
-        <button onTouchEnd={e=>{e.stopPropagation();e.preventDefault();onEdit(photo);}} onClick={e=>{e.stopPropagation();onEdit(photo);}} style={btnStyle(false)}>
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        </button>
       </div>
 
       {/* 写真エリア */}
@@ -3400,7 +3520,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
             <span style={{fontFamily:"'Outfit',sans-serif",fontWeight:700,fontSize:17,color:T.accent,minWidth:28,textAlign:"center"}}>{state.alarmMinutes||30}</span>
             <span style={{fontSize:13,color:T.text+"77"}}>分</span>
             <button className="btn bs bsm" style={{padding:"3px 10px",fontSize:16}} onClick={()=>update({alarmMinutes:Math.min(180,(state.alarmMinutes||30)+5)})}>＋</button>
-            <button className="tg" style={{background:state.alarmEnabled?T.accent:T.soft+"aa"}} onClick={()=>update({alarmEnabled:!state.alarmEnabled})}>
+            <button className="tg" style={{background:state.alarmEnabled?T.accent:T.soft+"aa"}} onClick={async()=>{if(!state.alarmEnabled){const ok=await ensureNotifPermission();if(!ok)return;}update({alarmEnabled:!state.alarmEnabled});}}>
               <div className="tg-k" style={{left:state.alarmEnabled?22:2}}/>
             </button>
           </div>
@@ -4114,12 +4234,18 @@ function App(){
     });
   },[]);
 
+  useEffect(()=>{scheduleExchangeNotif(state);schedulePhotoNotif(state);},[]);
+
   const update=useCallback(patch=>setState(s=>({...s,...patch})),[]);
   const T=THEMES[state.themeName]||THEMES.blush||Object.values(THEMES)[0];
 
   // オンボーディング完了処理
-  const handleOnboardingComplete=useCallback((settings)=>{
+  const handleOnboardingComplete=useCallback(async(settings)=>{
     update({...settings,onboardingDone:true});
+    // オンボーディング完了時に通知許可を一度だけ求める
+    if(Notif.isCapacitor()){
+      await Notif.requestPermission();
+    }
   },[update]);
 
   // 止め忘れダイアログ
@@ -4202,7 +4328,24 @@ function App(){
   // handleRemoveButton — runningMsをここで計算しない（コンポーネント側で持つ）
   const handleRemoveButton=useCallback((runningMs)=>{
     if(!state.timerRunning){
-      update({timerRunning:true,timerStart:Date.now(),timerElapsed:0});
+      const startMs=Date.now();
+      update({timerRunning:true,timerStart:startMs,timerElapsed:0});
+      // アラーム通知予約（Capacitor）
+      if(Notif.isCapacitor()&&state.alarmEnabled){
+        const mins=state.alarmMinutes||30;
+        Notif.cancel([1001]);
+        Notif.schedule(1001,"⏰ アラーム",`取り外しから${mins}分が経過しました`,startMs+mins*60000);
+      }
+      // 放置防止アラート通知予約（設定した時間から1時間おき・最大12本）
+      if(Notif.isCapacitor()&&state.forgetTimerAlert){
+        const hrs=state.forgetTimerHours||4;
+        const ids=Array.from({length:12},(_,i)=>1002+i);
+        Notif.cancel(ids);
+        for(let i=0;i<12;i++){
+          const h=hrs+i;
+          Notif.schedule(1002+i,"⚠️ タイマー放置防止",`取り外し中のタイマーが${h}時間を超えています`,startMs+h*3600000);
+        }
+      }
     } else {
       const endTime=Date.now(),startTime=state.timerStart||endTime;
       const cappedMs=Math.min(runningMs,86400000);
@@ -4212,6 +4355,8 @@ function App(){
       const dailyLog={...(state.dailyWearLog||{})};
       dailyLog[todayStr]=Math.max(0,86400-Math.floor(newRemovedMs/1000));
       update({timerRunning:false,timerStart:null,timerElapsed:0,timerSessions:allSess,dailyWearLog:dailyLog,_pendingReason:null});
+      // 通知キャンセル
+      if(Notif.isCapacitor()) Notif.cancel([1001,...Array.from({length:12},(_,i)=>1002+i)]);
     }
   },[state,todayStr,todayDayStartMs,todayDayEndMs,update]);
 
@@ -4258,7 +4403,7 @@ function App(){
       {drawerSection==="settings"     &&<SettingsModal T={T} state={state} onSave={(sf,th,sd,tp)=>update({settings:sf,targetWearHours:th,startDate:sd,totalPieces:tp})} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="schedule"     &&<ScheduleModal T={T} state={state} update={update} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="backup"       &&<BackupModal T={T} state={state} onImport={s=>setState(s)} onClose={()=>setDrawerSection(null)}/>}
-      {drawerSection==="notify"       &&<NotifyModal T={T} state={state} onSave={f=>update(f)} onClose={()=>setDrawerSection(null)}/>}
+      {drawerSection==="notify"       &&<NotifyModal T={T} state={state} onSave={f=>{update(f);setTimeout(()=>scheduleExchangeNotif({...state,...f}),500);schedulePhotoNotif({...state,...f});}} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="timerSettings"&&<TimerSettingsModal T={T} state={state} onSave={f=>update(f)} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="cameraSettings"&&<CameraSettingsModal T={T} state={state} onSave={f=>update(f)} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="premium"&&<PremiumModal T={T} state={state} onClose={()=>setDrawerSection(null)}/>}
