@@ -1,9 +1,11 @@
+const { useState, useEffect, useRef, useCallback } = React;
 // ── STORAGE LAYER ─────────────────────────────────────────────────────────────
 const LS_KEY = "smiletrack_v1";
 const IDB_NAME = "SmileTrackDB";
 const IDB_STORE = "photos";
 const IDB_VERSION = 1;
 
+// IndexedDB: 写真データ専用（大容量）
 function openIDB(){
   return new Promise((resolve,reject)=>{
     const req=indexedDB.open(IDB_NAME,IDB_VERSION);
@@ -21,6 +23,7 @@ function openIDB(){
 async function idbSavePhotos(photos){
   try{
     const db=await openIDB();
+    // 既存のIDを取得
     const existing=await new Promise((res,rej)=>{
       const tx=db.transaction(IDB_STORE,"readonly");
       const req=tx.objectStore(IDB_STORE).getAllKeys();
@@ -31,7 +34,9 @@ async function idbSavePhotos(photos){
     const existingIds=new Set(existing);
     const tx=db.transaction(IDB_STORE,"readwrite");
     const store=tx.objectStore(IDB_STORE);
+    // 削除: 新しいリストにないIDだけ消す
     existing.forEach(id=>{ if(!newIds.has(id)) store.delete(id); });
+    // 追加・更新: 既存にないものだけput（既存は変わらないので触らない）
     photos.forEach(p=>{ if(p.data&&!existingIds.has(p.id)) store.put(p); });
     return new Promise((res,rej)=>{tx.oncomplete=res;tx.onerror=()=>rej(tx.error);});
   }catch(e){console.warn("IDB save failed",e);}
@@ -49,8 +54,10 @@ async function idbLoadPhotos(){
   }catch(e){console.warn("IDB load failed",e);return[];}
 }
 
+// localStorage: 写真data以外の全state
 function lsSave(state){
   try{
+    // photosのdataフィールドを除外して保存（dataはIndexedDBへ）
     const toSave={
       ...state,
       photos:(state.photos||[]).map(p=>({...p,data:undefined}))
@@ -65,3 +72,4 @@ function lsLoad(){
     return raw?JSON.parse(raw):null;
   }catch(e){console.warn("localStorage load failed",e);return null;}
 }
+

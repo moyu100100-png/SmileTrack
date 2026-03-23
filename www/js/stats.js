@@ -323,6 +323,3 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
   );
 }
 
-// ── ONBOARDING ───────────────────────────────────────────────────────────────
-// ── ONBOARDING DATE PICKER (ネイティブカレンダー) ──────────────────────────
-function ObDatePicker({value,onChange,T}){

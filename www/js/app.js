@@ -1,3 +1,6 @@
+// ── ONBOARDING ───────────────────────────────────────────────────────────────
+// ── ONBOARDING DATE PICKER (ネイティブカレンダー) ──────────────────────────
+function ObDatePicker({value,onChange,T}){
   const today=new Date();
   const display=value
     ? value.replace(/-/g,"－")
@@ -425,5 +428,3 @@ function App(){
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(React.createElement(App));
-  </script>
-</body>
