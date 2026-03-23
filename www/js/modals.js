@@ -3,7 +3,7 @@ function HomePreviewModal({T,themeName,themeObj,onClose}){
   return(
     <div className="mo" onClick={onClose}>
       <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center"}}>
-        <div style={{fontFamily:"'Outfit',sans-serif",fontSize:15,fontWeight:700,color:T.primary,marginBottom:4}}>
+        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:15,fontWeight:700,color:T.primary,marginBottom:4}}>
           プレビュー
         </div>
         <div style={{fontSize:12,color:T.text+"88",marginBottom:14}}>このテーマのホーム画面イメージです</div>
@@ -36,10 +36,10 @@ function AboutModal({T,onClose}){
   const starIcon=<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>;
   const shareIcon=<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>;
   const Row=({icon,label,onClick})=>(
-    <div onClick={onClick} style={{display:"flex",alignItems:"center",gap:14,padding:"13px 4px",borderBottom:`1px solid ${T.soft}`,cursor:"pointer"}}>
-      <span style={{flexShrink:0}}>{icon}</span>
-      <span style={{fontSize:14,color:T.text,flex:1}}>{label}</span>
-      <span style={{fontSize:12,color:T.text+"33"}}>›</span>
+    <div onClick={onClick} style={{display:"flex",alignItems:"center",gap:14,padding:"14px 8px",borderBottom:`1px solid ${T.soft}`,cursor:"pointer",width:"100%",boxSizing:"border-box"}}>
+      <span style={{flexShrink:0,width:22,display:"flex",justifyContent:"center"}}>{icon}</span>
+      <span style={{fontSize:15,color:T.text,flex:1}}>{label}</span>
+      <span style={{fontSize:14,color:T.text+"44",flexShrink:0}}>›</span>
     </div>
   );
   return(
@@ -71,7 +71,7 @@ function PremiumModal({T,state,onClose,showCoffee=false}){
     <div className="mo" onClick={onClose}>
       <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center"}}>
         <div style={{fontSize:40,marginBottom:8}}>☕</div>
-        <div style={{fontFamily:"'Outfit',sans-serif",fontSize:16,fontWeight:700,color:T.primary,marginBottom:6}}>開発者にコーヒーを差し入れ</div>
+        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16,fontWeight:700,color:T.primary,marginBottom:6}}>開発者にコーヒーを差し入れ</div>
         <div style={{fontSize:13,color:T.text+"88",marginBottom:20}}>¥200 · 開発継続の大きな励みになります</div>
         <button className="btn bp" style={{width:"100%",marginBottom:8}} onClick={()=>setThankYou(true)}>差し入れる ☕ ¥200</button>
         <button className="btn bs" style={{width:"100%"}} onClick={onClose}>閉じる</button>
@@ -91,7 +91,7 @@ function PremiumModal({T,state,onClose,showCoffee=false}){
     <div className="mo" onClick={onClose}>
       <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center",padding:"32px 20px"}}>
         <div style={{fontSize:48,marginBottom:12}}>☕</div>
-        <div style={{fontFamily:"'Outfit',sans-serif",fontSize:20,fontWeight:700,color:T.primary,marginBottom:8}}>ありがとうございます！</div>
+        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:20,fontWeight:700,color:T.primary,marginBottom:8}}>ありがとうございます！</div>
         <div style={{fontSize:14,color:T.text+"88",lineHeight:1.8,marginBottom:24}}>
           コーヒーの差し入れ、とても嬉しいです。<br/>開発の大きな励みになります✨
         </div>
@@ -104,7 +104,7 @@ function PremiumModal({T,state,onClose,showCoffee=false}){
     <div className="mo" onClick={onClose}>
       <div className="md" onClick={e=>e.stopPropagation()}>
         <div style={{textAlign:"center",marginBottom:16}}>
-          <div style={{fontFamily:"'Outfit',sans-serif",fontSize:18,fontWeight:700,color:T.primary,marginBottom:4}}>SmileTrack プレミアム</div>
+          <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:700,color:T.primary,marginBottom:4}}>SmileTrack プレミアム</div>
           <div style={{fontSize:12,color:T.text+"88"}}>矯正記録をもっと便利に、もっと楽しく</div>
         </div>
 
@@ -129,7 +129,7 @@ function PremiumModal({T,state,onClose,showCoffee=false}){
                   <div style={{fontSize:11,color:T.text+"66",marginTop:2}}>{p.desc}</div>
                 </div>
                 <div style={{textAlign:"right",flexShrink:0}}>
-                  <div style={{fontFamily:"'Outfit',sans-serif",fontSize:18,fontWeight:700,color:p.badge?T.primary:T.text}}>{p.price}</div>
+                  <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:700,color:p.badge?T.primary:T.text}}>{p.price}</div>
                   <div style={{fontSize:10,color:T.text+"55"}}>{p.sub}</div>
                 </div>
               </div>
@@ -147,7 +147,7 @@ function PremiumModal({T,state,onClose,showCoffee=false}){
                 <div style={{fontSize:14,fontWeight:600,color:T.text}}>{p.label}</div>
                 <div style={{fontSize:11,color:T.text+"66",marginTop:2}}>{p.desc}</div>
               </div>
-              <div style={{fontFamily:"'Outfit',sans-serif",fontSize:16,fontWeight:700,color:T.text,flexShrink:0}}>{p.price}</div>
+              <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16,fontWeight:700,color:T.text,flexShrink:0}}>{p.price}</div>
             </div>
           ))}
         </div>
@@ -369,12 +369,16 @@ function TimerSettingsModal({T,state,onSave,onClose}){
                 <div style={{display:"flex",flexDirection:"column",gap:4,marginTop:6}}>
                   {ALARM_SOUNDS.map(s=>(
                     <div key={s.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 12px",borderRadius:10,background:alarmSound===s.id?T.soft:"transparent",border:`1.5px solid ${alarmSound===s.id?T.primary:T.soft}`,cursor:"pointer"}}
-                      onClick={()=>{setAlarmSound(s.id);playAlarmSound(s.id);setSoundOpen(false);}}>
-                      <div>
+                      onClick={()=>{setAlarmSound(s.id);setSoundOpen(false);}}>
+                      <div style={{flex:1}}>
                         <div style={{fontSize:13,fontWeight:600,color:alarmSound===s.id?T.primary:T.text}}>{s.label}</div>
                         <div style={{fontSize:11,color:T.text+"66"}}>{s.desc}</div>
                       </div>
-                      {alarmSound===s.id&&<div style={{width:8,height:8,borderRadius:"50%",background:T.primary,flexShrink:0}}/>}
+                      <button
+                        onClick={e=>{e.stopPropagation();playAlarmSound(s.id);}}
+                        style={{background:T.primary,border:"none",borderRadius:20,width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,marginLeft:8}}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><polygon points="5,3 19,12 5,21"/></svg>
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -476,7 +480,7 @@ function ScheduleModal({T,state,update,onClose}){
             <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginTop:6}}>
               <div style={{display:"flex",alignItems:"center",gap:6}}>
                 <button className="btn bs bsm" style={{fontSize:16,padding:"3px 12px",minWidth:32}} onClick={()=>setTempExtraCount(v=>Math.max(0,v-1))}>－</button>
-                <span style={{fontFamily:"'Outfit',sans-serif",fontSize:18,fontWeight:700,color:T.primary,minWidth:28,textAlign:"center"}}>{tempExtraCount}</span>
+                <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:700,color:T.primary,minWidth:28,textAlign:"center"}}>{tempExtraCount}</span>
                 <span style={{fontSize:13,color:T.text+"77"}}>枚</span>
                 <button className="btn bs bsm" style={{fontSize:16,padding:"3px 12px",minWidth:32}} onClick={()=>setTempExtraCount(v=>v+1)}>＋</button>
               </div>
@@ -628,7 +632,7 @@ function NotifyModal({T,state,onSave,onClose}){
           <div style={{display:"flex",alignItems:"center",gap:8}}>
             <span style={{fontSize:13,color:T.text+"88",flexShrink:0}}>取り外し中が</span>
             <button className="btn bs bsm" style={{padding:"2px 10px",fontSize:16}} onClick={()=>setF(x=>({...x,forgetTimerHours:Math.max(1,x.forgetTimerHours-1)}))}>－</button>
-            <span style={{fontFamily:"'Outfit',sans-serif",fontSize:18,fontWeight:700,color:T.primary,minWidth:24,textAlign:"center"}}>{f.forgetTimerHours}</span>
+            <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:700,color:T.primary,minWidth:24,textAlign:"center"}}>{f.forgetTimerHours}</span>
             <button className="btn bs bsm" style={{padding:"2px 10px",fontSize:16}} onClick={()=>setF(x=>({...x,forgetTimerHours:Math.min(24,x.forgetTimerHours+1)}))}>＋</button>
             <span style={{fontSize:13,color:T.text+"88",flexShrink:0}}>時間超えたら1時間おき</span>
           </div>
@@ -803,7 +807,7 @@ function ResetConfirmModal({T,onConfirm,onCancel}){
     <div className="mo" onClick={onCancel}>
       <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center"}}>
         <div style={{fontSize:36,marginBottom:8}}>⚠️</div>
-        <div style={{fontFamily:"'Outfit',sans-serif",fontSize:17,fontWeight:700,color:"#E74C3C",marginBottom:8}}>本当にリセットしますか？</div>
+        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:17,fontWeight:700,color:"#E74C3C",marginBottom:8}}>本当にリセットしますか？</div>
         <div style={{fontSize:15,color:T.text+"88",marginBottom:20,lineHeight:1.7}}>すべてのデータが完全に削除されます。<br/>この操作は元に戻せません。</div>
         <div style={{display:"flex",gap:10}}>
           <button className="btn bs blg" style={{flex:1}} onClick={onCancel}>戻る</button>

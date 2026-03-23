@@ -32,7 +32,9 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
     (s.start>=todayDayStartMs&&s.start<todayDayEndMs)||(!s.start&&s.day===todayStr)
   );
   const fmtTime=ts=>{const d=new Date(ts);return`${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;};
-  const sz=190,stk=14,rad=(sz-stk)/2,cir=2*Math.PI*rad;
+  const WIN_W=typeof window!=="undefined"?window.innerWidth:390;
+  const sz=Math.min(Math.round(WIN_W*0.72),280),stk=Math.round(sz*.084),rad=(sz-stk)/2,cir=2*Math.PI*rad;
+  const centerFontSize=Math.round(sz*.13);
   const targetSecs=(state.targetWearHours||22)*3600;
   const expectedWear=Math.max(0,86400-totalRemovedSec);
 
@@ -99,20 +101,19 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
               <circle cx={sz/2} cy={sz/2} r={rad} fill="none" stroke={isAlarm?(["atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"].includes(state.themeName)?(state.themeName==="atrium"?"#5A452C":T.soft):"#E74C3C"):T.primary} strokeWidth={stk}
                 strokeDasharray={cir} strokeDashoffset={cir*(1-cycleProgress)} strokeLinecap="round" style={{transition:"stroke-dashoffset .5s"}}/>
             </svg>
-            <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:1}}>
+            <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2}}>
               {timerRunning&&showBreakdown&&state._pendingReason&&(
                 <div style={{fontSize:17,color:T.accent,fontWeight:700,marginBottom:2}}>{state._pendingReason}</div>
               )}
-              <div style={{fontFamily:"'Outfit',sans-serif",fontSize:34,fontWeight:700,color:isAlarm?(["atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"].includes(state.themeName)?(state.themeName==="atrium"?"#5A452C":T.soft):"#E74C3C"):T.primary,lineHeight:1}}>{fmt(currentSec)}</div>
-              <div style={{fontSize:13,color:T.text+"66",marginTop:4}}>合計</div>
-              <div style={{fontFamily:"'Outfit',sans-serif",fontSize:32,fontWeight:600,color:T.text+"77",lineHeight:1}}>{fmt(totalRemovedSec)}</div>
-              
+              <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:centerFontSize,fontWeight:700,color:isAlarm?(["atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"].includes(state.themeName)?(state.themeName==="atrium"?"#5A452C":T.soft):"#E74C3C"):T.primary,lineHeight:1}}>{fmt(currentSec)}</div>
+              <div style={{fontSize:Math.round(centerFontSize*.38),color:T.text+"66",marginTop:4}}>取り外し合計時間</div>
+              <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:Math.round(centerFontSize*.82),fontWeight:600,color:T.text+"77",lineHeight:1}}>{fmt(totalRemovedSec)}</div>
             </div>
           </div>
         </div>
         <div style={{textAlign:"center",marginBottom:10}}>
           <div style={{fontSize:15,color:T.text+"88"}}>本日の装着予定時間</div>
-          <div style={{fontFamily:"'Outfit',sans-serif",fontSize:22,fontWeight:700,color:T.primary}}>{fmt(expectedWear)}</div>
+          <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:22,fontWeight:700,color:T.primary}}>{fmt(expectedWear)}</div>
           <div style={{fontSize:14,color:T.text+"88"}}>目標: {state.targetWearHours||22}時間以上</div>
         </div>
         <button onClick={onStartPress} style={{width:"100%",padding:"16px",border:"none",borderRadius:16,fontSize:17,fontWeight:700,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",background:timerRunning?T.accent:T.primary,color:"#fff",marginBottom:10}}>
@@ -124,7 +125,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
           <span style={{fontSize:15,fontWeight:700,color:T.accent}}>アラーム</span>
           <div style={{display:"flex",alignItems:"center",gap:8}}>
             <button className="btn bs bsm" style={{padding:"3px 10px",fontSize:16}} onClick={()=>update({alarmMinutes:Math.max(5,(state.alarmMinutes||30)-5)})}>－</button>
-            <span style={{fontFamily:"'Outfit',sans-serif",fontWeight:700,fontSize:17,color:T.accent,minWidth:28,textAlign:"center"}}>{state.alarmMinutes||30}</span>
+            <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,fontSize:17,color:T.accent,minWidth:28,textAlign:"center"}}>{state.alarmMinutes||30}</span>
             <span style={{fontSize:13,color:T.text+"77"}}>分</span>
             <button className="btn bs bsm" style={{padding:"3px 10px",fontSize:16}} onClick={()=>update({alarmMinutes:Math.min(180,(state.alarmMinutes||30)+5)})}>＋</button>
             <button className="tg" style={{background:state.alarmEnabled?T.accent:T.soft+"aa"}} onClick={async()=>{if(!state.alarmEnabled){const ok=await ensureNotifPermission();if(!ok)return;}update({alarmEnabled:!state.alarmEnabled});}}>
@@ -200,7 +201,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
                   )}
                   {!isEdit?(
                     /* 通常表示行 */
-                    <div style={{display:'flex',alignItems:'center',minHeight:28,padding:'0 8px',gap:4,cursor:'pointer'}}
+                    <div style={{display:'flex',alignItems:'center',minHeight:38,padding:'0 8px',gap:4,cursor:'pointer'}}
                       onClick={()=>{
                         setTimerEditId(s.id);setTimerEditVal(durStrHHMM);setTimerEditComment(s.comment||'');
                         setTimerEditRangeFrom(hasRange?fmtTime(s.start):'');
@@ -222,7 +223,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
                     </div>
                   ):(
                     /* 編集行 */
-                    <div style={{display:'flex',alignItems:'center',minHeight:28,padding:'0 8px',gap:4,background:T.card+'cc'}}>
+                    <div style={{display:'flex',alignItems:'center',minHeight:38,padding:'0 8px',gap:4,background:T.card+'cc'}}>
                       {showBreakdown&&<span style={{...reasonLabel,color:displayReason?T.primary:T.text+'33'}}
                         onMouseDown={e=>{e.preventDefault();e.stopPropagation();setTimerEditField(isReasonPick?null:'reason');}}>
                         {displayReason||'ー'}
@@ -248,7 +249,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
                           }}
                           onBlur={onBlur} onFocus={onFocus}
                           onClick={e=>e.stopPropagation()}
-                          style={{...ib,width:44,fontSize:11,fontFamily:"'Outfit',sans-serif",fontWeight:600,
+                          style={{...ib,width:44,fontSize:11,fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:600,
                             color:T.text+'77',borderBottom:'1px solid '+T.text+'22',padding:'1px 0',textAlign:'center'}}/>
                         <span style={{fontSize:11,color:T.text+'33',margin:'0 1px'}}>〜</span>
                         <input type='time' value={timerEditRangeTo}
@@ -264,7 +265,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
                           }}
                           onBlur={onBlur} onFocus={onFocus}
                           onClick={e=>e.stopPropagation()}
-                          style={{...ib,width:44,fontSize:11,fontFamily:"'Outfit',sans-serif",fontWeight:600,
+                          style={{...ib,width:44,fontSize:11,fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:600,
                             color:T.text+'77',borderBottom:'1px solid '+T.text+'22',padding:'1px 0',textAlign:'center'}}/>
                       </span>}
                       <input type='text' inputMode='numeric' maxLength={5} value={timerEditVal}
@@ -273,7 +274,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
                         onBlur={onBlur}
                         onKeyDown={e=>{if(e.key==='Enter')saveTimerSess(s.id);}}
                         onClick={e=>e.stopPropagation()}
-                        style={{...ib,minWidth:52,width:52,textAlign:'right',fontFamily:"'Outfit',sans-serif",fontSize:13,
+                        style={{...ib,minWidth:52,width:52,textAlign:'right',fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:13,
                           fontWeight:700,borderBottom:'2px solid '+T.accent,color:T.accent,
                           padding:'1px 2px',flexShrink:0,marginLeft:4}}/>
                       <button style={{background:'none',border:'none',padding:'0 0 0 4px',cursor:'pointer',flexShrink:0}}

@@ -226,7 +226,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
         {[["7日平均",avg7],["30日平均",avg30]].map(([lbl,v])=>(
           <div key={lbl} style={{background:T.card,borderRadius:13,padding:"11px 14px",textAlign:"center"}}>
             <div style={{fontSize:12,color:T.text+"77",marginBottom:4}}>{lbl}</div>
-            <div style={{fontFamily:"'Outfit',sans-serif",fontSize:18,fontWeight:700,color:v>=target?T.primary:(state.themeName==="night"?"#DC2626":["atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"].includes(state.themeName)?(state.themeName==="atrium"?"#5A452C":T.soft):"#E88080")}}>{fmtHM(v)}</div>
+            <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:700,color:v>=target?T.primary:(state.themeName==="night"?"#DC2626":["atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"].includes(state.themeName)?(state.themeName==="atrium"?"#5A452C":T.soft):"#E88080")}}>{fmtHM(v)}</div>
           </div>
         ))}
       </div>
@@ -274,7 +274,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
                       <div style={{width:22,height:22,borderRadius:"50%",background:isAct?T.primary:T.soft,color:isAct?"#fff":T.text,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,flexShrink:0}}>#{label}</div>
                       <span style={{fontSize:12,color:T.text+"99",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:160}}>{rangeLabel}</span>
                     </div>
-                    <span style={{fontFamily:"'Outfit',sans-serif",fontWeight:700,color:isAct?T.primary:T.text+"88",fontSize:14,flexShrink:0}}>{fmt(total)}</span>
+                    <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,color:isAct?T.primary:T.text+"88",fontSize:14,flexShrink:0}}>{fmt(total)}</span>
                   </div>
                 );
               })}
@@ -288,7 +288,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
             <div className="mdtitle">{selectedDay}</div>
             <div style={{marginBottom:10,textAlign:"center"}}>
               <div style={{fontSize:13,color:T.text+"66",marginBottom:2}}>装着時間</div>
-              <div style={{fontFamily:"'Outfit',sans-serif",fontSize:24,fontWeight:700,color:(effectiveLog[selectedDay]||0)>=target?T.primary:(["atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"].includes(state.themeName)?(state.themeName==="atrium"?"#5A452C":T.soft):"#E88080")}}>{effectiveLog[selectedDay]?fmt(effectiveLog[selectedDay]):"記録なし"}</div>
+              <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:24,fontWeight:700,color:(effectiveLog[selectedDay]||0)>=target?T.primary:(["atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"].includes(state.themeName)?(state.themeName==="atrium"?"#5A452C":T.soft):"#E88080")}}>{effectiveLog[selectedDay]?fmt(effectiveLog[selectedDay]):"記録なし"}</div>
             </div>
             {Object.keys(dayReasons).length>0&&<>
               <div className="ct">取り外し内訳</div>
@@ -308,8 +308,9 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
       {showReportModal&&<ReportModal T={T} state={state} onClose={()=>setShowReportModal(false)}/>}
       {showReportPreview&&(
         <div className="mo" onClick={()=>setShowReportPreview(false)}>
-          <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center"}}>
-            <div style={{fontFamily:"'Outfit',sans-serif",fontSize:15,fontWeight:700,color:T.primary,marginBottom:4}}>レポートプレビュー</div>
+          <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center",position:"relative"}}>
+            <button onClick={()=>setShowReportPreview(false)} style={{position:"absolute",top:8,right:8,background:"none",border:"none",cursor:"pointer",fontSize:20,color:T.text+"66",lineHeight:1,padding:4}}>✕</button>
+            <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:15,fontWeight:700,color:T.primary,marginBottom:4}}>レポートプレビュー</div>
             <div style={{fontSize:12,color:T.text+"88",marginBottom:4}}>サンプルデータによるイメージです</div>
             <div style={{fontSize:12,color:T.accent,fontWeight:600,marginBottom:12}}>🔒 PDF出力はプレミアム機能でご利用いただけます</div>
             <div style={{borderRadius:10,overflow:"hidden",marginBottom:14,border:`1px solid ${T.soft}`,maxHeight:"60dvh",overflowY:"auto"}}>

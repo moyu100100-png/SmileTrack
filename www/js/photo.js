@@ -57,6 +57,13 @@ function PhotoPage({T,state,update,todayStr}){
   const [overlayOpacity,setOverlayOpacity]=useState(0.35);
   const [showOverlay,setShowOverlay]=useState(true);
   const [showGuide,setShowGuide]=useState(true);
+  // アルバム追加用
+  const [albumCropPhoto,setAlbumCropPhoto]=useState(null); // {src, file}
+  const [albumMeta,setAlbumMeta]=useState({comment:"",shotMode:"",piece:state.currentPiece||1});
+  const [albumScale,setAlbumScale]=useState(1);
+  const [albumOffset,setAlbumOffset]=useState({x:0,y:0});
+  const [albumDragStart,setAlbumDragStart]=useState(null);
+  const [albumPinchDist,setAlbumPinchDist]=useState(null);
   // カラー調整 0〜100%・デフォルト50%
   const [brightness,setBrightness]=useState(50);
   const [saturation,setSaturation]=useState(50);
@@ -190,29 +197,18 @@ function PhotoPage({T,state,update,todayStr}){
         </div>
         {/* アルバムから追加 */}
         <div style={{marginTop:8}}>
-          <input type="file" accept="image/*" multiple id="album-input" style={{display:"none"}}
+          <input type="file" accept="image/*" id="album-input" style={{display:"none"}}
             onChange={e=>{
-              const files=Array.from(e.target.files||[]);
-              files.forEach(file=>{
-                const reader=new FileReader();
-                reader.onload=ev=>{
-                  const img=new Image();
-                  img.onload=()=>{
-                    const canvas=document.createElement("canvas");
-                    canvas.width=img.width;canvas.height=img.height;
-                    canvas.getContext("2d").drawImage(img,0,0);
-                    const data=canvas.toDataURL("image/webp",0.8);
-                    update({photos:[...(state.photos||[]),{
-                      id:Date.now()+Math.random(),data,
-                      mode:"front",shotMode:slot1Id,shotLabel:slot1Info.labelJP,
-                      piece:state.currentPiece,date:todayStr,
-                      comment:"",timestamp:Date.now()
-                    }]});
-                  };
-                  img.src=ev.target.result;
-                };
-                reader.readAsDataURL(file);
-              });
+              const file=e.target.files?.[0];
+              if(!file) return;
+              const reader=new FileReader();
+              reader.onload=ev=>{
+                setAlbumCropPhoto({src:ev.target.result});
+                setAlbumMeta({comment:"",shotMode:"",piece:state.currentPiece||1});
+                setAlbumScale(1);
+                setAlbumOffset({x:0,y:0});
+              };
+              reader.readAsDataURL(file);
               e.target.value="";
             }}/>
           <button className="btn bs" style={{width:"100%",padding:"10px"}}
@@ -460,7 +456,7 @@ function PhotoPage({T,state,update,todayStr}){
             <label>コメント</label>
             <input value={editComment} onChange={e=>setEditComment(e.target.value)} style={{marginBottom:10}}/>
             <label>日付</label>
-            <input type="date" value={editDate} onChange={e=>setEditDate(e.target.value)} style={{marginBottom:10}}/>
+            <input type="date" value={editDate} onChange={e=>setEditDate(e.target.value)} style={{marginBottom:10,width:"100%",boxSizing:"border-box"}}/>
             <label>マウスピース番号</label>
             <input type="number" min={1} max={100} value={editPiece} onChange={e=>setEditPiece(parseInt(e.target.value)||1)} style={{marginBottom:6}}/>
             <div style={{fontSize:11,color:T.text+"55",marginBottom:14}}>部位は変更できません</div>
@@ -485,6 +481,110 @@ function PhotoPage({T,state,update,todayStr}){
               <button className="btn bp" style={{flex:1}} onClick={()=>{update({photos:state.photos.map(p=>p.id===editId?{...p,comment:editComment,date:editDate,piece:editPiece}:p)});setEditId(null);}}>保存</button>
             </div>
 
+          </div>
+        </div>
+      )}
+      {albumCropPhoto&&(
+        <div className="mo" onClick={e=>e.stopPropagation()} style={{zIndex:250}}>
+          <div className="md" onClick={e=>e.stopPropagation()} style={{maxHeight:"95dvh",overflowY:"auto",padding:"16px"}}>
+            <div className="mdtitle">写真を追加</div>
+
+            {/* トリミングエリア */}
+            <div style={{position:"relative",width:"100%",paddingTop:"75%",background:"#111",borderRadius:12,overflow:"hidden",marginBottom:12,touchAction:"none"}}
+              onMouseDown={e=>{setAlbumDragStart({x:e.clientX-albumOffset.x,y:e.clientY-albumOffset.y});}}
+              onMouseMove={e=>{if(albumDragStart)setAlbumOffset({x:e.clientX-albumDragStart.x,y:e.clientY-albumDragStart.y});}}
+              onMouseUp={()=>setAlbumDragStart(null)}
+              onTouchStart={e=>{
+                if(e.touches.length===1){
+                  setAlbumDragStart({x:e.touches[0].clientX-albumOffset.x,y:e.touches[0].clientY-albumOffset.y});
+                } else if(e.touches.length===2){
+                  const dx=e.touches[0].clientX-e.touches[1].clientX;
+                  const dy=e.touches[0].clientY-e.touches[1].clientY;
+                  setAlbumPinchDist(Math.sqrt(dx*dx+dy*dy));
+                }
+              }}
+              onTouchMove={e=>{
+                e.preventDefault();
+                if(e.touches.length===1&&albumDragStart){
+                  setAlbumOffset({x:e.touches[0].clientX-albumDragStart.x,y:e.touches[0].clientY-albumDragStart.y});
+                } else if(e.touches.length===2&&albumPinchDist){
+                  const dx=e.touches[0].clientX-e.touches[1].clientX;
+                  const dy=e.touches[0].clientY-e.touches[1].clientY;
+                  const newDist=Math.sqrt(dx*dx+dy*dy);
+                  const ratio=newDist/albumPinchDist;
+                  setAlbumScale(s=>Math.min(4,Math.max(0.5,s*ratio)));
+                  setAlbumPinchDist(newDist);
+                }
+              }}
+              onTouchEnd={()=>{setAlbumDragStart(null);setAlbumPinchDist(null);}}>
+              <img src={albumCropPhoto.src}
+                style={{position:"absolute",top:"50%",left:"50%",
+                  transform:`translate(calc(-50% + ${albumOffset.x}px), calc(-50% + ${albumOffset.y}px)) scale(${albumScale})`,
+                  transformOrigin:"center",maxWidth:"none",maxHeight:"none",
+                  width:"100%",height:"100%",objectFit:"contain",userSelect:"none",pointerEvents:"none"}}
+                draggable={false}/>
+            </div>
+            <div style={{display:"flex",justifyContent:"center",gap:12,marginBottom:14}}>
+              <button onClick={()=>setAlbumScale(s=>Math.min(4,s+0.2))} style={{background:T.soft,border:"none",borderRadius:8,padding:"6px 16px",fontSize:18,cursor:"pointer",color:T.primary}}>＋</button>
+              <button onClick={()=>{setAlbumScale(1);setAlbumOffset({x:0,y:0});}} style={{background:T.soft,border:"none",borderRadius:8,padding:"6px 12px",fontSize:13,cursor:"pointer",color:T.text}}>リセット</button>
+              <button onClick={()=>setAlbumScale(s=>Math.max(0.5,s-0.2))} style={{background:T.soft,border:"none",borderRadius:8,padding:"6px 16px",fontSize:18,cursor:"pointer",color:T.primary}}>－</button>
+            </div>
+
+            {/* 部位選択（必須） */}
+            <label>部位 <span style={{color:"#E74C3C"}}>*必須</span></label>
+            <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:14,marginTop:4}}>
+              {SHOT_MODES.map(m=>(
+                <button key={m.id} onClick={()=>setAlbumMeta(v=>({...v,shotMode:m.id}))}
+                  style={{padding:"6px 12px",borderRadius:20,border:`1.5px solid ${albumMeta.shotMode===m.id?T.primary:T.soft}`,
+                    background:albumMeta.shotMode===m.id?T.primary:"transparent",
+                    color:albumMeta.shotMode===m.id?"#fff":T.text,
+                    fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>
+                  {m.labelJP}
+                </button>
+              ))}
+            </div>
+
+            {/* コメント */}
+            <label>コメント</label>
+            <input value={albumMeta.comment} onChange={e=>setAlbumMeta(v=>({...v,comment:e.target.value}))}
+              placeholder="コメントを入力…" style={{marginBottom:10}}/>
+
+            {/* マウスピース番号 */}
+            <label>マウスピース番号</label>
+            <input type="number" min={1} max={100} value={albumMeta.piece}
+              onChange={e=>setAlbumMeta(v=>({...v,piece:parseInt(e.target.value)||1}))}
+              style={{marginBottom:16}}/>
+
+            <div style={{display:"flex",gap:8}}>
+              <button className="btn bs" style={{flex:1}} onClick={()=>setAlbumCropPhoto(null)}>キャンセル</button>
+              <button className="btn bp" style={{flex:1,opacity:albumMeta.shotMode?"1":"0.4",cursor:albumMeta.shotMode?"pointer":"default"}}
+                onClick={()=>{
+                  if(!albumMeta.shotMode) return;
+                  const shotInfo=SHOT_MODES.find(x=>x.id===albumMeta.shotMode)||SHOT_MODES[0];
+                  const img=new Image();
+                  img.onload=()=>{
+                    const W=img.width,H=img.height;
+                    const canvas=document.createElement("canvas");
+                    canvas.width=W;canvas.height=H;
+                    const ctx=canvas.getContext("2d");
+                    ctx.save();
+                    ctx.translate(W/2,H/2);
+                    ctx.scale(albumScale,albumScale);
+                    ctx.translate(-W/2+albumOffset.x,-H/2+albumOffset.y);
+                    ctx.drawImage(img,0,0);
+                    ctx.restore();
+                    const data=canvas.toDataURL("image/webp",0.8);
+                    update({photos:[...(state.photos||[]),{
+                      id:Date.now()+Math.random(),data,
+                      mode:"front",shotMode:albumMeta.shotMode,shotLabel:shotInfo.labelJP,
+                      piece:albumMeta.piece,date:todayStr,
+                      comment:albumMeta.comment,timestamp:Date.now()
+                    }]});
+                    setAlbumCropPhoto(null);
+                  };
+                  img.src=albumCropPhoto.src;
+                }}>保存</button>
+            </div>
           </div>
         </div>
       )}
@@ -569,8 +669,9 @@ function PDFPreviewModal({T,onClose,onUpgrade}){
 
   return(
     <div className="mo" onClick={onClose}>
-      <div className="md" onClick={e=>e.stopPropagation()} style={{maxHeight:"88dvh",overflowY:"auto"}}>
-        <div style={{fontFamily:"'Outfit',sans-serif",fontSize:15,fontWeight:700,color:T.primary,marginBottom:4,textAlign:"center"}}>レポートプレビュー</div>
+      <div className="md" onClick={e=>e.stopPropagation()} style={{maxHeight:"88dvh",overflowY:"auto",position:"relative"}}>
+        <button onClick={onClose} style={{position:"absolute",top:8,right:8,background:"none",border:"none",cursor:"pointer",fontSize:20,color:T.text+"66",lineHeight:1,padding:4}}>✕</button>
+        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:15,fontWeight:700,color:T.primary,marginBottom:4,textAlign:"center"}}>レポートプレビュー</div>
         <div style={{fontSize:12,color:T.text+"88",marginBottom:12,textAlign:"center"}}>🔒 PDF出力はプレミアム機能です</div>
         <div style={{overflowX:"auto",marginBottom:14}}>
           <div dangerouslySetInnerHTML={{__html:previewHTML}}/>

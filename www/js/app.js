@@ -9,7 +9,7 @@ function ObDatePicker({value,onChange,T}){
     <div style={{textAlign:"center",position:"relative",display:"inline-block"}}>
       {/* 日付テキスト表示（タッチ不可・見た目専用） */}
       <div style={{
-        fontFamily:"'Outfit',sans-serif",fontSize:28,fontWeight:700,color:T.primary,
+        fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:28,fontWeight:700,color:T.primary,
         borderBottom:`3px solid ${T.primary}`,paddingBottom:4,letterSpacing:1,
         userSelect:"none",pointerEvents:"none"}}>
         {display}
@@ -42,7 +42,7 @@ function OnboardingScreen({T,onComplete}){
     background:"transparent",fontSize:19,cursor:"pointer",color:"inherit",
     display:"flex",alignItems:"center",justifyContent:"center"};
 
-  const numBig={fontSize:47,fontWeight:700,fontFamily:"'Outfit',sans-serif"};
+  const numBig={fontSize:47,fontWeight:700,fontFamily:"'M PLUS Rounded 1c',sans-serif"};
 
   const STEP_COUNT=4;
   const isLast=step===STEP_COUNT-1;
@@ -100,42 +100,46 @@ function OnboardingScreen({T,onComplete}){
     );
   };
 
-  const titles=["矯正開始日","マウスピース枚数","交換スケジュール","装着目標時間"];
-  const subs=["マウスピース矯正を始めた日を教えてください","治療で使用するマウスピースの合計枚数を教えてください","マウスピースを何日ごとに交換しますか？","1日に装着したい目標時間を設定してください"];
+  const titles=["矯正開始日","マウスピース合計枚数","交換スケジュール","装着目標時間"];
+  const subs=["","","マウスピースを何日ごとに交換しますか？","1日に装着したい目標時間を\n教えてください"];
   const valid=canNext();
 
   return(
-    <div style={{position:"fixed",inset:0,background:T.bg,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:32,zIndex:9999}}>
-      <div style={{marginBottom:40,textAlign:"center"}}>
-        <div style={{fontFamily:"'Outfit',sans-serif",fontSize:28,fontWeight:800,color:T.primary,letterSpacing:1}}>SmileTrack</div>
-        <div style={{fontSize:14,color:T.text+"66",marginTop:2}}>マウスピース矯正管理</div>
+    <div style={{position:"fixed",inset:0,background:T.bg,display:"flex",flexDirection:"column",alignItems:"center",padding:32,zIndex:9999}}>
+      <div style={{marginBottom:32,textAlign:"center",marginTop:40}}>
+        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:34,fontWeight:800,color:T.primary,letterSpacing:1}}>SmileTrack</div>
+        <div style={{fontSize:15,color:T.text+"66",marginTop:2}}>マウスピース矯正管理</div>
       </div>
-      <div style={{display:"flex",gap:8,marginBottom:40}}>
+      <div style={{display:"flex",gap:8,marginBottom:32}}>
         {Array.from({length:STEP_COUNT},(_,i)=>(
           <div key={i} style={{width:i===step?24:8,height:8,borderRadius:4,
             background:i<=step?T.primary:T.soft,transition:"all 0.3s"}}/>
         ))}
       </div>
       <div style={{width:"100%",maxWidth:360,background:T.card,borderRadius:24,padding:"36px 28px",
-        boxShadow:"0 8px 32px "+T.primary+"22",color:T.primary,textAlign:"center"}}>
-        <div style={{fontFamily:"'Outfit',sans-serif",fontSize:20,fontWeight:700,marginBottom:8,color:T.primary}}>{titles[step]}</div>
-        <div style={{fontSize:14,color:T.text+"77",marginBottom:32,lineHeight:1.6}}>{subs[step]}</div>
+        boxShadow:"0 8px 32px "+T.primary+"22",color:T.primary,textAlign:"center",
+        minHeight:220,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
+        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:24,fontWeight:700,marginBottom:subs[step]?16:24,color:T.primary}}>{titles[step]}</div>
+        {subs[step]&&<div style={{fontSize:15,color:T.text+"77",marginBottom:28,lineHeight:1.7,whiteSpace:"pre-line"}}>{subs[step]}</div>}
         {renderContent()}
       </div>
-      <button onClick={handleNext}
-        style={{marginTop:32,width:"100%",maxWidth:360,padding:"16px",borderRadius:16,border:"none",
-          background:valid?T.primary:T.soft,color:valid?"#fff":T.text+"44",
-          fontSize:16,fontWeight:700,fontFamily:"'M PLUS Rounded 1c',sans-serif",
-          cursor:valid?"pointer":"default",transition:"all 0.2s",letterSpacing:1}}>
-        {isLast?"はじめる →":valid?"次へ →":"入力してください"}
-      </button>
-      {step>0&&(
-        <button onClick={()=>setStep(s=>s-1)}
-          style={{marginTop:12,background:"none",border:"none",color:T.text+"55",
-            fontSize:15,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>
+      <div style={{position:"fixed",bottom:0,left:0,right:0,padding:"0 32px 40px",display:"flex",flexDirection:"column",alignItems:"center"}}>
+        <button onClick={handleNext}
+          style={{width:"100%",maxWidth:360,padding:"16px",borderRadius:16,border:"none",
+            background:valid?T.primary:T.soft,color:valid?"#fff":T.text+"44",
+            fontSize:16,fontWeight:700,fontFamily:"'M PLUS Rounded 1c',sans-serif",
+            cursor:valid?"pointer":"default",transition:"all 0.2s",letterSpacing:1}}>
+          {isLast?"はじめる →":valid?"次へ →":"入力してください"}
+        </button>
+        <button onClick={()=>step>0&&setStep(s=>s-1)}
+          style={{marginTop:12,background:"none",border:"none",
+            color:step>0?T.text+"55":"transparent",
+            fontSize:15,cursor:step>0?"pointer":"default",
+            fontFamily:"'M PLUS Rounded 1c',sans-serif",
+            pointerEvents:step>0?"auto":"none"}}>
           ← 戻る
         </button>
-      )}
+      </div>
     </div>
   );
 }
@@ -402,7 +406,7 @@ function App(){
             <div className="mdtitle" style={{marginBottom:8}}>タイマー止め忘れでは？</div>
             <div style={{fontSize:15,color:T.text+"88",marginBottom:20,lineHeight:1.7}}>
               取り外し中のタイマーが<br/>
-              <span style={{fontFamily:"'Outfit',sans-serif",fontWeight:700,color:T.primary,fontSize:16}}>
+              <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,color:T.primary,fontSize:16}}>
                 {Math.floor((Date.now()-(state.timerStart||Date.now()))/3600000)}時間以上
               </span><br/>
               動いています。

@@ -102,7 +102,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
       {/* Month nav */}
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px 6px",background:T.card,borderBottom:`1px solid ${T.soft}`}}>
         <button className="btn bs bsm" style={{fontSize:16,padding:"4px 14px"}} onClick={prevMonth}>‹</button>
-        <span style={{fontFamily:"'Outfit',sans-serif",fontWeight:700,fontSize:17,color:T.primary}}>{vy}年 {vm+1}月</span>
+        <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,fontSize:17,color:T.primary}}>{vy}年 {vm+1}月</span>
         <button className="btn bs bsm" style={{fontSize:16,padding:"4px 14px"}} onClick={nextMonth}>›</button>
       </div>
 
@@ -177,7 +177,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
       {/* Detail panel */}
       <div style={{background:T.card,borderTop:`2px solid ${T.soft}`,padding:"12px 14px 14px",marginTop:4}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
-          <div style={{fontFamily:"'Outfit',sans-serif",fontSize:15,fontWeight:700,color:T.text}}>{selLabel}</div>
+          <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:15,fontWeight:700,color:T.text}}>{selLabel}</div>
           <button className="btn bp bsm" onClick={()=>{setApptForm({date:sel||todayStr,time:"",title:"",note:""});setShowAddModal(true);}}>＋ 予定追加</button>
         </div>
 
@@ -210,7 +210,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                 ?(state.themeName==="atrium"?"#5A452C":T.soft)
                 :"#E88080";
               const wearColor=hasLog?(wearSec>=targetSecs?T.primary:failColor):T.text+"44";
-          const ROW=28;
+          const ROW=38;
 
           // ── ヘルパー ──
           const saveWear=()=>{
@@ -288,7 +288,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
 
           // 時間入力の共通スタイル
           const timeInputSt=(active)=>({
-            width:58,textAlign:"center",fontFamily:"'Outfit',sans-serif",
+            width:58,textAlign:"center",fontFamily:"'M PLUS Rounded 1c',sans-serif",
             fontSize:17,fontWeight:700,letterSpacing:2,
             border:"none",borderBottom:`2px solid ${active?T.primary:T.accent}`,
             outline:"none",background:"transparent",
@@ -322,10 +322,10 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                       onChange={e=>{let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&editLogVal.length===1)v+=':';setEditLogVal(v);}}
                       onBlur={saveWear}
                       onKeyDown={e=>{if(e.key==='Enter')saveWear();if(e.key==='Escape')setEditLogDay(isExpanded?sel:null);}}
-                      style={{width:52,textAlign:'right',fontFamily:"'Outfit',sans-serif",fontSize:16,fontWeight:700,
+                      style={{width:52,textAlign:'right',fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16,fontWeight:700,
                         border:'none',borderBottom:'2px solid '+T.primary,outline:'none',background:'transparent',
                         color:T.primary,letterSpacing:1,padding:'1px 0',borderRadius:0,flexShrink:0}}/>
-                  :<span style={{fontFamily:"'Outfit',sans-serif",fontSize:16,fontWeight:700,color:wearColor,cursor:'text',flexShrink:0}}
+                  :<span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16,fontWeight:700,color:wearColor,cursor:'text',flexShrink:0}}
                       onClick={e=>{e.stopPropagation();setEditLogDay(sel+'_wear');setEditLogVal(toHHMM(wearSec));}}>
                       {hasLog?toHHMM(wearSec):'--:--'}
                     </span>
@@ -407,7 +407,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                               {s.comment||''}
                             </span>
                             {rangeStr&&<span style={{fontSize:11,color:T.text+'44',flexShrink:0,marginLeft:4,whiteSpace:'nowrap'}}>{rangeStr}</span>}
-                            <span style={{fontFamily:"'Outfit',sans-serif",fontSize:14,fontWeight:700,color:T.accent,flexShrink:0,minWidth:40,textAlign:'right',marginLeft:4}}>{durStr}</span>
+                            <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:14,fontWeight:700,color:T.accent,flexShrink:0,minWidth:40,textAlign:'right',marginLeft:4}}>{durStr}</span>
                             <button style={{background:'none',border:'none',padding:'0 0 0 5px',cursor:'pointer',flexShrink:0}}
                               onClick={e=>{e.stopPropagation();setConfirmDeleteId(s.id);setInlineEditSessId(null);}}>
                               {Icons.trash(T.text+'33',10)}
@@ -442,7 +442,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                                 }}
                                 onBlur={onRowBlur} onFocus={onRowFocus}
                                 onClick={e=>e.stopPropagation()}
-                                style={{...ib,width:44,fontSize:11,fontFamily:"'Outfit',sans-serif",fontWeight:600,
+                                style={{...ib,width:44,fontSize:11,fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:600,
                                   color:T.text+'77',borderBottom:'1px solid '+T.text+'22',padding:'1px 0',textAlign:'center'}}/>
                               <span style={{fontSize:11,color:T.text+'33',margin:'0 1px'}}>〜</span>
                               <input type='time' value={inlineEditRangeTo}
@@ -457,7 +457,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                                 }}
                                 onBlur={onRowBlur} onFocus={onRowFocus}
                                 onClick={e=>e.stopPropagation()}
-                                style={{...ib,width:44,fontSize:11,fontFamily:"'Outfit',sans-serif",fontWeight:600,
+                                style={{...ib,width:44,fontSize:11,fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:600,
                                   color:T.text+'77',borderBottom:'1px solid '+T.text+'22',padding:'1px 0',textAlign:'center'}}/>
                             </span>
                             <input type='text' inputMode='numeric' maxLength={5} value={inlineEditVal}
@@ -466,7 +466,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                               onBlur={onRowBlur}
                               onKeyDown={e=>{if(e.key==='Enter'){saveSessField(s.id,'time');setInlineEditSessId(null);setInlineEditField(null);}}}
                               onClick={e=>e.stopPropagation()}
-                              style={{...ib,width:52,minWidth:52,textAlign:'right',fontFamily:"'Outfit',sans-serif",fontSize:13,
+                              style={{...ib,width:52,minWidth:52,textAlign:'right',fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:13,
                                 fontWeight:700,borderBottom:'2px solid '+T.accent,color:T.accent,
                                 padding:'1px 2px',flexShrink:0,marginLeft:4}}/>
                             <button style={{background:'none',border:'none',padding:'0 0 0 5px',cursor:'pointer',flexShrink:0}}
@@ -528,7 +528,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                               }
                             }}
                             onClick={e=>e.stopPropagation()}
-                            style={{width:44,fontSize:11,fontFamily:"'Outfit',sans-serif",fontWeight:600,
+                            style={{width:44,fontSize:11,fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:600,
                               border:'none',borderBottom:'1px solid '+T.text+'22',outline:'none',background:'transparent',
                               color:T.text+'77',padding:'1px 0',textAlign:'center',borderRadius:0}}/>
                           <span style={{fontSize:11,color:T.text+'33',margin:'0 1px'}}>〜</span>
@@ -544,7 +544,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                               }
                             }}
                             onClick={e=>e.stopPropagation()}
-                            style={{width:44,fontSize:11,fontFamily:"'Outfit',sans-serif",fontWeight:600,
+                            style={{width:44,fontSize:11,fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:600,
                               border:'none',borderBottom:'1px solid '+T.text+'22',outline:'none',background:'transparent',
                               color:T.text+'77',padding:'1px 0',textAlign:'center',borderRadius:0}}/>
                         </span>
@@ -553,7 +553,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                           onFocus={e=>e.target.select()}
                           onKeyDown={e=>{if(e.key==='Escape')setAddBreakdownDay(null);}}
                           onClick={e=>e.stopPropagation()}
-                          style={{width:44,textAlign:'right',fontFamily:"'Outfit',sans-serif",fontSize:14,fontWeight:700,
+                          style={{width:44,textAlign:'right',fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:14,fontWeight:700,
                             border:'none',borderBottom:'2px solid '+T.primary,outline:'none',background:'transparent',
                             color:T.primary,padding:'1px 0',letterSpacing:1,flexShrink:0,borderRadius:0}}/>
                         <button
@@ -618,7 +618,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
               {selEvents.map((ev,i)=>(
                 <div key={i} style={{display:"flex",alignItems:"center",padding:"7px 10px",background:T.bg,borderRadius:9,borderLeft:`3px solid ${ev.color}`,position:"relative",minHeight:32}}>
                   <span style={{flex:1,fontSize:14,color:T.text,fontWeight:600}}>{ev.title||ev.label}</span>
-                  {ev.time&&<span style={{position:"absolute",left:"50%",transform:"translateX(-50%)",fontSize:13,color:T.text+"66",fontFamily:"'Outfit',sans-serif",fontWeight:600,whiteSpace:"nowrap",pointerEvents:"none"}}>{ev.time}</span>}
+                  {ev.time&&<span style={{position:"absolute",left:"50%",transform:"translateX(-50%)",fontSize:13,color:T.text+"66",fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:600,whiteSpace:"nowrap",pointerEvents:"none"}}>{ev.time}</span>}
                   {ev.id&&<button onClick={()=>deleteEvent(ev)} style={{background:"none",border:"none",color:T.text+"33",cursor:"pointer",padding:"0 0 0 8px",flexShrink:0}}>{Icons.trash(T.text+"33",12)}</button>}
                 </div>
               ))}
