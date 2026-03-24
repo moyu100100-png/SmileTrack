@@ -490,40 +490,48 @@ function PhotoPage({T,state,update,todayStr}){
             <div className="mdtitle">写真を追加</div>
 
             {/* トリミングエリア */}
-            <div style={{position:"relative",width:"100%",paddingTop:"75%",background:"#111",borderRadius:12,overflow:"hidden",marginBottom:12,touchAction:"none"}}
-              onMouseDown={e=>{setAlbumDragStart({x:e.clientX-albumOffset.x,y:e.clientY-albumOffset.y});}}
-              onMouseMove={e=>{if(albumDragStart)setAlbumOffset({x:e.clientX-albumDragStart.x,y:e.clientY-albumDragStart.y});}}
-              onMouseUp={()=>setAlbumDragStart(null)}
-              onTouchStart={e=>{
-                if(e.touches.length===1){
-                  setAlbumDragStart({x:e.touches[0].clientX-albumOffset.x,y:e.touches[0].clientY-albumOffset.y});
-                } else if(e.touches.length===2){
-                  const dx=e.touches[0].clientX-e.touches[1].clientX;
-                  const dy=e.touches[0].clientY-e.touches[1].clientY;
-                  setAlbumPinchDist(Math.sqrt(dx*dx+dy*dy));
-                }
-              }}
-              onTouchMove={e=>{
-                e.preventDefault();
-                if(e.touches.length===1&&albumDragStart){
-                  setAlbumOffset({x:e.touches[0].clientX-albumDragStart.x,y:e.touches[0].clientY-albumDragStart.y});
-                } else if(e.touches.length===2&&albumPinchDist){
-                  const dx=e.touches[0].clientX-e.touches[1].clientX;
-                  const dy=e.touches[0].clientY-e.touches[1].clientY;
-                  const newDist=Math.sqrt(dx*dx+dy*dy);
-                  const ratio=newDist/albumPinchDist;
-                  setAlbumScale(s=>Math.min(4,Math.max(0.5,s*ratio)));
-                  setAlbumPinchDist(newDist);
-                }
-              }}
-              onTouchEnd={()=>{setAlbumDragStart(null);setAlbumPinchDist(null);}}>
-              <img src={albumCropPhoto.src}
-                style={{position:"absolute",top:"50%",left:"50%",
-                  transform:`translate(calc(-50% + ${albumOffset.x}px), calc(-50% + ${albumOffset.y}px)) scale(${albumScale})`,
-                  transformOrigin:"center",maxWidth:"none",maxHeight:"none",
-                  width:"100%",height:"100%",objectFit:"contain",userSelect:"none",pointerEvents:"none"}}
-                draggable={false}/>
-            </div>
+            {(()=>{
+              const selMode=SHOT_MODES.find(x=>x.id===albumMeta.shotMode);
+              const isLand=selMode?selMode.isLandscape:false;
+              // 横長(歯)→16:9、縦長(顔)→3:4
+              const aspectPad=isLand?"56.25%":"133.33%";
+              return(
+                <div style={{position:"relative",width:"100%",paddingTop:aspectPad,background:"#111",borderRadius:12,overflow:"hidden",marginBottom:12,touchAction:"none"}}
+                  onMouseDown={e=>{setAlbumDragStart({x:e.clientX-albumOffset.x,y:e.clientY-albumOffset.y});}}
+                  onMouseMove={e=>{if(albumDragStart)setAlbumOffset({x:e.clientX-albumDragStart.x,y:e.clientY-albumDragStart.y});}}
+                  onMouseUp={()=>setAlbumDragStart(null)}
+                  onTouchStart={e=>{
+                    if(e.touches.length===1){
+                      setAlbumDragStart({x:e.touches[0].clientX-albumOffset.x,y:e.touches[0].clientY-albumOffset.y});
+                    } else if(e.touches.length===2){
+                      const dx=e.touches[0].clientX-e.touches[1].clientX;
+                      const dy=e.touches[0].clientY-e.touches[1].clientY;
+                      setAlbumPinchDist(Math.sqrt(dx*dx+dy*dy));
+                    }
+                  }}
+                  onTouchMove={e=>{
+                    e.preventDefault();
+                    if(e.touches.length===1&&albumDragStart){
+                      setAlbumOffset({x:e.touches[0].clientX-albumDragStart.x,y:e.touches[0].clientY-albumDragStart.y});
+                    } else if(e.touches.length===2&&albumPinchDist){
+                      const dx=e.touches[0].clientX-e.touches[1].clientX;
+                      const dy=e.touches[0].clientY-e.touches[1].clientY;
+                      const newDist=Math.sqrt(dx*dx+dy*dy);
+                      const ratio=newDist/albumPinchDist;
+                      setAlbumScale(s=>Math.min(4,Math.max(0.5,s*ratio)));
+                      setAlbumPinchDist(newDist);
+                    }
+                  }}
+                  onTouchEnd={()=>{setAlbumDragStart(null);setAlbumPinchDist(null);}}>
+                  <img src={albumCropPhoto.src}
+                    style={{position:"absolute",top:"50%",left:"50%",
+                      transform:`translate(calc(-50% + ${albumOffset.x}px), calc(-50% + ${albumOffset.y}px)) scale(${albumScale})`,
+                      transformOrigin:"center",maxWidth:"none",maxHeight:"none",
+                      width:"100%",height:"100%",objectFit:"contain",userSelect:"none",pointerEvents:"none"}}
+                    draggable={false}/>
+                </div>
+              );
+            })()}
             <div style={{display:"flex",justifyContent:"center",gap:12,marginBottom:14}}>
               <button onClick={()=>setAlbumScale(s=>Math.min(4,s+0.2))} style={{background:T.soft,border:"none",borderRadius:8,padding:"6px 16px",fontSize:18,cursor:"pointer",color:T.primary}}>＋</button>
               <button onClick={()=>{setAlbumScale(1);setAlbumOffset({x:0,y:0});}} style={{background:T.soft,border:"none",borderRadius:8,padding:"6px 12px",fontSize:13,cursor:"pointer",color:T.text}}>リセット</button>

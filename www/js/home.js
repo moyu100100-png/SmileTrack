@@ -48,22 +48,23 @@ function HomePage({T,state,todayStr,todayDayStartMs,onGoTimer}){
 
   return(
     <div style={{display:"flex",flexDirection:"column",height:"100%"}}>
-      {/* Donut */}
-      <div style={{background:T.card,display:"flex",justifyContent:"center",alignItems:"center",paddingTop:10,paddingBottom:6,flex:"0 0 auto"}}>
-        <div style={{position:"relative",width:SZ,height:SZ,cursor:"pointer"}} onClick={onGoTimer}>
-          <svg width={SZ} height={SZ} style={{transform:"rotate(-90deg)"}}>
-            <circle cx={SZ/2} cy={SZ/2} r={R} fill="none" stroke={T.soft} strokeWidth={STK}/>
-            <circle cx={SZ/2} cy={SZ/2} r={R} fill="none" stroke={T.primary} strokeWidth={STK}
-              strokeDasharray={`${CIRC*wearPct} ${CIRC}`} strokeDashoffset={0} style={{transition:"all .6s"}}/>
-            {totalRemovedSec>0&&<circle cx={SZ/2} cy={SZ/2} r={R} fill="none" stroke={T.removedColor} strokeWidth={STK}
-              strokeDasharray={`${CIRC*(1-wearPct)} ${CIRC}`} strokeDashoffset={-CIRC*wearPct} style={{transition:"all .6s"}}/>}
-          </svg>
-          <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2}}>
-            <div style={{fontSize:Math.round(centerFontSize*.5),color:T.text+"77",fontWeight:600}}>本日の装着時間</div>
-            <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:centerFontSize,fontWeight:700,color:T.primary,lineHeight:1}}>{fmt(actualWearSec)}</div>
-
-            <div style={{fontSize:Math.round(centerFontSize*.5),color:T.text+"77"}}>取り外し</div>
-            <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:Math.round(centerFontSize*.82),fontWeight:600,color:T.text+"99",lineHeight:1}}>{fmt(totalRemovedSec)}</div>
+      {/* Donut Card */}
+      <div style={{background:T.bg,padding:"10px 12px 6px",flex:"0 0 auto"}}>
+        <div className="card" style={{display:"flex",justifyContent:"center",alignItems:"center",padding:"20px 13px",cursor:"pointer"}} onClick={onGoTimer}>
+          <div style={{position:"relative",width:SZ,height:SZ}}>
+            <svg width={SZ} height={SZ} style={{transform:"rotate(-90deg)"}}>
+              <circle cx={SZ/2} cy={SZ/2} r={R} fill="none" stroke={T.soft} strokeWidth={STK}/>
+              <circle cx={SZ/2} cy={SZ/2} r={R} fill="none" stroke={T.primary} strokeWidth={STK}
+                strokeDasharray={`${CIRC*wearPct} ${CIRC}`} strokeDashoffset={0} style={{transition:"all .6s"}}/>
+              {totalRemovedSec>0&&<circle cx={SZ/2} cy={SZ/2} r={R} fill="none" stroke={T.removedColor} strokeWidth={STK}
+                strokeDasharray={`${CIRC*(1-wearPct)} ${CIRC}`} strokeDashoffset={-CIRC*wearPct} style={{transition:"all .6s"}}/>}
+            </svg>
+            <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2}}>
+              <div style={{fontSize:Math.round(centerFontSize*.5),color:T.text+"77",fontWeight:600}}>本日の装着時間</div>
+              <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:centerFontSize,fontWeight:700,color:T.primary,lineHeight:1}}>{fmt(actualWearSec)}</div>
+              <div style={{fontSize:Math.round(centerFontSize*.5),color:T.text+"77"}}>取り外し</div>
+              <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:Math.round(centerFontSize*.82),fontWeight:600,color:T.text+"99",lineHeight:1}}>{fmt(totalRemovedSec)}</div>
+            </div>
           </div>
         </div>
       </div>

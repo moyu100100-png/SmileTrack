@@ -63,7 +63,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
         const startDs=dsFromDate(start);
         const endDs=dsFromDate(end);
         const year=start.getFullYear();
-        const rangeLabel=`${start.getMonth()+1}/${start.getDate()}〜${end.getMonth()+1}/${end.getDate()}`;
+        const rangeLabel=`${start.getMonth()+1}/${start.getDate()}〜\n${end.getMonth()+1}/${end.getDate()}`;
         bars.push({key:startDs,endKey:endDs,label:rangeLabel,yearLabel:`${year}`,secs:avgSecs,isPast:true,isToday:startDs===thisWeekDs});
       }
       return bars;
@@ -241,7 +241,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
             const activeBar = selectedBar || bars.find(b=>b.isToday) || bars[bars.length-1];
             const isDefault = !selectedBar;
             const bd = getBreakdownForBar(activeBar);
-            const rt = Object.values(bd).reduce((a,v)=>a+v,0)||1;
+            const rt = (24*3600) - target; // 24時間－目標時間を100%とする
             const labelStr = activeBar
               ? (period==="daily" ? activeBar.key : period==="weekly" ? activeBar.label : `${activeBar.year}年${activeBar.month+1}月`)
               : null;
