@@ -95,7 +95,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
     <div style={{padding:12}}>
       <div className="card" style={{marginBottom:10}}>
         <div style={{display:"flex",justifyContent:"center",margin:"4px 0 10px"}}>
-          <div style={{position:"relative",width:sz,height:sz}}>
+          <div style={{position:"relative",width:sz,height:sz,cursor:"pointer"}} onClick={onStartPress}>
             <svg width={sz} height={sz} style={{transform:"rotate(-90deg)"}}>
               <circle cx={sz/2} cy={sz/2} r={rad} fill="none" stroke={T.soft} strokeWidth={stk}/>
               <circle cx={sz/2} cy={sz/2} r={rad} fill="none" stroke={isAlarm?(["atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"].includes(state.themeName)?(state.themeName==="atrium"?"#5A452C":T.soft):"#E74C3C"):T.primary} strokeWidth={stk}
@@ -114,7 +114,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
         <div style={{textAlign:"center",marginBottom:10}}>
           <div style={{fontSize:15,color:T.text+"88"}}>本日の装着予定時間</div>
           <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:22,fontWeight:700,color:T.primary}}>{fmt(expectedWear)}</div>
-          <div style={{fontSize:14,color:T.text+"88"}}>目標: {state.targetWearHours||22}時間以上</div>
+
         </div>
         <button onClick={onStartPress} style={{width:"100%",padding:"16px",border:"none",borderRadius:16,fontSize:17,fontWeight:700,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",background:timerRunning?T.accent:T.primary,color:"#fff",marginBottom:10}}>
           {timerRunning?"装着":"▶ 取り外し開始"}
@@ -191,12 +191,17 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
                       ))}
                     </div>
                   )}
-                  {/* 削除確認 */}
+                  {/* 削除確認ポップアップ */}
                   {timerConfirmDeleteId===s.id&&(
-                    <div style={{display:'flex',alignItems:'center',gap:8,padding:'4px 10px',background:'#FFF0F0'}}>
-                      <span style={{flex:1,fontSize:13,color:'#E74C3C'}}>削除しますか？</span>
-                      <button style={{border:'none',background:'none',fontSize:13,color:T.text+'66',cursor:'pointer'}} onClick={()=>setTimerConfirmDeleteId(null)}>キャンセル</button>
-                      <button style={{border:'none',background:'#E74C3C',color:'#fff',borderRadius:8,padding:'2px 10px',fontSize:13,fontWeight:700,cursor:'pointer'}} onClick={()=>deleteSess(s.id)}>削除</button>
+                    <div className="mo" onClick={()=>setTimerConfirmDeleteId(null)} style={{zIndex:300}}>
+                      <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center"}}>
+                        <div style={{fontSize:28,marginBottom:8}}>🗑</div>
+                        <div className="mdtitle" style={{marginBottom:8}}>この記録を削除しますか？</div>
+                        <div style={{display:"flex",gap:8,marginTop:16}}>
+                          <button className="btn bs" style={{flex:1}} onClick={()=>setTimerConfirmDeleteId(null)}>キャンセル</button>
+                          <button style={{flex:1,padding:"10px",border:"none",borderRadius:12,background:"#E74C3C",color:"#fff",fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16}} onClick={()=>deleteSess(s.id)}>削除</button>
+                        </div>
+                      </div>
                     </div>
                   )}
                   {!isEdit?(
@@ -268,7 +273,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
                           style={{...ib,width:44,fontSize:11,fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:600,
                             color:T.text+'77',borderBottom:'1px solid '+T.text+'22',padding:'1px 0',textAlign:'center'}}/>
                       </span>}
-                      <input type='text' inputMode='numeric' maxLength={5} value={timerEditVal}
+                      <input type='text' inputMode='numeric' maxLength={5} autoComplete='off' autoCorrect='off' autoCapitalize='off' spellCheck={false} value={timerEditVal}
                         onChange={e=>{let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&timerEditVal.length===1)v+=':';setTimerEditVal(v);}}
                         onFocus={e=>{onFocus();e.target.select();}}
                         onBlur={onBlur}

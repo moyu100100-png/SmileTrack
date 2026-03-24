@@ -569,16 +569,21 @@ function PhotoPage({T,state,update,todayStr}){
                 onClick={()=>{
                   if(!albumMeta.shotMode) return;
                   const shotInfo=SHOT_MODES.find(x=>x.id===albumMeta.shotMode)||SHOT_MODES[0];
+                  const isLand=shotInfo.isLandscape;
                   const img=new Image();
                   img.onload=()=>{
-                    const W=img.width,H=img.height;
+                    // 出力サイズを部位に合わせる
+                    const outW=isLand?1280:720;
+                    const outH=isLand?720:960;
                     const canvas=document.createElement("canvas");
-                    canvas.width=W;canvas.height=H;
+                    canvas.width=outW;canvas.height=outH;
                     const ctx=canvas.getContext("2d");
+                    // 画像をキャンバス中央に配置してスケール・オフセット適用
+                    const baseScale=Math.max(outW/img.width,outH/img.height);
                     ctx.save();
-                    ctx.translate(W/2,H/2);
-                    ctx.scale(albumScale,albumScale);
-                    ctx.translate(-W/2+albumOffset.x,-H/2+albumOffset.y);
+                    ctx.translate(outW/2,outH/2);
+                    ctx.scale(albumScale*baseScale,albumScale*baseScale);
+                    ctx.translate(-img.width/2+albumOffset.x/baseScale,-img.height/2+albumOffset.y/baseScale);
                     ctx.drawImage(img,0,0);
                     ctx.restore();
                     const data=canvas.toDataURL("image/webp",0.8);

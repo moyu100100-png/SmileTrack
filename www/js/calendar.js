@@ -14,7 +14,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
   const [editLogVal,setEditLogVal] = useState("22:00");
   // セッション追加フォーム
   const [addBreakdownDay,setAddBreakdownDay] = useState(null);
-  const [addBreakdownReason,setAddBreakdownReason] = useState("その他");
+  const [addBreakdownReason,setAddBreakdownReason] = useState("");
   const [addBreakdownDur,setAddBreakdownDur] = useState("00:30");
   const [addBreakdownComment,setAddBreakdownComment] = useState("");
   const [addBreakdownTimeFrom,setAddBreakdownTimeFrom] = useState("");
@@ -316,7 +316,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                   装着時間
                 </span>
                 {isWearEdit
-                  ?<input type='text' inputMode='numeric' maxLength={5} value={editLogVal}
+                  ?<input type='text' inputMode='numeric' maxLength={5} autoComplete='off' autoCorrect='off' autoCapitalize='off' spellCheck={false} value={editLogVal}
                       autoFocus
                       onFocus={e=>e.target.select()}
                       onChange={e=>{let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&editLogVal.length===1)v+=':';setEditLogVal(v);}}
@@ -365,8 +365,8 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                     };
                     // 理由ラベルの共通スタイル
                     const reasonLabel=(active)=>({
-                      fontSize:13,fontWeight:700,flexShrink:0,width:42,whiteSpace:'nowrap',cursor:'pointer',
-                      borderRadius:4,padding:'1px 2px',textAlign:'center',lineHeight:'16px',
+                      fontSize:13,fontWeight:700,flexShrink:0,minWidth:52,whiteSpace:'nowrap',cursor:'pointer',
+                      borderRadius:4,padding:'1px 6px',textAlign:'center',lineHeight:'16px',
                       color:active?T.primary:T.text+'33',
                       border:'1px dashed '+(active?T.primary+'66':T.text+'22'),
                     });
@@ -460,7 +460,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                                 style={{...ib,width:44,fontSize:11,fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:600,
                                   color:T.text+'77',borderBottom:'1px solid '+T.text+'22',padding:'1px 0',textAlign:'center'}}/>
                             </span>
-                            <input type='text' inputMode='numeric' maxLength={5} value={inlineEditVal}
+                            <input type='text' inputMode='numeric' maxLength={5} autoComplete='off' autoCorrect='off' autoCapitalize='off' spellCheck={false} value={inlineEditVal}
                               onChange={e=>{let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&inlineEditVal.length===1)v+=':';setInlineEditVal(v);}}
                               onFocus={e=>{onRowFocus();e.target.select();}}
                               onBlur={onRowBlur}
@@ -484,7 +484,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                     <div style={{display:'flex',alignItems:'center',height:ROW,padding:'0 10px',justifyContent:'flex-end'}}>
                       <button style={{background:'none',border:'none',color:T.primary,fontSize:20,
                         cursor:'pointer',fontWeight:700,padding:0,lineHeight:1}}
-                        onClick={e=>{e.stopPropagation();setAddBreakdownDay(sel);setAddBreakdownReason('その他');setAddBreakdownDur('00:30');setAddBreakdownComment('');}}>
+                        onClick={e=>{e.stopPropagation();const firstR=getReasonList(state)[0]||'';setAddBreakdownDay(sel);setAddBreakdownReason(firstR);setAddBreakdownDur('00:30');setAddBreakdownComment('');}}>
                         ＋
                       </button>
                     </div>
@@ -548,7 +548,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                               border:'none',borderBottom:'1px solid '+T.text+'22',outline:'none',background:'transparent',
                               color:T.text+'77',padding:'1px 0',textAlign:'center',borderRadius:0}}/>
                         </span>
-                        <input type='text' inputMode='numeric' maxLength={5} value={addBreakdownDur}
+                        <input type='text' inputMode='numeric' maxLength={5} autoComplete='off' autoCorrect='off' autoCapitalize='off' spellCheck={false} value={addBreakdownDur}
                           onChange={e=>{let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&addBreakdownDur.length===1)v+=':';setAddBreakdownDur(v);}}
                           onFocus={e=>e.target.select()}
                           onKeyDown={e=>{if(e.key==='Escape')setAddBreakdownDay(null);}}
@@ -593,8 +593,9 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
               )}
 
               {confirmDeleteId&&selSessions.some(s=>s.id===confirmDeleteId)&&(
-                <div className='mo' onClick={()=>setConfirmDeleteId(null)}>
-                  <div className='md' style={{padding:'22px 20px 18px'}} onClick={e=>e.stopPropagation()}>
+                <div className='mo' onClick={()=>setConfirmDeleteId(null)} style={{alignItems:'center'}}>
+                  <div className='md' style={{padding:'22px 20px 18px',borderRadius:20,maxWidth:340}} onClick={e=>e.stopPropagation()}>
+                    <div style={{textAlign:'center',fontSize:28,marginBottom:8}}>🗑</div>
                     <div style={{textAlign:'center',fontSize:17,fontWeight:700,color:T.text,marginBottom:6}}>削除しますか？</div>
                     <div style={{textAlign:'center',fontSize:14,color:T.text+'66',marginBottom:20}}>
                       「{selSessions.find(s=>s.id===confirmDeleteId)?.reason||'その他'}」の記録を削除します
@@ -634,9 +635,22 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
             <label>タイトル</label>
             <input value={apptForm.title} onChange={e=>setApptForm(f=>({...f,title:e.target.value}))} placeholder="タイトル" style={{marginBottom:8}}/>
             <label>日付</label>
-            <input type="date" value={apptForm.date} onChange={e=>setApptForm(f=>({...f,date:e.target.value}))} style={{marginBottom:8}}/>
-            <label>時間（任意）</label>
-            <input type="time" value={apptForm.time} onChange={e=>setApptForm(f=>({...f,time:e.target.value}))} style={{marginBottom:14}}/>
+            <input type="date" value={apptForm.date} onChange={e=>setApptForm(f=>({...f,date:e.target.value}))} style={{marginBottom:8,width:"100%",boxSizing:"border-box"}}/>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:6}}>
+              <label style={{margin:0}}>時間</label>
+              <div style={{display:"flex",alignItems:"center",gap:8}}>
+                <span style={{fontSize:12,color:T.text+"66"}}>終日</span>
+                <button onClick={()=>setApptForm(f=>({...f,allDay:!f.allDay,time:f.allDay?"":""}))}
+                  style={{width:40,height:22,borderRadius:11,border:"none",cursor:"pointer",
+                    background:apptForm.allDay?T.primary:T.soft,position:"relative",flexShrink:0,transition:"background .2s"}}>
+                  <div style={{width:18,height:18,borderRadius:"50%",background:"#fff",position:"absolute",
+                    top:2,left:apptForm.allDay?20:2,transition:"left .2s",boxShadow:"0 1px 3px #0003"}}/>
+                </button>
+              </div>
+            </div>
+            {!apptForm.allDay&&(
+              <input type="time" value={apptForm.time} onChange={e=>setApptForm(f=>({...f,time:e.target.value}))} style={{marginBottom:14,width:"100%",boxSizing:"border-box"}}/>
+            )}
             <div style={{display:"flex",gap:8}}>
               <button className="btn bs" style={{flex:1}} onClick={()=>setShowAddModal(false)}>キャンセル</button>
               <button className="btn bp" style={{flex:1}} onClick={addEvent}>追加</button>

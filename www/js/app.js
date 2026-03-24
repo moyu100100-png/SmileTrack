@@ -108,7 +108,6 @@ function OnboardingScreen({T,onComplete}){
     <div style={{position:"fixed",inset:0,background:T.bg,display:"flex",flexDirection:"column",alignItems:"center",padding:32,zIndex:9999}}>
       <div style={{marginBottom:32,textAlign:"center",marginTop:40}}>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:34,fontWeight:800,color:T.primary,letterSpacing:1}}>SmileTrack</div>
-        <div style={{fontSize:15,color:T.text+"66",marginTop:2}}>マウスピース矯正管理</div>
       </div>
       <div style={{display:"flex",gap:8,marginBottom:32}}>
         {Array.from({length:STEP_COUNT},(_,i)=>(
@@ -363,7 +362,7 @@ function App(){
       <div className="app">
         <div className="hdr">
           <button className="ham" onClick={()=>setDrawerOpen(true)}>{Icons.menu(T.primary,18)}</button>
-          <div style={{textAlign:"center"}}><div className="htitle">SmileTrack</div><div className="hsub">マウスピース矯正管理</div></div>
+          <div style={{textAlign:"center"}}><div className="htitle" style={{fontSize:18}}>SmileTrack</div></div>
           <div style={{width:32}}/>
         </div>
         <div className="content">
