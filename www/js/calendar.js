@@ -19,6 +19,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
   const [addBreakdownComment,setAddBreakdownComment] = useState("");
   const [addBreakdownTimeFrom,setAddBreakdownTimeFrom] = useState("");
   const [addBreakdownTimeTo,setAddBreakdownTimeTo] = useState("");
+  const [addUseTime,setAddUseTime] = useState(false);
   // 編集モーダル
   const [editSessId,setEditSessId] = useState(null);
   const [editSessReason,setEditSessReason] = useState("");
@@ -218,62 +219,6 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
             log[sel]=parseHHMM(editLogVal);
             update({dailyWearLog:log});
             setEditLogDay(sel);
-          };
-          const saveSessField=(sid,field)=>{
-            const orig=(state.timerSessions||[]).find(x=>x.id===sid);
-            if(!orig)return;
-            let patch={comment:inlineEditComment,noReason:false};
-
-            if(field==="time"){
-              const ms=parseHHMM(inlineEditVal)*1000;
-              patch={...patch,ms,end:orig.start?(orig.start+ms):undefined};
-            }
-            if(field==="range"){
-              if(inlineEditRangeFrom&&inlineEditRangeTo){
-                const [fh,fm]=inlineEditRangeFrom.split(":").map(Number);
-                const [th,tm]=inlineEditRangeTo.split(":").map(Number);
-                const newStart=dayMs+fh*3600000+fm*60000;
-                const newEnd=dayMs+th*3600000+tm*60000;
-                const ms=Math.max(60000,newEnd-newStart);
-                patch={...patch,start:newStart,end:newEnd,ms};
-                // 経過時間も同期
-              } else if(!inlineEditRangeFrom&&!inlineEditRangeTo){
-                // 両方空なら range削除
-                patch={...patch,start:undefined,end:undefined};
-              }
-              // 片方だけ入力中は保存しない
-              else return;
-            }
-            if(field==="all"){
-              // 行外フォーカス時：範囲優先、なければ手入力時間
-              if(inlineEditRangeFrom&&inlineEditRangeTo){
-                const [fh,fm]=inlineEditRangeFrom.split(":").map(Number);
-                const [th,tm]=inlineEditRangeTo.split(":").map(Number);
-                const newStart=dayMs+fh*3600000+fm*60000;
-                const newEnd=dayMs+th*3600000+tm*60000;
-                const ms=Math.max(60000,newEnd-newStart);
-                patch={...patch,start:newStart,end:newEnd,ms};
-              } else {
-                const ms=parseHHMM(inlineEditVal)*1000;
-                patch={...patch,ms,end:orig.start?(orig.start+ms):undefined};
-                if(!inlineEditRangeFrom&&!inlineEditRangeTo){
-                  patch={...patch,start:undefined,end:undefined};
-                }
-              }
-            }
-
-            const newSess=(state.timerSessions||[]).map(x=>x.id===sid?{...x,...patch}:x);
-            const newRem=newSess.filter(x=>
-              (x.start>=dayMs&&x.start<dayMs+86400000)||(!x.start&&x.day===sel)
-            ).reduce((a,x)=>a+x.ms,0);
-            const dl={...(state.dailyWearLog||{})};
-            dl[sel]=Math.max(0,86400-Math.floor(newRem/1000));
-            update({timerSessions:newSess,dailyWearLog:dl});
-          };
-          const saveSess=(sid)=>{
-            saveSessField(sid,"all");
-            setInlineEditSessId(null);
-            setInlineEditField(null);
           };
           const deleteSess=(sid)=>{
             const newSess=(state.timerSessions||[]).filter(x=>x.id!==sid);
@@ -526,34 +471,49 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                 </button>
               ))}
             </div>
-            {/* 時刻 */}
-            <label>時刻（任意）</label>
-            <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:14}}>
-              <input type='time' value={addBreakdownTimeFrom||''} onChange={e=>{
-                const f=e.target.value; setAddBreakdownTimeFrom(f);
-                if(f&&addBreakdownTimeTo){
-                  const [fh,fm]=f.split(':').map(Number);
-                  const [th,tm]=addBreakdownTimeTo.split(':').map(Number);
-                  const sec=Math.max(0,(th*60+tm)-(fh*60+fm))*60;
-                  if(sec>0)setAddBreakdownDur(toHHMM(sec));
-                }}}
-                style={{flex:1,height:44,fontSize:16,borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,padding:'0 12px',WebkitAppearance:'none',appearance:'none'}}/>
-              <span style={{color:T.text+'55'}}>〜</span>
-              <input type='time' value={addBreakdownTimeTo||''} onChange={e=>{
-                const t=e.target.value; setAddBreakdownTimeTo(t);
-                if(addBreakdownTimeFrom&&t){
-                  const [fh,fm]=addBreakdownTimeFrom.split(':').map(Number);
-                  const [th,tm]=t.split(':').map(Number);
-                  const sec=Math.max(0,(th*60+tm)-(fh*60+fm))*60;
-                  if(sec>0)setAddBreakdownDur(toHHMM(sec));
-                }}}
-                style={{flex:1,height:44,fontSize:16,borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,padding:'0 12px',WebkitAppearance:'none',appearance:'none'}}/>
+            {/* 時刻/時間 */}
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}}>
+              <label style={{margin:0}}>時刻</label>
+              <div style={{display:'flex',alignItems:'center',gap:8}}>
+                <span style={{fontSize:13,color:T.text+'66'}}>ON</span>
+                <button onClick={()=>{setAddUseTime(v=>!v);setAddBreakdownTimeFrom('');setAddBreakdownTimeTo('');}}
+                  style={{width:44,height:24,borderRadius:12,border:'none',cursor:'pointer',
+                    background:addUseTime?T.primary:T.soft,position:'relative',flexShrink:0,transition:'background .2s'}}>
+                  <div style={{width:20,height:20,borderRadius:'50%',background:'#fff',position:'absolute',
+                    top:2,left:addUseTime?22:2,transition:'left .2s',boxShadow:'0 1px 3px #0003'}}/>
+                </button>
+              </div>
             </div>
-            {/* 時間 */}
-            <label>時間（HH:MM）</label>
-            <input type='text' inputMode='numeric' maxLength={5} autoComplete='off' value={addBreakdownDur}
-              onChange={e=>{let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&addBreakdownDur.length===1)v+=':';setAddBreakdownDur(v);}}
-              style={{marginBottom:14,textAlign:'center'}}/>
+            {addUseTime?(
+              <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:14}}>
+                <input type='time' value={addBreakdownTimeFrom||''} onChange={e=>{
+                  const f=e.target.value; setAddBreakdownTimeFrom(f);
+                  if(f&&addBreakdownTimeTo){
+                    const [fh,fm]=f.split(':').map(Number);
+                    const [th,tm]=addBreakdownTimeTo.split(':').map(Number);
+                    const sec=Math.max(0,(th*60+tm)-(fh*60+fm))*60;
+                    if(sec>0)setAddBreakdownDur(toHHMM(sec));
+                  }}}
+                  style={{flex:1,height:44,fontSize:16,borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,padding:'0 12px',WebkitAppearance:'none',appearance:'none'}}/>
+                <span style={{color:T.text+'55'}}>〜</span>
+                <input type='time' value={addBreakdownTimeTo||''} onChange={e=>{
+                  const t=e.target.value; setAddBreakdownTimeTo(t);
+                  if(addBreakdownTimeFrom&&t){
+                    const [fh,fm]=addBreakdownTimeFrom.split(':').map(Number);
+                    const [th,tm]=t.split(':').map(Number);
+                    const sec=Math.max(0,(th*60+tm)-(fh*60+fm))*60;
+                    if(sec>0)setAddBreakdownDur(toHHMM(sec));
+                  }}}
+                  style={{flex:1,height:44,fontSize:16,borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,padding:'0 12px',WebkitAppearance:'none',appearance:'none'}}/>
+              </div>
+            ):(
+              <div style={{marginBottom:14}}>
+                <label>時間</label>
+                <input type='text' inputMode='numeric' maxLength={5} autoComplete='off' value={addBreakdownDur}
+                  onChange={e=>{let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&addBreakdownDur.length===1)v+=':';setAddBreakdownDur(v);}}
+                  style={{textAlign:'center'}}/>
+              </div>
+            )}
             {/* コメント */}
             <label>コメント</label>
             <input type='text' value={addBreakdownComment} onChange={e=>setAddBreakdownComment(e.target.value)}
@@ -611,10 +571,13 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
               </div>
             </div>
             {!apptForm.allDay&&(
-              <input type="time" value={apptForm.time} onChange={e=>setApptForm(f=>({...f,time:e.target.value}))}
-                style={{marginBottom:14,width:"100%",boxSizing:"border-box",height:44,fontSize:16,
-                  borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,
-                  padding:"0 12px",WebkitAppearance:"none",appearance:"none"}}/>
+              <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:14}}>
+                <input type="time" value={apptForm.time||''} onChange={e=>setApptForm(f=>({...f,time:e.target.value}))}
+                  style={{flex:1,height:44,fontSize:16,borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,padding:'0 12px',WebkitAppearance:'none',appearance:'none'}}/>
+                <span style={{color:T.text+'55'}}>〜</span>
+                <input type="time" value={apptForm.timeTo||''} onChange={e=>setApptForm(f=>({...f,timeTo:e.target.value}))}
+                  style={{flex:1,height:44,fontSize:16,borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,padding:'0 12px',WebkitAppearance:'none',appearance:'none'}}/>
+              </div>
             )}
             <div style={{display:"flex",gap:8}}>
               <button className="btn bs" style={{flex:1}} onClick={()=>setShowAddModal(false)}>キャンセル</button>
