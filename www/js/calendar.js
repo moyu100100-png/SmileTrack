@@ -257,7 +257,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                 display:'flex',alignItems:'center',height:ROW+4,padding:'0 12px',
                 gap:8,userSelect:'none'}}>
                 <span style={{fontSize:13,color:T.primary,fontWeight:700,flex:1,cursor:'pointer'}}
-                  onClick={()=>{setEditLogDay(isExpanded?null:sel);setInlineEditSessId(null);setAddBreakdownDay(null);}}>
+                  onClick={()=>{setEditLogDay(isExpanded?null:sel);setAddBreakdownDay(null);}}>
                   装着時間
                 </span>
                 {isWearEdit
@@ -276,7 +276,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                     </span>
                 }
                 <span style={{fontSize:14,color:T.primary+'66',marginLeft:4,cursor:'pointer',flexShrink:0}}
-                  onClick={()=>{setEditLogDay(isExpanded?null:sel);setInlineEditSessId(null);setAddBreakdownDay(null);}}>
+                  onClick={()=>{setEditLogDay(isExpanded?null:sel);setAddBreakdownDay(null);}}>
                   {isExpanded?'▲':'▼'}
                 </span>
               </div>
