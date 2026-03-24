@@ -396,7 +396,11 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
         return(
           <div className="mo" onClick={()=>setEditSessId(null)} style={{alignItems:"center"}}>
             <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:400}}>
-              <div className="mdtitle">取り外しを編集</div>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
+                <div className="mdtitle" style={{margin:0}}>取り外しを編集</div>
+                <button style={{background:'none',border:'none',color:'#E74C3C',fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:"'M PLUS Rounded 1c',sans-serif",padding:'4px 8px'}}
+                  onClick={()=>{setConfirmDeleteId(editSessId);setEditSessId(null);}}>削除</button>
+              </div>
               <label>理由</label>
               <div style={{display:'flex',flexWrap:'wrap',gap:8,marginBottom:14}}>
                 {[...getReasonList(state),"ー"].map(r=>(
@@ -433,7 +437,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
               </div>
               {!isFromTimer&&(
                 <>
-                  <label>時間（HH:MM）</label>
+                  <label>時間</label>
                   <input type='text' inputMode='numeric' maxLength={5} autoComplete='off' value={editSessDur}
                     onChange={e=>{let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&editSessDur.length===1)v+=':';setEditSessDur(v);}}
                     style={{marginBottom:14,textAlign:'center'}}/>
@@ -444,8 +448,6 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                 placeholder='コメントを入力…' style={{marginBottom:16}}/>
               <div style={{display:'flex',gap:8}}>
                 <button className='btn bs' style={{flex:1}} onClick={()=>setEditSessId(null)}>キャンセル</button>
-                <button style={{flex:1,padding:'10px',border:'none',borderRadius:12,background:'#E74C3C',color:'#fff',fontWeight:600,cursor:'pointer',fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:15}}
-                  onClick={()=>{setConfirmDeleteId(editSessId);setEditSessId(null);}}>削除</button>
                 <button className='btn bp' style={{flex:1}} onClick={saveEdit}>保存</button>
               </div>
             </div>

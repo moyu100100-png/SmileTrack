@@ -190,8 +190,8 @@ function PhotoPage({T,state,update,todayStr}){
             <div style={{display:"flex",alignItems:"center",gap:4}}>{Icons.camera("#fff",14)}<span style={{fontSize:14}}>{slot1Info.labelJP}</span></div>
             {getOverlayPhoto(slot1Id)&&<div style={{fontSize:11,opacity:.7,marginTop:2}}>前回あり</div>}
           </button>
-          <button className="btn bs" onClick={()=>{if(!isPremium){setShowSlot2Gate(true);return;}openCam(slot2Id);}} style={{padding:"12px 8px",flexDirection:"column",opacity:isPremium?1:0.55}}>
-            <div style={{display:"flex",alignItems:"center",gap:4}}>{isPremium?Icons.camera(T.primary,14):<span style={{fontSize:14}}>🔒</span>}<span style={{fontSize:14}}>{slot2Info.labelJP}</span></div>
+          <button className="btn bp" onClick={()=>{if(!isPremium){setShowSlot2Gate(true);return;}openCam(slot2Id);}} style={{padding:"12px 8px",flexDirection:"column",opacity:isPremium?1:0.55}}>
+            <div style={{display:"flex",alignItems:"center",gap:4}}>{isPremium?Icons.camera("#fff",14):<span style={{fontSize:14}}>🔒</span>}<span style={{fontSize:14}}>{slot2Info.labelJP}</span></div>
             {isPremium&&getOverlayPhoto(slot2Id)&&<div style={{fontSize:11,opacity:.7,marginTop:2}}>前回あり</div>}
           </button>
         </div>
@@ -521,7 +521,7 @@ function PhotoPage({T,state,update,todayStr}){
                       const dy=e.touches[0].clientY-e.touches[1].clientY;
                       const newDist=Math.sqrt(dx*dx+dy*dy);
                       const ratio=newDist/albumPinchDist;
-                      setAlbumScale(s=>Math.min(4,Math.max(0.5,s*ratio)));
+                      setAlbumScale(s=>Math.min(8,Math.max(0.5,s*ratio)));
                       setAlbumPinchDist(newDist);
                     }
                   }}
@@ -536,7 +536,7 @@ function PhotoPage({T,state,update,todayStr}){
               );
             })()}
             <div style={{display:"flex",justifyContent:"center",gap:12,marginBottom:14}}>
-              <button onClick={()=>setAlbumScale(s=>Math.min(4,s+0.2))} style={{background:T.soft,border:"none",borderRadius:8,padding:"6px 16px",fontSize:18,cursor:"pointer",color:T.primary}}>＋</button>
+              <button onClick={()=>setAlbumScale(s=>Math.min(8,s+0.2))} style={{background:T.soft,border:"none",borderRadius:8,padding:"6px 16px",fontSize:18,cursor:"pointer",color:T.primary}}>＋</button>
               <button onClick={()=>{setAlbumScale(1);setAlbumOffset({x:0,y:0});}} style={{background:T.soft,border:"none",borderRadius:8,padding:"6px 12px",fontSize:13,cursor:"pointer",color:T.text}}>リセット</button>
               <button onClick={()=>setAlbumScale(s=>Math.max(0.5,s-0.2))} style={{background:T.soft,border:"none",borderRadius:8,padding:"6px 16px",fontSize:18,cursor:"pointer",color:T.primary}}>－</button>
             </div>
