@@ -10,13 +10,12 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
 
   const [pendingReason,setPendingReason]=useState(null);
   // インライン編集 state（カレンダーと同じ構造）
-  const [timerEditId,setTimerEditId]=useState(null);
-  const blurTimerRef=useRef(null);
-  const [timerEditVal,setTimerEditVal]=useState("00:00");
-  const [timerEditComment,setTimerEditComment]=useState("");
-  const [timerEditRangeFrom,setTimerEditRangeFrom]=useState("");
-  const [timerEditRangeTo,setTimerEditRangeTo]=useState("");
-  const [timerEditField,setTimerEditField]=useState(null); // 'reason' or null
+  const [timerEditSessId,setTimerEditSessId]=useState(null);
+  const [timerEditSessReason,setTimerEditSessReason]=useState("");
+  const [timerEditSessComment,setTimerEditSessComment]=useState("");
+  const [timerEditSessFrom,setTimerEditSessFrom]=useState("");
+  const [timerEditSessTo,setTimerEditSessTo]=useState("");
+  const [timerEditSessDur,setTimerEditSessDur]=useState("00:00");
   const [timerConfirmDeleteId,setTimerConfirmDeleteId]=useState(null);
   const currentSec=Math.floor(runningMs/1000);
   const CYCLE=3600;
@@ -47,48 +46,33 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
   const secToHHMMSS=sec=>`${String(Math.floor(sec/3600)).padStart(2,"0")}:${String(Math.floor((sec%3600)/60)).padStart(2,"0")}:${String(sec%60).padStart(2,"0")}`;
   const parseHHMM2=str=>{const[h,m]=(str+":0").split(":");return Math.max(0,Math.min(86400,(parseInt(h)||0)*3600+(parseInt(m)||0)*60));};
 
-  // コメントのみ保存（時刻・時間は一切変更しない）
-  const saveTimerComment=(sid)=>{
-    const orig=(state.timerSessions||[]).find(x=>x.id===sid);
-    if(!orig)return;
-    const newSessions=(state.timerSessions||[]).map(x=>x.id===sid?{...x,comment:timerEditComment}:x);
-    update({timerSessions:newSessions});
-    setTimerEditId(null);setTimerEditField(null);
-  };
-  // 時刻・時間を含む完全保存（時間入力欄・時刻入力欄から明示的に確定したとき）
-  const saveTimerSess=(sid)=>{
-    const orig=(state.timerSessions||[]).find(x=>x.id===sid);
-    if(!orig)return;
-    let newMs,newStart,newEnd;
-    if(timerEditRangeFrom&&timerEditRangeTo){
-      const dayMs=new Date(todayStr+"T00:00:00").getTime();
-      const [fh,fm]=timerEditRangeFrom.split(":").map(Number);
-      const [th,tm]=timerEditRangeTo.split(":").map(Number);
-      newStart=dayMs+fh*3600000+fm*60000;
-      newEnd=dayMs+th*3600000+tm*60000;
-      newMs=Math.max(60000,newEnd-newStart);
-    } else {
-      newMs=parseHHMM2(timerEditVal)*1000;
-      newStart=orig.start;
-      newEnd=orig.end||(orig.start?orig.start+newMs:undefined);
-    }
-    const newSessions=(state.timerSessions||[]).map(x=>x.id===sid?{...x,ms:newMs,start:newStart,end:newEnd,comment:timerEditComment}:x);
-    const newRemovedMs=newSessions.filter(s=>sessInDay(s,todayDayStartMs,todayStr)).reduce((a,s)=>a+s.ms,0);
-    const dailyLog={...(state.dailyWearLog||{})};
-    dailyLog[todayStr]=Math.max(0,86400-Math.floor(newRemovedMs/1000));
-    update({timerSessions:newSessions,dailyWearLog:dailyLog});
-    setTimerEditId(null);setTimerEditField(null);
-  };
   const deleteSess=id=>{
     const newSess=(state.timerSessions||[]).filter(s=>s.id!==id);
     const newRemovedMs=newSess.filter(s=>sessInDay(s,todayDayStartMs,todayStr)).reduce((a,s)=>a+s.ms,0);
     const dailyLog={...(state.dailyWearLog||{})};dailyLog[todayStr]=Math.max(0,86400-Math.floor(newRemovedMs/1000));
-    update({timerSessions:newSess,dailyWearLog:dailyLog});setTimerEditId(null);setTimerConfirmDeleteId(null);
+    update({timerSessions:newSess,dailyWearLog:dailyLog});setTimerConfirmDeleteId(null);setTimerEditSessId(null);
   };
-  const pickTimerReason=(sid,r)=>{
-    const newSessions=(state.timerSessions||[]).map(x=>x.id===sid?{...x,reason:r,noReason:!r}:x);
-    update({timerSessions:newSessions});
-    setTimerEditField(null);
+  const saveTimerEdit=()=>{
+    const orig=(state.timerSessions||[]).find(x=>x.id===timerEditSessId);
+    if(!orig)return;
+    const isFromTimer=!!(orig.start&&orig.end);
+    let patch={reason:timerEditSessReason,noReason:!timerEditSessReason,comment:timerEditSessComment};
+    if(timerEditSessFrom&&timerEditSessTo){
+      const dayMs2=new Date(todayStr+"T00:00:00").getTime();
+      const [fh,fm]=timerEditSessFrom.split(":").map(Number);
+      const [th,tm]=timerEditSessTo.split(":").map(Number);
+      const start=dayMs2+fh*3600000+fm*60000;
+      const end=dayMs2+th*3600000+tm*60000;
+      patch={...patch,start,end,ms:Math.max(60000,end-start)};
+    } else if(!isFromTimer){
+      patch={...patch,ms:parseHHMM2(timerEditSessDur)*1000};
+    }
+    const newSessions=(state.timerSessions||[]).map(x=>x.id===timerEditSessId?{...x,...patch}:x);
+    const newRemovedMs=newSessions.filter(s=>sessInDay(s,todayDayStartMs,todayStr)).reduce((a,s)=>a+s.ms,0);
+    const dailyLog={...(state.dailyWearLog||{})};
+    dailyLog[todayStr]=Math.max(0,86400-Math.floor(newRemovedMs/1000));
+    update({timerSessions:newSessions,dailyWearLog:dailyLog});
+    setTimerEditSessId(null);
   };
 
   return(
@@ -172,138 +156,28 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
           ? <div style={{textAlign:"center",color:T.text+"44",fontSize:14,padding:8}}>まだ記録がありません</div>
           : <>
             {todaySess.map((s,i)=>{
-              const isEdit=timerEditId===s.id;
-              const isReasonPick=timerEditId===s.id&&timerEditField==='reason';
               const displayReason=(!s.noReason&&s.reason)?s.reason:null;
               const durStr=secToHHMMSS(Math.floor(s.ms/1000));
-              const durStrHHMM=secToHHMM(Math.floor(s.ms/1000));
               const hasRange=s.start&&s.end&&s.end>s.start;
               const rangeStr=hasRange?`${fmtTime(s.start)}〜${fmtTime(s.end)}`:'';
-              const ib={border:'none',outline:'none',background:'transparent',borderRadius:0};
-              const onBlur=()=>{blurTimerRef.current=setTimeout(()=>{saveTimerSess(s.id);},200);};
-              const onFocus=()=>{if(blurTimerRef.current){clearTimeout(blurTimerRef.current);blurTimerRef.current=null;}};
-              const reasonLabel={fontSize:13,fontWeight:700,flexShrink:0,maxWidth:80,cursor:'pointer',
-                borderRadius:4,padding:'1px 6px',textAlign:'center',lineHeight:'18px',display:'inline-block',
-                whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis',
-                color:displayReason?T.primary:T.text+'33',
-                border:'1px dashed '+(displayReason?T.primary+'66':T.text+'22')};
               return(
-                <div key={s.id||i} style={{borderBottom:'1px solid '+T.text+'07'}}>
-                  {/* 理由ピッカー */}
-                  {isReasonPick&&(
-                    <div style={{padding:'6px 10px',background:T.soft,display:'flex',flexWrap:'wrap',gap:4}}
-                      onMouseDown={e=>e.preventDefault()}>
-                      <button style={{border:'none',borderRadius:12,padding:'4px 8px',fontSize:13,fontWeight:600,cursor:'pointer',textAlign:'center',whiteSpace:'nowrap',flexShrink:0,fontFamily:"'M PLUS Rounded 1c',sans-serif",
-                        background:!displayReason?T.primary:T.card+'cc',color:!displayReason?'#fff':T.text+'55'}}
-                        onClick={()=>pickTimerReason(s.id,'')}>ー</button>
-                      {getReasonList(state).map(r=>(
-                        <button key={r} style={{border:'none',borderRadius:12,padding:'4px 8px',fontSize:13,fontWeight:600,cursor:'pointer',textAlign:'center',whiteSpace:'nowrap',flexShrink:0,fontFamily:"'M PLUS Rounded 1c',sans-serif",
-                          background:displayReason===r?T.primary:T.card+'cc',color:displayReason===r?'#fff':T.text+'77'}}
-                          onClick={()=>pickTimerReason(s.id,r)}>{r}</button>
-                      ))}
-                    </div>
-                  )}
-                  {/* 削除確認ポップアップ */}
-                  {timerConfirmDeleteId===s.id&&(
-                    <div className="mo" onClick={()=>setTimerConfirmDeleteId(null)} style={{zIndex:300,alignItems:"center"}}>
-                      <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center",borderRadius:20,maxWidth:340}}>
-                        <div style={{display:"flex",justifyContent:"center",marginBottom:8}}>
-                          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-                          </svg>
-                        </div>
-                        <div className="mdtitle" style={{marginBottom:8}}>この記録を削除しますか？</div>
-                        <div style={{display:"flex",gap:8,marginTop:16}}>
-                          <button className="btn bs" style={{flex:1}} onClick={()=>setTimerConfirmDeleteId(null)}>キャンセル</button>
-                          <button style={{flex:1,padding:"10px",border:"none",borderRadius:12,background:"#E74C3C",color:"#fff",fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16}} onClick={()=>deleteSess(s.id)}>削除</button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  {!isEdit?(
-                    /* 通常表示行 */
-                    <div style={{display:'flex',alignItems:'center',minHeight:38,padding:'0 8px',gap:4,cursor:'pointer'}}
-                      onClick={()=>{
-                        setTimerEditId(s.id);setTimerEditVal(durStrHHMM);setTimerEditComment(s.comment||'');
-                        setTimerEditRangeFrom(hasRange?fmtTime(s.start):'');
-                        setTimerEditRangeTo(hasRange?fmtTime(s.end):'');
-                        setTimerConfirmDeleteId(null);
-                        // timerEditFieldはリセットしない（理由タップ時に上書きされないように）
-                      }}>
-                      {showBreakdown&&<span style={reasonLabel}
-                        onClick={e=>{e.stopPropagation();setTimerEditId(s.id);setTimerEditVal(durStrHHMM);setTimerEditComment(s.comment||'');setTimerEditRangeFrom(hasRange?fmtTime(s.start):'');setTimerEditRangeTo(hasRange?fmtTime(s.end):'');setTimerEditField('reason');}}>
-                        {displayReason||'ー'}
-                      </span>}
-                      <span style={{flex:1,fontSize:11,color:T.text+'55',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',padding:'0 3px'}}>{s.comment||''}</span>
-                      {rangeStr&&<span style={{fontSize:11,color:T.text+'44',flexShrink:0,whiteSpace:'nowrap'}}>{rangeStr}</span>}
-                      <span style={{fontWeight:700,color:T.accent,fontSize:13,whiteSpace:"nowrap",textAlign:"right",minWidth:36,marginLeft:4,flexShrink:0}}>{durStr}</span>
-                      <button style={{background:'none',border:'none',padding:'0 0 0 4px',cursor:'pointer',flexShrink:0}}
-                        onClick={e=>{e.stopPropagation();setTimerConfirmDeleteId(s.id);setTimerEditId(null);}}>
-                        {Icons.trash(T.text+'33',10)}
-                      </button>
-                    </div>
-                  ):(
-                    /* 編集行 */
-                    <div style={{display:'flex',alignItems:'center',minHeight:38,padding:'0 8px',gap:4,background:T.card+'cc'}}>
-                      {showBreakdown&&<span style={{...reasonLabel,color:displayReason?T.primary:T.text+'33'}}
-                        onMouseDown={e=>{e.preventDefault();e.stopPropagation();setTimerEditField(isReasonPick?null:'reason');}}>
-                        {displayReason||'ー'}
-                      </span>}
-                      <input type='text' value={timerEditComment}
-                        onChange={e=>setTimerEditComment(e.target.value)}
-                        onBlur={()=>saveTimerComment(s.id)}
-                        placeholder='コメント'
-                        onClick={e=>e.stopPropagation()}
-                        onKeyDown={e=>{if(e.key==='Enter'){e.target.blur();}}}
-                        style={{...ib,flex:1,fontSize:12,borderBottom:'1px solid '+T.text+'22',padding:'1px 3px',color:T.text,minWidth:0}}/>
-                      {hasRange&&<span style={{display:'flex',alignItems:'center',gap:1,flexShrink:0,marginLeft:4}}>
-                        <input type='time' value={timerEditRangeFrom}
-                          onChange={e=>{
-                            const val=e.target.value;
-                            setTimerEditRangeFrom(val);
-                            if(timerEditRangeTo){
-                              const [fh,fm]=val.split(':').map(Number);
-                              const [th,tm]=timerEditRangeTo.split(':').map(Number);
-                              const sec=Math.max(0,(th*60+tm)-(fh*60+fm))*60;
-                              if(sec>0)setTimerEditVal(secToHHMM(sec));
-                            }
-                          }}
-                          onBlur={onBlur} onFocus={onFocus}
-                          onClick={e=>e.stopPropagation()}
-                          style={{...ib,width:44,fontSize:11,fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:600,
-                            color:T.text+'77',borderBottom:'1px solid '+T.text+'22',padding:'1px 0',textAlign:'center'}}/>
-                        <span style={{fontSize:11,color:T.text+'33',margin:'0 1px'}}>〜</span>
-                        <input type='time' value={timerEditRangeTo}
-                          onChange={e=>{
-                            const val=e.target.value;
-                            setTimerEditRangeTo(val);
-                            if(timerEditRangeFrom){
-                              const [fh,fm]=timerEditRangeFrom.split(':').map(Number);
-                              const [th,tm]=val.split(':').map(Number);
-                              const sec=Math.max(0,(th*60+tm)-(fh*60+fm))*60;
-                              if(sec>0)setTimerEditVal(secToHHMM(sec));
-                            }
-                          }}
-                          onBlur={onBlur} onFocus={onFocus}
-                          onClick={e=>e.stopPropagation()}
-                          style={{...ib,width:44,fontSize:11,fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:600,
-                            color:T.text+'77',borderBottom:'1px solid '+T.text+'22',padding:'1px 0',textAlign:'center'}}/>
-                      </span>}
-                      <input type='text' inputMode='numeric' maxLength={5} autoComplete='off' autoCorrect='off' autoCapitalize='off' spellCheck={false} value={timerEditVal}
-                        onChange={e=>{let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&timerEditVal.length===1)v+=':';setTimerEditVal(v);}}
-                        onFocus={e=>{onFocus();e.target.select();}}
-                        onBlur={onBlur}
-                        onKeyDown={e=>{if(e.key==='Enter')saveTimerSess(s.id);}}
-                        onClick={e=>e.stopPropagation()}
-                        style={{...ib,minWidth:52,width:52,textAlign:'right',fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:13,
-                          fontWeight:700,borderBottom:'2px solid '+T.accent,color:T.accent,
-                          padding:'1px 2px',flexShrink:0,marginLeft:4}}/>
-                      <button style={{background:'none',border:'none',padding:'0 0 0 4px',cursor:'pointer',flexShrink:0}}
-                        onClick={e=>{e.stopPropagation();setTimerConfirmDeleteId(s.id);setTimerEditId(null);}}>
-                        {Icons.trash(T.text+'33',10)}
-                      </button>
-                    </div>
-                  )}
+                <div key={s.id||i} style={{borderBottom:'1px solid '+T.text+'07'}}
+                  onClick={()=>{
+                    setTimerEditSessId(s.id);
+                    setTimerEditSessReason(s.reason||'');
+                    setTimerEditSessComment(s.comment||'');
+                    setTimerEditSessFrom(hasRange?fmtTime(s.start):'');
+                    setTimerEditSessTo(hasRange?fmtTime(s.end):'');
+                    setTimerEditSessDur(secToHHMM(Math.floor(s.ms/1000)));
+                  }}>
+                  <div style={{display:'flex',alignItems:'center',minHeight:38,padding:'0 8px',gap:4,cursor:'pointer'}}>
+                    {showBreakdown&&<span style={{fontSize:13,fontWeight:700,flexShrink:0,minWidth:44,color:displayReason?T.primary:T.text+'44'}}>
+                      {displayReason||'ー'}
+                    </span>}
+                    <span style={{flex:1,fontSize:11,color:T.text+'55',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',padding:'0 3px'}}>{s.comment||''}</span>
+                    {rangeStr&&<span style={{fontSize:11,color:T.text+'44',flexShrink:0,whiteSpace:'nowrap'}}>{rangeStr}</span>}
+                    <span style={{fontWeight:700,color:T.accent,fontSize:13,whiteSpace:"nowrap",textAlign:"right",minWidth:36,marginLeft:4,flexShrink:0}}>{durStr}</span>
+                  </div>
                 </div>
               );
             })}
@@ -321,6 +195,91 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
           </>
         }
       </div>
+
+      {/* 編集モーダル */}
+      {timerEditSessId&&(()=>{
+        const s=(state.timerSessions||[]).find(x=>x.id===timerEditSessId);
+        if(!s) return null;
+        const isFromTimer=!!(s.start&&s.end);
+        return(
+          <div className="mo" onClick={()=>setTimerEditSessId(null)} style={{alignItems:"center"}}>
+            <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:400}}>
+              <div className="mdtitle">取り外しを編集</div>
+              <label>理由</label>
+              <div style={{display:'flex',flexWrap:'wrap',gap:8,marginBottom:14}}>
+                {[...getReasonList(state),"ー"].map(r=>(
+                  <button key={r} onClick={()=>setTimerEditSessReason(r==="ー"?"":r)}
+                    style={{padding:'10px 16px',borderRadius:20,
+                      border:`1.5px solid ${(timerEditSessReason===r||(r==="ー"&&!timerEditSessReason))?T.primary:T.soft}`,
+                      background:(timerEditSessReason===r||(r==="ー"&&!timerEditSessReason))?T.primary:'transparent',
+                      color:(timerEditSessReason===r||(r==="ー"&&!timerEditSessReason))?'#fff':T.text,
+                      fontSize:15,fontWeight:600,cursor:'pointer',fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>
+                    {r}
+                  </button>
+                ))}
+              </div>
+              <label>時刻</label>
+              <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:14}}>
+                <input type='time' value={timerEditSessFrom} onChange={e=>{
+                  setTimerEditSessFrom(e.target.value);
+                  if(timerEditSessTo){
+                    const [fh,fm]=e.target.value.split(':').map(Number);
+                    const [th,tm]=timerEditSessTo.split(':').map(Number);
+                    const sec=Math.max(0,(th*60+tm)-(fh*60+fm))*60;
+                    if(sec>0)setTimerEditSessDur(secToHHMM(sec));
+                  }}}
+                  style={{flex:1,height:44,fontSize:16,borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,padding:'0 12px',WebkitAppearance:'none',appearance:'none'}}/>
+                <span style={{color:T.text+'55'}}>〜</span>
+                <input type='time' value={timerEditSessTo} onChange={e=>{
+                  setTimerEditSessTo(e.target.value);
+                  if(timerEditSessFrom){
+                    const [fh,fm]=timerEditSessFrom.split(':').map(Number);
+                    const [th,tm]=e.target.value.split(':').map(Number);
+                    const sec=Math.max(0,(th*60+tm)-(fh*60+fm))*60;
+                    if(sec>0)setTimerEditSessDur(secToHHMM(sec));
+                  }}}
+                  style={{flex:1,height:44,fontSize:16,borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,padding:'0 12px',WebkitAppearance:'none',appearance:'none'}}/>
+              </div>
+              {!isFromTimer&&(
+                <>
+                  <label>時間</label>
+                  <input type='text' inputMode='numeric' maxLength={5} autoComplete='off' value={timerEditSessDur}
+                    onChange={e=>{let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&timerEditSessDur.length===1)v+=':';setTimerEditSessDur(v);}}
+                    style={{marginBottom:14,textAlign:'center'}}/>
+                </>
+              )}
+              <label>コメント</label>
+              <input type='text' value={timerEditSessComment} onChange={e=>setTimerEditSessComment(e.target.value)}
+                placeholder='コメントを入力…' style={{marginBottom:16}}/>
+              <div style={{display:'flex',gap:8}}>
+                <button className='btn bs' style={{flex:1}} onClick={()=>setTimerEditSessId(null)}>キャンセル</button>
+                <button style={{flex:1,padding:'10px',border:'none',borderRadius:12,background:'#E74C3C',color:'#fff',fontWeight:600,cursor:'pointer',fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:15}}
+                  onClick={()=>{setTimerConfirmDeleteId(timerEditSessId);setTimerEditSessId(null);}}>削除</button>
+                <button className='btn bp' style={{flex:1}} onClick={saveTimerEdit}>保存</button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* 削除確認 */}
+      {timerConfirmDeleteId&&(
+        <div className="mo" onClick={()=>setTimerConfirmDeleteId(null)} style={{zIndex:300,alignItems:"center"}}>
+          <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center",borderRadius:20,maxWidth:340}}>
+            <div style={{display:"flex",justifyContent:"center",marginBottom:8}}>
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+              </svg>
+            </div>
+            <div className="mdtitle" style={{marginBottom:8}}>この記録を削除しますか？</div>
+            <div style={{display:"flex",gap:8,marginTop:16}}>
+              <button className="btn bs" style={{flex:1}} onClick={()=>setTimerConfirmDeleteId(null)}>キャンセル</button>
+              <button style={{flex:1,padding:"10px",border:"none",borderRadius:12,background:"#E74C3C",color:"#fff",fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16}}
+                onClick={()=>deleteSess(timerConfirmDeleteId)}>削除</button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

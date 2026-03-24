@@ -369,7 +369,8 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
 
       {/* セッション編集モーダル */}
       {editSessId&&(()=>{
-        const s=selSessions.find(x=>x.id===editSessId);
+        const allSess=state.timerSessions||[];
+        const s=allSess.find(x=>x.id===editSessId);
         if(!s) return null;
         const isFromTimer=!!(s.start&&s.end);
         const saveEdit=()=>{
