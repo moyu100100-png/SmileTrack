@@ -137,14 +137,26 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
 
       {/* Reason picker */}
       {pendingReason!==null&&(
-        <div className="mo">
-          <div className="md">
-            <div className="mdtitle">何のために外しますか？</div>
-            <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:16}}>
-              {getReasonList(state).map(r=>(<button key={r} className="reason-chip" onClick={()=>confirmReason(r)}>{r}</button>))}
-              <button className="reason-chip" style={{background:T.soft,color:T.text+"77"}} onClick={()=>confirmReason("")}>ー</button>
+        <div className="mo" style={{alignItems:"flex-end"}}>
+          <div style={{background:T.card,borderRadius:"20px 20px 0 0",padding:"24px 20px 36px",width:"100%",boxSizing:"border-box"}}>
+            <div className="mdtitle" style={{marginBottom:16,fontSize:18}}>何のために外しますか？</div>
+            <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:16}}>
+              {getReasonList(state).map(r=>(
+                <button key={r} onClick={()=>confirmReason(r)}
+                  style={{width:"100%",padding:"18px",border:`1.5px solid ${T.soft}`,borderRadius:14,
+                    background:T.bg,color:T.text,fontSize:17,fontWeight:600,cursor:"pointer",
+                    fontFamily:"'M PLUS Rounded 1c',sans-serif",textAlign:"center"}}>
+                  {r}
+                </button>
+              ))}
+              <button onClick={()=>confirmReason("")}
+                style={{width:"100%",padding:"16px",border:`1.5px solid ${T.soft}`,borderRadius:14,
+                  background:T.bg,color:T.text+"55",fontSize:15,fontWeight:600,cursor:"pointer",
+                  fontFamily:"'M PLUS Rounded 1c',sans-serif",textAlign:"center"}}>
+                ー（記録しない）
+              </button>
             </div>
-            <button className="btn bs" style={{width:"100%"}} onClick={()=>setPendingReason(null)}>キャンセル</button>
+            <button className="btn bs" style={{width:"100%",padding:"16px",fontSize:16}} onClick={()=>setPendingReason(null)}>キャンセル</button>
           </div>
         </div>
       )}
@@ -193,9 +205,13 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
                   )}
                   {/* 削除確認ポップアップ */}
                   {timerConfirmDeleteId===s.id&&(
-                    <div className="mo" onClick={()=>setTimerConfirmDeleteId(null)} style={{zIndex:300}}>
-                      <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center"}}>
-                        <div style={{fontSize:28,marginBottom:8}}>🗑</div>
+                    <div className="mo" onClick={()=>setTimerConfirmDeleteId(null)} style={{zIndex:300,alignItems:"center"}}>
+                      <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center",borderRadius:20,maxWidth:340}}>
+                        <div style={{display:"flex",justifyContent:"center",marginBottom:8}}>
+                          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                          </svg>
+                        </div>
                         <div className="mdtitle" style={{marginBottom:8}}>この記録を削除しますか？</div>
                         <div style={{display:"flex",gap:8,marginTop:16}}>
                           <button className="btn bs" style={{flex:1}} onClick={()=>setTimerConfirmDeleteId(null)}>キャンセル</button>

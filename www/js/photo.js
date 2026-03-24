@@ -605,9 +605,13 @@ function PhotoPage({T,state,update,todayStr}){
         </div>
       )}
       {deleteConfirmId&&(
-        <div className="mo" onClick={()=>setDeleteConfirmId(null)}>
-          <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center"}}>
-            <div style={{fontSize:32,marginBottom:8}}>🗑</div>
+        <div className="mo" onClick={()=>setDeleteConfirmId(null)} style={{alignItems:"center"}}>
+          <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center",borderRadius:20,maxWidth:340}}>
+            <div style={{display:"flex",justifyContent:"center",marginBottom:8}}>
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+              </svg>
+            </div>
             <div className="mdtitle" style={{marginBottom:8}}>写真を削除</div>
             <div style={{fontSize:14,color:T.text+"88",marginBottom:20}}>この写真を削除しますか？<br/>削除すると元に戻せません。</div>
             <div style={{display:"flex",gap:8}}>
