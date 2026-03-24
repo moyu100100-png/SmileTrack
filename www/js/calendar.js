@@ -480,115 +480,13 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                   })}
 
                   {/* ＋追加ボタン：右端 */}
-                  {!isAdding&&(
-                    <div style={{display:'flex',alignItems:'center',height:ROW,padding:'0 10px',justifyContent:'flex-end'}}>
-                      <button style={{background:'none',border:'none',color:T.primary,fontSize:20,
-                        cursor:'pointer',fontWeight:700,padding:0,lineHeight:1}}
-                        onClick={e=>{e.stopPropagation();const firstR=getReasonList(state)[0]||'';setAddBreakdownDay(sel);setAddBreakdownReason(firstR);setAddBreakdownDur('00:30');setAddBreakdownComment('');}}>
-                        ＋
-                      </button>
-                    </div>
-                  )}
-
-                  {/* 追加フォーム */}
-                  {isAdding&&(
-                    <div style={{borderTop:'1px solid '+T.text+'0a',padding:'8px 10px 10px'}}>
-                      <div style={{display:'flex',flexWrap:'wrap',gap:4,marginBottom:8}}>
-                        {[...getReasonList(state),"ー"].map(r=>(
-                          <button key={r} style={{border:'none',borderRadius:20,fontSize:13,fontWeight:600,cursor:'pointer',
-                            padding:'4px 10px',whiteSpace:'nowrap',flexShrink:0,
-                            fontFamily:"'M PLUS Rounded 1c',sans-serif",
-                            background:addBreakdownReason===r?T.primary:T.soft,
-                            color:addBreakdownReason===r?'#fff':T.primary}}
-                            onClick={e=>{e.stopPropagation();setAddBreakdownReason(r);}}>
-                            {r}
-                          </button>
-                        ))}
-                      </div>
-                      <div style={{display:'flex',alignItems:'center',gap:6}}>
-                        <span style={{fontSize:13,color:T.primary,fontWeight:700,flexShrink:0}}>{addBreakdownReason}</span>
-                        <input type='text' value={addBreakdownComment}
-                          onChange={e=>setAddBreakdownComment(e.target.value)}
-                          onClick={e=>e.stopPropagation()}
-                          placeholder='コメント'
-                          autoFocus
-                          style={{flex:1,fontSize:12,border:'none',borderBottom:'1px solid '+T.text+'22',
-                            outline:'none',background:'transparent',padding:'1px 3px',color:T.text,minWidth:0,borderRadius:0}}/>
-                        {/* 時刻範囲（任意） */}
-                        <span style={{display:'flex',alignItems:'center',gap:1,flexShrink:0}}>
-                          <input type='time' value={addBreakdownTimeFrom||''}
-                            onChange={e=>{
-                              const f=e.target.value;
-                              setAddBreakdownTimeFrom(f);
-                              if(f&&addBreakdownTimeTo){
-                                const [fh,fm]=f.split(':').map(Number);
-                                const [th,tm]=addBreakdownTimeTo.split(':').map(Number);
-                                const sec=Math.max(0,(th*60+tm)-(fh*60+fm))*60;
-                                if(sec>0)setAddBreakdownDur(toHHMM(sec));
-                              }
-                            }}
-                            onClick={e=>e.stopPropagation()}
-                            style={{width:44,fontSize:11,fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:600,
-                              border:'none',borderBottom:'1px solid '+T.text+'22',outline:'none',background:'transparent',
-                              color:T.text+'77',padding:'1px 0',textAlign:'center',borderRadius:0}}/>
-                          <span style={{fontSize:11,color:T.text+'33',margin:'0 1px'}}>〜</span>
-                          <input type='time' value={addBreakdownTimeTo||''}
-                            onChange={e=>{
-                              const t=e.target.value;
-                              setAddBreakdownTimeTo(t);
-                              if(addBreakdownTimeFrom&&t){
-                                const [fh,fm]=addBreakdownTimeFrom.split(':').map(Number);
-                                const [th,tm]=t.split(':').map(Number);
-                                const sec=Math.max(0,(th*60+tm)-(fh*60+fm))*60;
-                                if(sec>0)setAddBreakdownDur(toHHMM(sec));
-                              }
-                            }}
-                            onClick={e=>e.stopPropagation()}
-                            style={{width:44,fontSize:11,fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:600,
-                              border:'none',borderBottom:'1px solid '+T.text+'22',outline:'none',background:'transparent',
-                              color:T.text+'77',padding:'1px 0',textAlign:'center',borderRadius:0}}/>
-                        </span>
-                        <input type='text' inputMode='numeric' maxLength={5} autoComplete='off' autoCorrect='off' autoCapitalize='off' spellCheck={false} value={addBreakdownDur}
-                          onChange={e=>{let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&addBreakdownDur.length===1)v+=':';setAddBreakdownDur(v);}}
-                          onFocus={e=>e.target.select()}
-                          onKeyDown={e=>{if(e.key==='Escape')setAddBreakdownDay(null);}}
-                          onClick={e=>e.stopPropagation()}
-                          style={{width:44,textAlign:'right',fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:14,fontWeight:700,
-                            border:'none',borderBottom:'2px solid '+T.primary,outline:'none',background:'transparent',
-                            color:T.primary,padding:'1px 0',letterSpacing:1,flexShrink:0,borderRadius:0}}/>
-                        <button
-                          onClick={e=>{
-                            e.stopPropagation();
-                            let startTs=undefined,endTs=undefined,ms=parseHHMM(addBreakdownDur)*1000;
-                            if(addBreakdownTimeFrom&&addBreakdownTimeTo){
-                              const [fh,fm]=addBreakdownTimeFrom.split(':').map(Number);
-                              const [th,tm]=addBreakdownTimeTo.split(':').map(Number);
-                              startTs=dayMs+fh*3600000+fm*60000;
-                              endTs=dayMs+th*3600000+tm*60000;
-                              ms=Math.max(60000,endTs-startTs); // 時刻範囲優先
-                            }
-                            if(ms<=0){setAddBreakdownDay(null);return;}
-                            const newSess={id:Date.now(),day:sel,ms,reason:addBreakdownReason,comment:addBreakdownComment,
-                              ...(startTs?{start:startTs,end:endTs}:{})};
-                            const allSess=[...(state.timerSessions||[]),newSess];
-                            const newRem=allSess.filter(x=>
-                              (x.start>=dayMs&&x.start<dayMs+86400000)||(!x.start&&x.day===sel)
-                            ).reduce((a,x)=>a+x.ms,0);
-                            const dl={...(state.dailyWearLog||{})};
-                            dl[sel]=Math.max(0,86400-Math.floor(newRem/1000));
-                            update({timerSessions:allSess,dailyWearLog:dl});
-                            setAddBreakdownDay(null);
-                            setAddBreakdownTimeFrom('');
-                            setAddBreakdownTimeTo('');
-                          }}
-                          style={{flexShrink:0,width:26,height:26,border:'none',borderRadius:'50%',
-                            background:T.primary,color:'#fff',fontSize:16,fontWeight:700,cursor:'pointer',
-                            display:'flex',alignItems:'center',justifyContent:'center',lineHeight:1}}>
-                          ＋
-                        </button>
-                      </div>
-                    </div>
-                  )}
+                  <div style={{display:'flex',alignItems:'center',height:ROW,padding:'0 10px',justifyContent:'flex-end'}}>
+                    <button style={{background:'none',border:'none',color:T.primary,fontSize:20,
+                      cursor:'pointer',fontWeight:700,padding:0,lineHeight:1}}
+                      onClick={e=>{e.stopPropagation();const firstR=getReasonList(state)[0]||'';setAddBreakdownDay(sel);setAddBreakdownReason(firstR);setAddBreakdownDur('00:30');setAddBreakdownComment('');setAddBreakdownTimeFrom('');setAddBreakdownTimeTo('');}}>
+                      ＋
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -630,6 +528,85 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
             </div>
         }
       </div>
+
+      {/* 取り外し内訳追加モーダル */}
+      {addBreakdownDay&&(
+        <div className="mo" onClick={()=>setAddBreakdownDay(null)} style={{alignItems:"center"}}>
+          <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:400}}>
+            <div className="mdtitle">取り外しを追加</div>
+            {/* 理由選択 */}
+            <label>理由</label>
+            <div style={{display:'flex',flexWrap:'wrap',gap:8,marginBottom:14}}>
+              {[...getReasonList(state),"ー"].map(r=>(
+                <button key={r}
+                  onClick={()=>setAddBreakdownReason(r)}
+                  style={{padding:'10px 16px',borderRadius:20,border:`1.5px solid ${addBreakdownReason===r?T.primary:T.soft}`,
+                    background:addBreakdownReason===r?T.primary:'transparent',
+                    color:addBreakdownReason===r?'#fff':T.text,
+                    fontSize:15,fontWeight:600,cursor:'pointer',fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>
+                  {r}
+                </button>
+              ))}
+            </div>
+            {/* 時刻 */}
+            <label>時刻（任意）</label>
+            <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:14}}>
+              <input type='time' value={addBreakdownTimeFrom||''} onChange={e=>{
+                const f=e.target.value; setAddBreakdownTimeFrom(f);
+                if(f&&addBreakdownTimeTo){
+                  const [fh,fm]=f.split(':').map(Number);
+                  const [th,tm]=addBreakdownTimeTo.split(':').map(Number);
+                  const sec=Math.max(0,(th*60+tm)-(fh*60+fm))*60;
+                  if(sec>0)setAddBreakdownDur(toHHMM(sec));
+                }}}
+                style={{flex:1,height:44,fontSize:16,borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,padding:'0 12px',WebkitAppearance:'none',appearance:'none'}}/>
+              <span style={{color:T.text+'55'}}>〜</span>
+              <input type='time' value={addBreakdownTimeTo||''} onChange={e=>{
+                const t=e.target.value; setAddBreakdownTimeTo(t);
+                if(addBreakdownTimeFrom&&t){
+                  const [fh,fm]=addBreakdownTimeFrom.split(':').map(Number);
+                  const [th,tm]=t.split(':').map(Number);
+                  const sec=Math.max(0,(th*60+tm)-(fh*60+fm))*60;
+                  if(sec>0)setAddBreakdownDur(toHHMM(sec));
+                }}}
+                style={{flex:1,height:44,fontSize:16,borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,padding:'0 12px',WebkitAppearance:'none',appearance:'none'}}/>
+            </div>
+            {/* 時間 */}
+            <label>時間（HH:MM）</label>
+            <input type='text' inputMode='numeric' maxLength={5} autoComplete='off' value={addBreakdownDur}
+              onChange={e=>{let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&addBreakdownDur.length===1)v+=':';setAddBreakdownDur(v);}}
+              style={{marginBottom:14,textAlign:'center'}}/>
+            {/* コメント */}
+            <label>コメント</label>
+            <input type='text' value={addBreakdownComment} onChange={e=>setAddBreakdownComment(e.target.value)}
+              placeholder='コメントを入力…' style={{marginBottom:16}}/>
+            <div style={{display:'flex',gap:8}}>
+              <button className='btn bs' style={{flex:1}} onClick={()=>setAddBreakdownDay(null)}>キャンセル</button>
+              <button className='btn bp' style={{flex:1}} onClick={()=>{
+                const sel=addBreakdownDay;
+                const dayMs2=new Date(sel+'T00:00:00').getTime();
+                let startTs=undefined,endTs=undefined,ms=parseHHMM(addBreakdownDur)*1000;
+                if(addBreakdownTimeFrom&&addBreakdownTimeTo){
+                  const [fh,fm]=addBreakdownTimeFrom.split(':').map(Number);
+                  const [th,tm]=addBreakdownTimeTo.split(':').map(Number);
+                  startTs=dayMs2+fh*3600000+fm*60000;
+                  endTs=dayMs2+th*3600000+tm*60000;
+                  ms=Math.max(60000,endTs-startTs);
+                }
+                if(ms<=0){setAddBreakdownDay(null);return;}
+                const newSess={id:Date.now(),day:sel,ms,reason:addBreakdownReason,comment:addBreakdownComment,
+                  ...(startTs?{start:startTs,end:endTs}:{})};
+                const allSess=[...(state.timerSessions||[]),newSess];
+                const newRem=allSess.filter(x=>(x.start>=dayMs2&&x.start<dayMs2+86400000)||(!x.start&&x.day===sel)).reduce((a,x)=>a+x.ms,0);
+                const dl={...(state.dailyWearLog||{})};
+                dl[sel]=Math.max(0,86400-Math.floor(newRem/1000));
+                update({timerSessions:allSess,dailyWearLog:dl});
+                setAddBreakdownDay(null);
+              }}>追加</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Add event modal */}
       {showAddModal&&(

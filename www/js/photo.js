@@ -461,7 +461,7 @@ function PhotoPage({T,state,update,todayStr}){
                 borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,
                 padding:"0 12px",WebkitAppearance:"none",appearance:"none"}}/>
             <label>マウスピース番号</label>
-            <input type="number" min={1} max={100} value={editPiece} onChange={e=>setEditPiece(parseInt(e.target.value)||1)} style={{marginBottom:6}}/>
+            <input type="number" min={1} max={100} value={editPiece} onChange={e=>setEditPiece(parseInt(e.target.value)||1)} style={{marginBottom:6,textAlign:"center"}}/>
             <div style={{fontSize:11,color:T.text+"55",marginBottom:14}}>部位は変更できません</div>
             <button className="btn bs" style={{width:"100%",marginBottom:10}} onClick={()=>{
               const photo=state.photos.find(p=>p.id===editId);

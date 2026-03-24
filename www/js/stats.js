@@ -1,6 +1,7 @@
 function StatsPage({T,state,update,todayStr,todayDayStartMs}){
   const isPremium=IS_PREMIUM;
   useTick(1000, state.timerRunning);
+  const fmtShort = ds => { if(!ds) return "—"; const d=new Date(ds+"T00:00:00"); return `${d.getMonth()+1}/${d.getDate()}`; };
 
   const [period,setPeriod]=useState("daily");
   const [statsView,setStatsView]=useState("breakdown");
@@ -156,8 +157,8 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
       if(ds >= startStr && (!nextStartStr || ds < nextStartStr)) total += secs;
     });
     const rangeLabel = startStr && endStr
-      ? `${fmtDateJP(startStr)}〜${fmtDateJP(endStr)}`
-      : startStr ? `${fmtDateJP(startStr)}〜` : "—";
+      ? `${fmtShort(startStr)}〜${fmtShort(endStr)}`
+      : startStr ? `${fmtShort(startStr)}〜` : "—";
     return { n: p.n, label: p.label, rangeLabel, total };
   });
 
@@ -271,7 +272,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
                 return(
                   <div key={n} className="wr" style={{opacity:(total===0&&!isAct)?0.45:1}}>
                     <div style={{display:"flex",alignItems:"center",gap:8,flex:1,minWidth:0}}>
-                      <div style={{width:22,height:22,borderRadius:"50%",background:isAct?T.primary:T.soft,color:isAct?"#fff":T.text,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,flexShrink:0}}>#{label}</div>
+                      <div style={{width:22,height:22,borderRadius:"50%",background:isAct?T.primary:T.soft,color:isAct?"#fff":T.text,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,flexShrink:0}}>{ label }</div>
                       <span style={{fontSize:12,color:T.text+"99",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:160}}>{rangeLabel}</span>
                     </div>
                     <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,color:isAct?T.primary:T.text+"88",fontSize:14,flexShrink:0}}>{fmt(total)}</span>
