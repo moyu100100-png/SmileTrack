@@ -49,8 +49,8 @@ function HomePage({T,state,todayStr,todayDayStartMs,onGoTimer}){
   return(
     <div style={{display:"flex",flexDirection:"column",height:"100%"}}>
       {/* Donut Card */}
-      <div style={{background:T.bg,padding:"10px 12px 6px",flex:"0 0 auto"}}>
-        <div className="card" style={{display:"flex",justifyContent:"center",alignItems:"center",padding:"20px 13px",cursor:"pointer"}} onClick={onGoTimer}>
+      <div style={{background:T.bg,padding:"8px 12px 6px",flex:"1 1 auto",display:"flex",flexDirection:"column"}}>
+        <div className="card" style={{display:"flex",justifyContent:"center",alignItems:"center",padding:"24px 13px",cursor:"pointer",flex:1}} onClick={onGoTimer}>
           <div style={{position:"relative",width:SZ,height:SZ}}>
             <svg width={SZ} height={SZ} style={{transform:"rotate(-90deg)"}}>
               <circle cx={SZ/2} cy={SZ/2} r={R} fill="none" stroke={T.soft} strokeWidth={STK}/>
@@ -69,7 +69,7 @@ function HomePage({T,state,todayStr,todayDayStartMs,onGoTimer}){
         </div>
       </div>
       {/* Stats grid 2×2 */}
-      <div style={{background:T.bg,padding:"6px 12px 0",display:"flex",flexDirection:"column",gap:6}}>
+      <div style={{background:T.bg,padding:"6px 12px 0",display:"flex",flexDirection:"column",gap:6,flex:"0 0 auto"}}>
         {totalEndDate&&new Date(dsFromDate(totalEndDate)+"T00:00:00").getTime()<todayMs?(
           /* 治療完了 */
           <div style={{background:T.card,borderRadius:16,padding:"32px 16px",textAlign:"center"}}>
