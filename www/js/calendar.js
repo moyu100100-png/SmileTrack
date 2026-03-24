@@ -9,7 +9,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
   const [vm,setVm] = useState(today.getMonth());
   const [sel,setSel] = useState(todayStr);
   const [showAddModal,setShowAddModal] = useState(false);
-  const [apptForm,setApptForm] = useState({date:todayStr,time:"",title:"",note:""});
+  const [apptForm,setApptForm] = useState({date:todayStr,time:"",title:"",note:"",allDay:false});
   const [editLogDay,setEditLogDay] = useState(null);
   const [editLogVal,setEditLogVal] = useState("22:00");
   // セッション追加フォーム
@@ -595,7 +595,11 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
               {confirmDeleteId&&selSessions.some(s=>s.id===confirmDeleteId)&&(
                 <div className='mo' onClick={()=>setConfirmDeleteId(null)} style={{alignItems:'center'}}>
                   <div className='md' style={{padding:'22px 20px 18px',borderRadius:20,maxWidth:340}} onClick={e=>e.stopPropagation()}>
-                    <div style={{textAlign:'center',fontSize:28,marginBottom:8}}>🗑</div>
+                    <div style={{display:"flex",justifyContent:"center",marginBottom:8}}>
+                      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                      </svg>
+                    </div>
                     <div style={{textAlign:'center',fontSize:17,fontWeight:700,color:T.text,marginBottom:6}}>削除しますか？</div>
                     <div style={{textAlign:'center',fontSize:14,color:T.text+'66',marginBottom:20}}>
                       「{selSessions.find(s=>s.id===confirmDeleteId)?.reason||'その他'}」の記録を削除します
@@ -635,21 +639,27 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
             <label>タイトル</label>
             <input value={apptForm.title} onChange={e=>setApptForm(f=>({...f,title:e.target.value}))} placeholder="タイトル" style={{marginBottom:8}}/>
             <label>日付</label>
-            <input type="date" value={apptForm.date} onChange={e=>setApptForm(f=>({...f,date:e.target.value}))} style={{marginBottom:8,width:"100%",boxSizing:"border-box"}}/>
-            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:6}}>
+            <input type="date" value={apptForm.date} onChange={e=>setApptForm(f=>({...f,date:e.target.value}))}
+              style={{marginBottom:8,width:"100%",boxSizing:"border-box",height:44,fontSize:16,
+                borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,
+                padding:"0 12px",WebkitAppearance:"none",appearance:"none"}}/>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
               <label style={{margin:0}}>時間</label>
               <div style={{display:"flex",alignItems:"center",gap:8}}>
-                <span style={{fontSize:12,color:T.text+"66"}}>終日</span>
-                <button onClick={()=>setApptForm(f=>({...f,allDay:!f.allDay,time:f.allDay?"":""}))}
-                  style={{width:40,height:22,borderRadius:11,border:"none",cursor:"pointer",
+                <span style={{fontSize:13,color:T.text+"66"}}>終日</span>
+                <button onClick={()=>setApptForm(f=>({...f,allDay:!f.allDay}))}
+                  style={{width:44,height:24,borderRadius:12,border:"none",cursor:"pointer",
                     background:apptForm.allDay?T.primary:T.soft,position:"relative",flexShrink:0,transition:"background .2s"}}>
-                  <div style={{width:18,height:18,borderRadius:"50%",background:"#fff",position:"absolute",
-                    top:2,left:apptForm.allDay?20:2,transition:"left .2s",boxShadow:"0 1px 3px #0003"}}/>
+                  <div style={{width:20,height:20,borderRadius:"50%",background:"#fff",position:"absolute",
+                    top:2,left:apptForm.allDay?22:2,transition:"left .2s",boxShadow:"0 1px 3px #0003"}}/>
                 </button>
               </div>
             </div>
             {!apptForm.allDay&&(
-              <input type="time" value={apptForm.time} onChange={e=>setApptForm(f=>({...f,time:e.target.value}))} style={{marginBottom:14,width:"100%",boxSizing:"border-box"}}/>
+              <input type="time" value={apptForm.time} onChange={e=>setApptForm(f=>({...f,time:e.target.value}))}
+                style={{marginBottom:14,width:"100%",boxSizing:"border-box",height:44,fontSize:16,
+                  borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,
+                  padding:"0 12px",WebkitAppearance:"none",appearance:"none"}}/>
             )}
             <div style={{display:"flex",gap:8}}>
               <button className="btn bs" style={{flex:1}} onClick={()=>setShowAddModal(false)}>キャンセル</button>

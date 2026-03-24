@@ -456,7 +456,10 @@ function PhotoPage({T,state,update,todayStr}){
             <label>コメント</label>
             <input value={editComment} onChange={e=>setEditComment(e.target.value)} style={{marginBottom:10}}/>
             <label>日付</label>
-            <input type="date" value={editDate} onChange={e=>setEditDate(e.target.value)} style={{marginBottom:10,width:"100%",boxSizing:"border-box"}}/>
+            <input type="date" value={editDate} onChange={e=>setEditDate(e.target.value)}
+              style={{marginBottom:10,width:"100%",boxSizing:"border-box",height:44,fontSize:16,
+                borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,
+                padding:"0 12px",WebkitAppearance:"none",appearance:"none"}}/>
             <label>マウスピース番号</label>
             <input type="number" min={1} max={100} value={editPiece} onChange={e=>setEditPiece(parseInt(e.target.value)||1)} style={{marginBottom:6}}/>
             <div style={{fontSize:11,color:T.text+"55",marginBottom:14}}>部位は変更できません</div>
@@ -572,19 +575,19 @@ function PhotoPage({T,state,update,todayStr}){
                   const isLand=shotInfo.isLandscape;
                   const img=new Image();
                   img.onload=()=>{
-                    // 出力サイズを部位に合わせる
                     const outW=isLand?1280:720;
                     const outH=isLand?720:960;
                     const canvas=document.createElement("canvas");
                     canvas.width=outW;canvas.height=outH;
                     const ctx=canvas.getContext("2d");
-                    // 画像をキャンバス中央に配置してスケール・オフセット適用
-                    const baseScale=Math.max(outW/img.width,outH/img.height);
+                    // プレビュー表示と同じ計算：画像をcontainで収めた上でユーザーのscale/offsetを適用
+                    const fitScale=Math.min(outW/img.width,outH/img.height);
+                    const dispW=img.width*fitScale;
+                    const dispH=img.height*fitScale;
                     ctx.save();
-                    ctx.translate(outW/2,outH/2);
-                    ctx.scale(albumScale*baseScale,albumScale*baseScale);
-                    ctx.translate(-img.width/2+albumOffset.x/baseScale,-img.height/2+albumOffset.y/baseScale);
-                    ctx.drawImage(img,0,0);
+                    ctx.translate(outW/2+albumOffset.x,outH/2+albumOffset.y);
+                    ctx.scale(albumScale,albumScale);
+                    ctx.drawImage(img,-dispW/2,-dispH/2,dispW,dispH);
                     ctx.restore();
                     const data=canvas.toDataURL("image/webp",0.8);
                     update({photos:[...(state.photos||[]),{
