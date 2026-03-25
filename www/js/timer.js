@@ -46,6 +46,16 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
   const confirmReason=reason=>{setPendingReason(null);update({timerRunning:true,timerStart:Date.now(),timerElapsed:0,_pendingReason:reason});};
   const secToHHMM=sec=>`${String(Math.floor(sec/3600)).padStart(2,"0")}:${String(Math.floor((sec%3600)/60)).padStart(2,"0")}`;
   const secToHHMMSS=sec=>`${String(Math.floor(sec/3600)).padStart(2,"0")}:${String(Math.floor((sec%3600)/60)).padStart(2,"0")}:${String(sec%60).padStart(2,"0")}`;
+
+  // 時刻が変わったら時間を自動計算
+  useEffect(()=>{
+    if(timerEditSessFrom&&timerEditSessTo){
+      const [fh,fm]=timerEditSessFrom.split(':').map(Number);
+      const [th,tm]=timerEditSessTo.split(':').map(Number);
+      const sec=Math.max(0,(th*60+tm)-(fh*60+fm))*60;
+      if(sec>0)setTimerEditSessDur(secToHHMM(sec));
+    }
+  },[timerEditSessFrom,timerEditSessTo]);
   const parseHHMM2=str=>{const[h,m]=(str+":0").split(":");return Math.max(0,Math.min(86400,(parseInt(h)||0)*3600+(parseInt(m)||0)*60));};
 
   const deleteSess=id=>{

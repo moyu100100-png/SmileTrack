@@ -31,6 +31,16 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
   // 削除確認
   const [confirmDeleteId,setConfirmDeleteId] = useState(null);
 
+  // 時刻が変わったら時間を自動計算
+  React.useEffect(()=>{
+    if(editSessFrom&&editSessTo){
+      const [fh,fm]=editSessFrom.split(':').map(Number);
+      const [th,tm]=editSessTo.split(':').map(Number);
+      const sec=Math.max(0,(th*60+tm)-(fh*60+fm))*60;
+      if(sec>0)setEditSessDur(toHHMM(sec));
+    }
+  },[editSessFrom,editSessTo]);
+
   const ws = state.settings?.calendarWeekStart ?? 0;
   const DOW = ws===0 ? ["日","月","火","水","木","金","土"] : ["月","火","水","木","金","土","日"];
 
