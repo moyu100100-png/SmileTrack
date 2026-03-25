@@ -376,7 +376,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
         const saveEdit=()=>{
           const dayMs2=new Date(sel+'T00:00:00').getTime();
           let patch={reason:editSessReason,noReason:!editSessReason,comment:editSessComment};
-          if(editSessHasRange&&editSessFrom&&editSessTo){
+          if(editSessFrom&&editSessTo){
             const [fh,fm]=editSessFrom.split(':').map(Number);
             const [th,tm]=editSessTo.split(':').map(Number);
             const start=dayMs2+fh*3600000+fm*60000;
