@@ -226,24 +226,28 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
               </div>
               <label>時刻</label>
               <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:14}}>
-                <input type='time' value={timerEditSessFrom} onChange={e=>{
-                  setTimerEditSessFrom(e.target.value);
-                  if(timerEditSessTo){
-                    const [fh,fm]=e.target.value.split(':').map(Number);
-                    const [th,tm]=timerEditSessTo.split(':').map(Number);
-                    const sec=Math.max(0,(th*60+tm)-(fh*60+fm))*60;
-                    if(sec>0)setTimerEditSessDur(secToHHMM(sec));
-                  }}}
+                <input type='time' value={timerEditSessFrom}
+                  onChange={e=>{setTimerEditSessFrom(e.target.value);}}
+                  onBlur={e=>{
+                    const f=e.target.value;
+                    if(f&&timerEditSessTo){
+                      const [fh,fm]=f.split(':').map(Number);
+                      const [th,tm]=timerEditSessTo.split(':').map(Number);
+                      const sec=Math.max(0,(th*60+tm)-(fh*60+fm))*60;
+                      if(sec>0)setTimerEditSessDur(secToHHMM(sec));
+                    }}}
                   style={{flex:1,height:44,fontSize:16,borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,padding:'0 12px',WebkitAppearance:'none',appearance:'none'}}/>
                 <span style={{color:T.text+'55'}}>〜</span>
-                <input type='time' value={timerEditSessTo} onChange={e=>{
-                  setTimerEditSessTo(e.target.value);
-                  if(timerEditSessFrom){
-                    const [fh,fm]=timerEditSessFrom.split(':').map(Number);
-                    const [th,tm]=e.target.value.split(':').map(Number);
-                    const sec=Math.max(0,(th*60+tm)-(fh*60+fm))*60;
-                    if(sec>0)setTimerEditSessDur(secToHHMM(sec));
-                  }}}
+                <input type='time' value={timerEditSessTo}
+                  onChange={e=>{setTimerEditSessTo(e.target.value);}}
+                  onBlur={e=>{
+                    const t=e.target.value;
+                    if(timerEditSessFrom&&t){
+                      const [fh,fm]=timerEditSessFrom.split(':').map(Number);
+                      const [th,tm]=t.split(':').map(Number);
+                      const sec=Math.max(0,(th*60+tm)-(fh*60+fm))*60;
+                      if(sec>0)setTimerEditSessDur(secToHHMM(sec));
+                    }}}
                   style={{flex:1,height:44,fontSize:16,borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,padding:'0 12px',WebkitAppearance:'none',appearance:'none'}}/>
               </div>
               <label>時間</label>
