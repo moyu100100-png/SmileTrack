@@ -210,7 +210,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
                       // 毎週: 年 → 日付範囲（同サイズ）
                       <>
                         <div style={{fontSize:12,color:isSelected?T.accent:T.text+"55",fontWeight:isSelected?700:400}}>{b.yearLabel}</div>
-                        <div style={{fontSize:12,color:labelColor,fontWeight:labelWeight,whiteSpace:"nowrap"}}>{b.label}</div>
+                        <div style={{fontSize:12,color:labelColor,fontWeight:labelWeight,whiteSpace:"pre-line",textAlign:"center",lineHeight:1.3}}>{b.label}</div>
                       </>
                     ) : (
                       <div style={{fontSize:11,color:labelColor,fontWeight:labelWeight}}>{b.label}</div>

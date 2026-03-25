@@ -19,7 +19,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
   const [addBreakdownComment,setAddBreakdownComment] = useState("");
   const [addBreakdownTimeFrom,setAddBreakdownTimeFrom] = useState("");
   const [addBreakdownTimeTo,setAddBreakdownTimeTo] = useState("");
-  const [addUseTime,setAddUseTime] = useState(false);
+  const [addUseTime,setAddUseTime] = useState(true);
   // 編集モーダル
   const [editSessId,setEditSessId] = useState(null);
   const [editSessReason,setEditSessReason] = useState("");
@@ -487,8 +487,8 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                 </button>
               </div>
             </div>
-            {addUseTime?(
-              <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:14}}>
+            {addUseTime&&(
+              <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:8}}>
                 <input type='time' value={addBreakdownTimeFrom||''} onChange={e=>{
                   const f=e.target.value; setAddBreakdownTimeFrom(f);
                   if(f&&addBreakdownTimeTo){
@@ -509,14 +509,14 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                   }}}
                   style={{flex:1,height:44,fontSize:16,borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,padding:'0 12px',WebkitAppearance:'none',appearance:'none'}}/>
               </div>
-            ):(
-              <div style={{marginBottom:14}}>
-                <label>時間</label>
-                <input type='text' inputMode='numeric' maxLength={5} autoComplete='off' value={addBreakdownDur}
-                  onChange={e=>{let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&addBreakdownDur.length===1)v+=':';setAddBreakdownDur(v);}}
-                  style={{textAlign:'center'}}/>
-              </div>
             )}
+            <div style={{marginBottom:14}}>
+              <label>時間</label>
+              <input type='text' inputMode='numeric' maxLength={5} autoComplete='off' value={addBreakdownDur}
+                onChange={e=>{if(addUseTime)return;let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&addBreakdownDur.length===1)v+=':';setAddBreakdownDur(v);}}
+                readOnly={addUseTime}
+                style={{textAlign:'center',opacity:addUseTime?0.6:1,background:addUseTime?T.soft:T.bg}}/>
+            </div>
             {/* コメント */}
             <label>コメント</label>
             <input type='text' value={addBreakdownComment} onChange={e=>setAddBreakdownComment(e.target.value)}

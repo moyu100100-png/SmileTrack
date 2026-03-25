@@ -64,6 +64,7 @@ function PhotoPage({T,state,update,todayStr}){
   const [albumOffset,setAlbumOffset]=useState({x:0,y:0});
   const [albumDragStart,setAlbumDragStart]=useState(null);
   const [albumPinchDist,setAlbumPinchDist]=useState(null);
+  const albumPreviewRef=useRef(null);
   // カラー調整 0〜100%・デフォルト50%
   const [brightness,setBrightness]=useState(50);
   const [saturation,setSaturation]=useState(50);
@@ -499,7 +500,7 @@ function PhotoPage({T,state,update,todayStr}){
               // 横長(歯)→16:9、縦長(顔)→3:4
               const aspectPad=isLand?"56.25%":"133.33%";
               return(
-                <div style={{position:"relative",width:"100%",paddingTop:aspectPad,background:"#111",borderRadius:12,overflow:"hidden",marginBottom:12,touchAction:"none"}}
+                <div ref={albumPreviewRef} style={{position:"relative",width:"100%",paddingTop:aspectPad,background:"#111",borderRadius:12,overflow:"hidden",marginBottom:12,touchAction:"none"}}
                   onMouseDown={e=>{setAlbumDragStart({x:e.clientX-albumOffset.x,y:e.clientY-albumOffset.y});}}
                   onMouseMove={e=>{if(albumDragStart)setAlbumOffset({x:e.clientX-albumDragStart.x,y:e.clientY-albumDragStart.y});}}
                   onMouseUp={()=>setAlbumDragStart(null)}
@@ -580,14 +581,22 @@ function PhotoPage({T,state,update,todayStr}){
                     const canvas=document.createElement("canvas");
                     canvas.width=outW;canvas.height=outH;
                     const ctx=canvas.getContext("2d");
-                    // プレビュー表示と同じ計算：画像をcontainで収めた上でユーザーのscale/offsetを適用
-                    const fitScale=Math.min(outW/img.width,outH/img.height);
+                    // プレビューエリアの実際のサイズを取得
+                    const previewEl=albumPreviewRef.current;
+                    const previewW=previewEl?previewEl.offsetWidth:outW;
+                    const previewH=previewEl?previewEl.offsetHeight:outH;
+                    // プレビューとcanvasのスケール比
+                    const scaleX=outW/previewW;
+                    const scaleY=outH/previewH;
+                    // 画像をcontainで収めるfitScale（プレビューサイズ基準）
+                    const fitScale=Math.min(previewW/img.width,previewH/img.height);
                     const dispW=img.width*fitScale;
                     const dispH=img.height*fitScale;
                     ctx.save();
-                    ctx.translate(outW/2+albumOffset.x,outH/2+albumOffset.y);
+                    // オフセットをcanvasスケールに変換
+                    ctx.translate(outW/2+albumOffset.x*scaleX,outH/2+albumOffset.y*scaleY);
                     ctx.scale(albumScale,albumScale);
-                    ctx.drawImage(img,-dispW/2,-dispH/2,dispW,dispH);
+                    ctx.drawImage(img,-dispW*scaleX/2,-dispH*scaleY/2,dispW*scaleX,dispH*scaleY);
                     ctx.restore();
                     const data=canvas.toDataURL("image/webp",0.8);
                     update({photos:[...(state.photos||[]),{

@@ -24,9 +24,10 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
   useEffect(()=>{
     if(isAlarmNow) playAlarmSound(state.alarmSound||"standard");
   },[isAlarmNow]);
+  const cycleCount=Math.floor(currentSec/CYCLE);
   const cycleProgress=(currentSec%CYCLE)/CYCLE;
+  const cycleColor=cycleCount%2===0?T.primary:T.accent;
   const isAlarm=state.alarmEnabled&&timerRunning&&currentSec>=alarmSecs;
-  const showBreakdown=state.showReasonBreakdown!==false;
   const todaySess=(state.timerSessions||[]).filter(s=>
     (s.start>=todayDayStartMs&&s.start<todayDayEndMs)||(!s.start&&s.day===todayStr)
   );
@@ -82,14 +83,14 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
           <div style={{position:"relative",width:sz,height:sz,cursor:"pointer"}} onClick={onStartPress}>
             <svg width={sz} height={sz} style={{transform:"rotate(-90deg)"}}>
               <circle cx={sz/2} cy={sz/2} r={rad} fill="none" stroke={T.soft} strokeWidth={stk}/>
-              <circle cx={sz/2} cy={sz/2} r={rad} fill="none" stroke={isAlarm?(["atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"].includes(state.themeName)?(state.themeName==="atrium"?"#5A452C":T.soft):"#E74C3C"):T.primary} strokeWidth={stk}
+              <circle cx={sz/2} cy={sz/2} r={rad} fill="none" stroke={cycleColor} strokeWidth={stk}
                 strokeDasharray={cir} strokeDashoffset={cir*(1-cycleProgress)} strokeLinecap="round" style={{transition:"stroke-dashoffset .5s"}}/>
             </svg>
             <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2}}>
               {timerRunning&&showBreakdown&&state._pendingReason&&(
                 <div style={{fontSize:17,color:T.accent,fontWeight:700,marginBottom:2}}>{state._pendingReason}</div>
               )}
-              <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:centerFontSize,fontWeight:700,color:isAlarm?(["atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"].includes(state.themeName)?(state.themeName==="atrium"?"#5A452C":T.soft):"#E74C3C"):T.primary,lineHeight:1}}>{fmt(currentSec)}</div>
+              <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:centerFontSize,fontWeight:700,color:T.primary,lineHeight:1}}>{fmt(currentSec)}</div>
               <div style={{fontSize:Math.round(centerFontSize*.38),color:T.text+"66",marginTop:4}}>取り外し合計時間</div>
               <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:Math.round(centerFontSize*.82),fontWeight:600,color:T.text+"77",lineHeight:1}}>{fmt(totalRemovedSec)}</div>
             </div>
@@ -204,7 +205,11 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
         return(
           <div className="mo" onClick={()=>setTimerEditSessId(null)} style={{alignItems:"center"}}>
             <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:400}}>
-              <div className="mdtitle">取り外しを編集</div>
+              <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
+                <div className="mdtitle" style={{margin:0}}>取り外しを編集</div>
+                <button style={{background:'none',border:'none',color:'#E74C3C',fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:"'M PLUS Rounded 1c',sans-serif",padding:'4px 8px'}}
+                  onClick={()=>{setTimerConfirmDeleteId(timerEditSessId);setTimerEditSessId(null);}}>削除</button>
+              </div>
               <label>理由</label>
               <div style={{display:'flex',flexWrap:'wrap',gap:8,marginBottom:14}}>
                 {[...getReasonList(state),"ー"].map(r=>(
@@ -240,21 +245,16 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
                   }}}
                   style={{flex:1,height:44,fontSize:16,borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,padding:'0 12px',WebkitAppearance:'none',appearance:'none'}}/>
               </div>
-              {!isFromTimer&&(
-                <>
-                  <label>時間</label>
-                  <input type='text' inputMode='numeric' maxLength={5} autoComplete='off' value={timerEditSessDur}
-                    onChange={e=>{let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&timerEditSessDur.length===1)v+=':';setTimerEditSessDur(v);}}
-                    style={{marginBottom:14,textAlign:'center'}}/>
-                </>
-              )}
+              <label>時間</label>
+              <input type='text' inputMode='numeric' maxLength={5} autoComplete='off' value={timerEditSessDur}
+                onChange={e=>{if(isFromTimer)return;let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&timerEditSessDur.length===1)v+=':';setTimerEditSessDur(v);}}
+                readOnly={isFromTimer}
+                style={{marginBottom:14,textAlign:'center',opacity:isFromTimer?0.6:1,background:isFromTimer?T.soft:T.bg}}/>
               <label>コメント</label>
               <input type='text' value={timerEditSessComment} onChange={e=>setTimerEditSessComment(e.target.value)}
                 placeholder='コメントを入力…' style={{marginBottom:16}}/>
               <div style={{display:'flex',gap:8}}>
                 <button className='btn bs' style={{flex:1}} onClick={()=>setTimerEditSessId(null)}>キャンセル</button>
-                <button style={{flex:1,padding:'10px',border:'none',borderRadius:12,background:'#E74C3C',color:'#fff',fontWeight:600,cursor:'pointer',fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:15}}
-                  onClick={()=>{setTimerConfirmDeleteId(timerEditSessId);setTimerEditSessId(null);}}>削除</button>
                 <button className='btn bp' style={{flex:1}} onClick={saveTimerEdit}>保存</button>
               </div>
             </div>
