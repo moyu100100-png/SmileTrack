@@ -435,14 +435,11 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                   }}}
                   style={{flex:1,height:44,fontSize:16,borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,padding:'0 12px',WebkitAppearance:'none',appearance:'none'}}/>
               </div>
-              {!isFromTimer&&(
-                <>
-                  <label>時間</label>
-                  <input type='text' inputMode='numeric' maxLength={5} autoComplete='off' value={editSessDur}
-                    onChange={e=>{let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&editSessDur.length===1)v+=':';setEditSessDur(v);}}
-                    style={{marginBottom:14,textAlign:'center'}}/>
-                </>
-              )}
+              <label>時間</label>
+              <input type='text' inputMode='numeric' maxLength={5} autoComplete='off' value={editSessDur}
+                onChange={e=>{if(isFromTimer)return;let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&editSessDur.length===1)v+=':';setEditSessDur(v);}}
+                readOnly={isFromTimer}
+                style={{marginBottom:14,textAlign:'center',opacity:isFromTimer?0.6:1,background:isFromTimer?T.soft:T.bg}}/>
               <label>コメント</label>
               <input type='text' value={editSessComment} onChange={e=>setEditSessComment(e.target.value)}
                 placeholder='コメントを入力…' style={{marginBottom:16}}/>
