@@ -28,6 +28,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
   const cycleProgress=(currentSec%CYCLE)/CYCLE;
   const cycleColor=cycleCount%2===0?T.primary:T.accent;
   const isAlarm=state.alarmEnabled&&timerRunning&&currentSec>=alarmSecs;
+  const showBreakdown=state.showReasonBreakdown!==false;
   const todaySess=(state.timerSessions||[]).filter(s=>
     (s.start>=todayDayStartMs&&s.start<todayDayEndMs)||(!s.start&&s.day===todayStr)
   );
