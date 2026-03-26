@@ -152,8 +152,9 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
             const isSun2 = ws===0?dow===0:dow===1;
             const isSat2 = ws===0?dow===6:dow===0;
             const greyFailThemes=["blush","wisteria","powder","glacier","amber"];
+            const accentFailThemes=["atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"];
             const isNight=state.themeName==="night";
-            const failBgColor=isNight?"rgba(220,38,38,0.28)":greyFailThemes.includes(state.themeName)?"rgba(160,160,160,0.22)":"rgba(220,38,38,0.12)";
+            const failBgColor=isNight?"rgba(220,38,38,0.28)":accentFailThemes.includes(state.themeName)?T.soft+"66":greyFailThemes.includes(state.themeName)?"rgba(160,160,160,0.22)":"rgba(220,38,38,0.12)";
             let numBg="transparent",numColor=isPast?(T.text+"66"):isSun2?"#DC2626":isSat2?"#2563EB":T.text,numFw=400;
             if(isSel){ numBg=T.primary; numColor="#fff"; numFw=700; }
             else if(isToday){ numBg=T.soft; numColor=T.primary; numFw=700; }
@@ -193,9 +194,10 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
           <span style={{fontSize:11,display:"flex",alignItems:"center",gap:3,color:T.text+"77"}}><span style={{width:10,height:10,borderRadius:2,background:`${T.primary}22`,border:`1.5px solid ${T.primary}`,display:"inline-block"}}/>達成</span>
           {(()=>{
             const gf=["blush","wisteria","powder","glacier","amber"];
+            const af=["atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"];
             const isN=state.themeName==="night";
-            const failBg=isN?"rgba(220,38,38,0.35)":gf.includes(state.themeName)?"rgba(160,160,160,0.25)":"rgba(220,38,38,0.12)";
-            const failBd=isN?"1.5px solid rgba(220,38,38,0.7)":gf.includes(state.themeName)?"1.5px solid #aaa":"1.5px solid #DC2626";
+            const failBg=isN?"rgba(220,38,38,0.35)":af.includes(state.themeName)?T.soft+"99":gf.includes(state.themeName)?"rgba(160,160,160,0.25)":"rgba(220,38,38,0.12)";
+            const failBd=isN?"1.5px solid rgba(220,38,38,0.7)":af.includes(state.themeName)?`1.5px solid ${T.soft}`:gf.includes(state.themeName)?"1.5px solid #aaa":"1.5px solid #DC2626";
             return <span style={{fontSize:11,display:"flex",alignItems:"center",gap:3,color:T.text+"77"}}><span style={{width:10,height:10,borderRadius:2,background:failBg,border:failBd,display:"inline-block"}}/>未達</span>;
           })()}
           <span style={{fontSize:11,display:"flex",alignItems:"center",gap:3,color:T.text+"77"}}><span style={{width:10,height:10,borderRadius:"2px",border:`2px solid ${T.accent}`,display:"inline-block"}}/>交換日</span>
@@ -234,7 +236,8 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
           const toHHMM=sec=>`${String(Math.floor(sec/3600)).padStart(2,"0")}:${String(Math.floor((sec%3600)/60)).padStart(2,"0")}`;
           const fmtTs=ts=>{const d=new Date(ts);return`${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;};
           const greyFailT=["blush","wisteria","powder","glacier","amber"];
-          const failColor=state.themeName==="night"?"rgba(220,38,38,0.8)":greyFailT.includes(state.themeName)?"#A0A0A0":"#E88080";
+          const accentFailT=["atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"];
+          const failColor=state.themeName==="night"?"rgba(220,38,38,0.8)":accentFailT.includes(state.themeName)?T.soft:greyFailT.includes(state.themeName)?"#A0A0A0":"#E88080";
               const wearColor=hasLog?(wearSec>=targetSecs?T.primary:failColor):T.text+"44";
           const ROW=38;
 

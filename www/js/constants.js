@@ -13,8 +13,8 @@ const THEMES = {
   navyrose:   { primary:"#023059", accent:"#708BB2", bg:"#F4F6FA", card:"#FFFFFF", soft:"#8C613B", text:"#011828", secondary:"#8C613B", removedColor:"#C0CCDC" },
   deepteal:   { primary:"#2E6858", accent:"#1c3f35", bg:"#F2EDE4", card:"#FFFFFF", soft:"#C8A870", text:"#0E2418", secondary:"#C8A870", removedColor:"#B0D8CC" },
   elegan:     { primary:"#773335", accent:"#6e6466", bg:"#cdcdc3", card:"#FFFFFF", soft:"#bbada9", text:"#373838", secondary:"#bbada9", removedColor:"#C8B0B0" },
-  ashviolet:  { primary:"#092948", accent:"#C49090", bg:"#F3EBD9", card:"#FFFFFF", soft:"#D8E8F4", text:"#0A1828", secondary:"#D8E8F4", removedColor:"#C8D8E8" },
-  blushhemp:  { primary:"#402924", accent:"#E8D8C8", bg:"#FAF6F2", card:"#FFFFFF", soft:"#C49090", text:"#1A0C08", secondary:"#C49090", removedColor:"#D8C8B8" },
+  ashviolet:  { primary:"#092948", accent:"#D8E8F4", bg:"#F3EBD9", card:"#FFFFFF", soft:"#C49090", text:"#0A1828", secondary:"#D8E8F4", removedColor:"#C8D8E8" },
+  blushhemp:  { primary:"#C49090", accent:"#E8D8C8", bg:"#FAF6F2", card:"#FFFFFF", soft:"#402924", text:"#1A0C08", secondary:"#C49090", removedColor:"#D8C8B8" },
 };
 
 // 理由リストはstateから動的に取得する

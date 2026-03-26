@@ -61,10 +61,8 @@ function HomePage({T,state,todayStr,todayDayStartMs,onGoTimer}){
             <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2}}>
               <div style={{fontSize:Math.round(centerFontSize*.5),color:T.text+"77",fontWeight:600}}>本日の装着時間</div>
               {(()=>{
-                const accentNum=["atrium","navyrose","deepteal","ashviolet","blushhemp"].includes(state.themeName);
-                const numC=accentNum?T.soft:T.primary;
                 return <>
-                  <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:centerFontSize,fontWeight:700,color:numC,lineHeight:1}}>{fmt(actualWearSec)}</div>
+                  <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:centerFontSize,fontWeight:700,color:T.primary,lineHeight:1}}>{fmt(actualWearSec)}</div>
                   <div style={{fontSize:Math.round(centerFontSize*.5),color:T.text+"77"}}>取り外し</div>
                   <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:Math.round(centerFontSize*.82),fontWeight:600,color:T.text+"99",lineHeight:1}}>{fmt(totalRemovedSec)}</div>
                 </>;
@@ -83,8 +81,7 @@ function HomePage({T,state,todayStr,todayDayStartMs,onGoTimer}){
         ):(
           <>
           {(()=>{
-            const accentNum=["atrium","navyrose","deepteal","ashviolet","blushhemp"].includes(state.themeName);
-            const nC=accentNum?T.soft:T.primary;
+            const nC=T.primary;
             return <>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
               {/* 今日 */}
@@ -140,7 +137,7 @@ function HomePage({T,state,todayStr,todayDayStartMs,onGoTimer}){
                 <span style={{fontSize:13,color:T.text+"66"}}>スタートから <strong style={{color:T.primary}}>{elapsedDays}</strong> 日目</span>
                 <span style={{fontSize:13,color:T.text+"66"}}>あと <strong style={{color:T.primary}}>{remainDays}</strong> 日</span>
               </div>
-              <div style={{position:"relative",height:12,background:state.themeName==="night"?"#B0B8D0":T.soft,borderRadius:99,overflow:"hidden"}}>
+              <div style={{position:"relative",height:12,background:state.themeName==="night"?T.text:T.soft,borderRadius:99,overflow:"hidden"}}>
                 <div style={{position:"absolute",left:0,top:0,bottom:0,width:`${progressPct*100}%`,background:T.primary,borderRadius:99,transition:"width 1.2s"}}/>
               </div>
               {totalEndDate&&(()=>{
