@@ -103,7 +103,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
               )}
               <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:centerFontSize,fontWeight:700,color:T.primary,lineHeight:1}}>{fmt(currentSec)}</div>
               <div style={{fontSize:Math.round(centerFontSize*.38),color:T.text+"66",marginTop:4}}>取り外し合計時間</div>
-              <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:Math.round(centerFontSize*.82),fontWeight:600,color:T.text+"77",lineHeight:1}}>{fmt(totalRemovedSec)}</div>
+              <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:Math.round(centerFontSize*.82),fontWeight:600,color:T.text+"77",lineHeight:1}}>{secToHHMM(totalRemovedSec)}</div>
             </div>
           </div>
         </div>

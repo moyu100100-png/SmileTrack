@@ -2,6 +2,8 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
   const isPremium=IS_PREMIUM;
   useTick(1000, state.timerRunning);
   const fmtShort = ds => { if(!ds) return "—"; const d=new Date(ds+"T00:00:00"); return `${d.getMonth()+1}/${d.getDate()}`; };
+  const greyThemesFail=["blush","wisteria","atrium","ashviolet","navyrose","elegan","glacier","amber","deepteal","blushhemp"];
+  const failCol=greyThemesFail.includes(state.themeName)?"#A0A0A0":state.themeName==="night"?"#DC2626":"#E88080";
 
   const [period,setPeriod]=useState("daily");
   const [statsView,setStatsView]=useState("breakdown");
@@ -196,7 +198,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
                 <div key={i} style={{display:"flex",flexDirection:"column",alignItems:"center",width:barW,cursor:"pointer",flexShrink:0}}
                   onClick={()=>setSelectedBar(isSelected?null:b)}>
                   <div style={{height:160,display:"flex",alignItems:"flex-end",width:"100%",justifyContent:"center"}}>
-                    <div style={{width:"72%",height:`${Math.max(2,h)}px`,background:b.secs===0?T.soft:achieved?T.primary:(state.themeName==="night"?"#DC2626":["atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"].includes(state.themeName)?(state.themeName==="atrium"?"#5A452C":T.soft):"#E88080"),borderRadius:"3px 3px 0 0",opacity:(selectedBar&&!isSelected)?0.35:b.isToday?1:0.8,transition:"opacity .2s"}}/>
+                    <div style={{width:"72%",height:`${Math.max(2,h)}px`,background:b.secs===0?T.soft:achieved?T.primary:failCol,borderRadius:"3px 3px 0 0",opacity:(selectedBar&&!isSelected)?0.35:b.isToday?1:0.8,transition:"opacity .2s"}}/>
                   </div>
                   {/* ラベル: 棒グラフの下 */}
                   <div style={{marginTop:3,textAlign:"center",lineHeight:1.4,maxWidth:barW}}>
@@ -227,7 +229,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
         {[["7日平均",avg7],["30日平均",avg30]].map(([lbl,v])=>(
           <div key={lbl} style={{background:T.card,borderRadius:13,padding:"11px 14px",textAlign:"center"}}>
             <div style={{fontSize:12,color:T.text+"77",marginBottom:4}}>{lbl}</div>
-            <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:700,color:v>=target?T.primary:(state.themeName==="night"?"#DC2626":["atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"].includes(state.themeName)?(state.themeName==="atrium"?"#5A452C":T.soft):"#E88080")}}>{fmtHM(v)}</div>
+            <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:700,color:v>=target?T.primary:failCol}}>{fmtHM(v)}</div>
           </div>
         ))}
       </div>
@@ -289,7 +291,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
             <div className="mdtitle">{selectedDay}</div>
             <div style={{marginBottom:10,textAlign:"center"}}>
               <div style={{fontSize:13,color:T.text+"66",marginBottom:2}}>装着時間</div>
-              <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:24,fontWeight:700,color:(effectiveLog[selectedDay]||0)>=target?T.primary:(["atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"].includes(state.themeName)?(state.themeName==="atrium"?"#5A452C":T.soft):"#E88080")}}>{effectiveLog[selectedDay]?fmt(effectiveLog[selectedDay]):"記録なし"}</div>
+              <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:24,fontWeight:700,color:(effectiveLog[selectedDay]||0)>=target?T.primary:failCol}}>{effectiveLog[selectedDay]?fmt(effectiveLog[selectedDay]):"記録なし"}</div>
             </div>
             {Object.keys(dayReasons).length>0&&<>
               <div className="ct">取り外し内訳</div>

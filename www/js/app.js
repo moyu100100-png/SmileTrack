@@ -146,8 +146,8 @@ function OnboardingScreen({T,onComplete}){
   if(step===4) return(
     <div style={{position:"fixed",inset:0,background:T.bg,display:"flex",flexDirection:"column",padding:"52px 26px 36px",zIndex:9999}}>
       <Header allDone={true}/>
-      {/* Step行分の空白でカード位置を入力画面と揃える */}
-      <div style={{height:28,flexShrink:0}}/>
+      {/* Step行（テキストなし）分の空白でカード位置を入力画面と揃える */}
+      <div style={{height:20,flexShrink:0}}/>
 
       {/* カード（height:320固定） */}
       <div style={{width:"100%",background:T.card,borderRadius:26,border:`1px solid ${T.primary}14`,
@@ -172,9 +172,8 @@ function OnboardingScreen({T,onComplete}){
         </div>
       </div>
 
-      <div style={{flex:1,minHeight:0}}/>
-      {/* ボタン（カード外・下） */}
-      <div style={{flexShrink:0,paddingTop:16}}>
+      {/* ボタン（カード真下） */}
+      <div style={{flexShrink:0,marginTop:16}}>
         <button onClick={()=>onComplete({startDate,totalPieces,intervalDays,targetWearHours:targetHours})}
           style={{width:"100%",height:56,border:"none",borderRadius:16,
             background:T.primary,color:"#fff",fontFamily:"'M PLUS Rounded 1c',sans-serif",
@@ -214,10 +213,8 @@ function OnboardingScreen({T,onComplete}){
         {cardContent()}
       </div>
 
-      <div style={{flex:1,minHeight:0}}/>
-
-      {/* ボタン（カード外・下） */}
-      <div style={{flexShrink:0,paddingTop:16}}>
+      {/* ボタン（カード真下） */}
+      <div style={{flexShrink:0,marginTop:16}}>
         <button onClick={handleNext}
           style={{width:"100%",height:56,border:"none",borderRadius:16,
             background:canNext()?T.primary:T.soft,

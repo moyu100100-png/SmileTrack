@@ -103,12 +103,13 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
   }
 
   const deleteEvent = ev => {
-    if(ev.type==="appt") update({appointments:(state.appointments||[]).filter(x=>x.id!==ev.id)});
+    if(ev.id) update({appointments:(state.appointments||[]).filter(x=>x.id!==ev.id)});
   };
 
   const addEvent = () => {
     if(!apptForm.date||!apptForm.title?.trim()) return;
-    update({appointments:[...(state.appointments||[]),{id:Date.now(),date:apptForm.date,time:apptForm.time,title:apptForm.title,note:apptForm.note}].sort((a,b)=>a.date.localeCompare(b.date))});
+    const ev={id:Date.now(),date:apptForm.date,time:apptForm.allDay?"":apptForm.time,timeTo:apptForm.allDay?"":apptForm.timeTo,title:apptForm.title,allDay:apptForm.allDay||false};
+    update({appointments:[...(state.appointments||[]),ev].sort((a,b)=>a.date.localeCompare(b.date))});
     setShowAddModal(false);
   };
 
@@ -150,11 +151,20 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
             const dow = d.getDay();
             const isSun2 = ws===0?dow===0:dow===1;
             const isSat2 = ws===0?dow===6:dow===0;
+            const greyThemes=["blush","wisteria","atrium","ashviolet","navyrose","elegan","glacier","amber","deepteal","blushhemp"];
+            const isNight=state.themeName==="night";
             let numBg="transparent",numColor=isPast?(T.text+"66"):isSun2?"#DC2626":isSat2?"#2563EB":T.text,numFw=400;
             if(isSel){ numBg=T.primary; numColor="#fff"; numFw=700; }
             else if(isToday){ numBg=T.soft; numColor=T.primary; numFw=700; }
-            else if(achieved){ numBg=`${T.primary}22`; }
-            else if(failed){ numBg="rgba(220,38,38,0.12)"; }
+            else if(achieved){
+              if(state.themeName==="wisteria") numBg=`${T.primary}44`;
+              else numBg=`${T.primary}22`;
+            }
+            else if(failed){
+              if(greyThemes.includes(state.themeName)) numBg="rgba(160,160,160,0.18)";
+              else if(isNight) numBg="rgba(220,38,38,0.28)";
+              else numBg="rgba(220,38,38,0.12)";
+            }
             return(
               <div key={ds} onClick={()=>setSel(ds)}
                 style={{display:"flex",flexDirection:"column",alignItems:"center",cursor:"pointer",borderRadius:5,padding:"2px 1px",minHeight:44}}>
@@ -184,7 +194,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
         {/* Legend */}
         <div style={{display:"flex",gap:10,flexWrap:"wrap",paddingTop:6,borderTop:`1px solid ${T.soft}`,marginTop:4}}>
           <span style={{fontSize:11,display:"flex",alignItems:"center",gap:3,color:T.text+"77"}}><span style={{width:10,height:10,borderRadius:2,background:`${T.primary}22`,border:`1.5px solid ${T.primary}`,display:"inline-block"}}/>達成</span>
-          <span style={{fontSize:11,display:"flex",alignItems:"center",gap:3,color:T.text+"77"}}><span style={{width:10,height:10,borderRadius:2,background:"rgba(220,38,38,0.12)",border:"1.5px solid #DC2626",display:"inline-block"}}/>未達</span>
+          <span style={{fontSize:11,display:"flex",alignItems:"center",gap:3,color:T.text+"77"}}><span style={{width:10,height:10,borderRadius:2,background:["blush","wisteria","atrium","ashviolet","navyrose","elegan","glacier","amber","deepteal","blushhemp"].includes(state.themeName)?"rgba(160,160,160,0.25)":state.themeName==="night"?"rgba(220,38,38,0.35)":"rgba(220,38,38,0.12)",border:["blush","wisteria","atrium","ashviolet","navyrose","elegan","glacier","amber","deepteal","blushhemp"].includes(state.themeName)?"1.5px solid #aaa":state.themeName==="night"?"1.5px solid rgba(220,38,38,0.7)":"1.5px solid #DC2626",display:"inline-block"}}/>未達</span>
           <span style={{fontSize:11,display:"flex",alignItems:"center",gap:3,color:T.text+"77"}}><span style={{width:10,height:10,borderRadius:"2px",border:`2px solid ${T.accent}`,display:"inline-block"}}/>交換日</span>
         </div>
       </div>
@@ -221,9 +231,10 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
           const toHHMM=sec=>`${String(Math.floor(sec/3600)).padStart(2,"0")}:${String(Math.floor((sec%3600)/60)).padStart(2,"0")}`;
           const fmtTs=ts=>{const d=new Date(ts);return`${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;};
           const accentThemes=["atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"];
-              const failColor=accentThemes.includes(state.themeName)
-                ?(state.themeName==="atrium"?"#5A452C":T.soft)
-                :"#E88080";
+          const greyThemes2=["blush","wisteria","atrium","ashviolet","navyrose","elegan","glacier","amber","deepteal","blushhemp"];
+          const failColor=greyThemes2.includes(state.themeName)
+            ?"#A0A0A0"
+            :state.themeName==="night"?"rgba(220,38,38,0.8)":"#E88080";
               const wearColor=hasLog?(wearSec>=targetSecs?T.primary:failColor):T.text+"44";
           const ROW=38;
 
@@ -384,56 +395,69 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
       {/* 装着時間編集ポップアップ */}
       {showWearEditConfirm&&(()=>{
         const dayMs2=new Date(sel+"T00:00:00").getTime();
+        const isToday2=sel===todayStr;
         const selSess2=(state.timerSessions||[]).filter(s=>
           s.start>=dayMs2&&s.start<dayMs2+86400000||(!s.start&&s.day===sel)
         );
         const hasBreakdown=selSess2.length>0;
+        const parseHH=str=>{const p=(str||"").split(":");return Math.min(86400,Math.max(0,(parseInt(p[0])||0)*3600+(parseInt(p[1])||0)*60));};
         return(
           <div className="mo" onClick={()=>setShowWearEditConfirm(false)} style={{alignItems:"center"}}>
             <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:340}}>
               <div className="mdtitle" style={{marginBottom:12}}>装着時間を変更</div>
-              {/* 時間入力（常に表示） */}
-              <label>時間</label>
-              <input type='text' inputMode='numeric' maxLength={5} autoComplete='off'
-                value={editLogVal}
-                onChange={e=>{let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&editLogVal.length===1)v+=':';setEditLogVal(v);}}
-                style={{textAlign:'center',fontSize:18,fontWeight:700,marginBottom:hasBreakdown?16:20}}
-                autoFocus/>
-              {hasBreakdown&&(
+              {isToday2?(
                 <>
-                  <div style={{fontSize:12,color:"#E74C3C",marginBottom:14,lineHeight:1.6,padding:"8px 12px",background:"#E74C3C11",borderRadius:10}}>
-                    内訳がある場合、手動変更すると内訳がリセットされます
+                  <div style={{fontSize:13,color:T.text+"77",marginBottom:16,lineHeight:1.6}}>
+                    当日の装着時間はリアルタイムで自動計算されるため変更できません。
                   </div>
-                  <div style={{display:"flex",gap:8,marginBottom:8}}>
-                    <button className="btn bs" style={{flex:1,fontSize:13}} onClick={()=>{
-                      setShowWearEditConfirm(false);
-                      setEditLogDay(sel);
-                    }}>内訳を編集</button>
-                    <button className="btn bp" style={{flex:1,fontSize:13,background:"#E74C3C"}} onClick={()=>{
-                      const log={...(state.dailyWearLog||{})};
-                      const parseHH=str=>{const p=(str||"").split(":");return Math.min(86400,Math.max(0,(parseInt(p[0])||0)*3600+(parseInt(p[1])||0)*60));};
-                      log[sel]=parseHH(editLogVal);
-                      const newSess=(state.timerSessions||[]).filter(x=>
-                        !(x.start>=dayMs2&&x.start<dayMs2+86400000)&&!(!x.start&&x.day===sel)
-                      );
-                      update({dailyWearLog:log,timerSessions:newSess});
-                      setShowWearEditConfirm(false);
-                    }}>内訳をリセットして変更</button>
+                  <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowWearEditConfirm(false)}>閉じる</button>
+                </>
+              ):(
+                <>
+                  <label>時間</label>
+                  <input type='text' inputMode='numeric' maxLength={5} autoComplete='off'
+                    value={editLogVal}
+                    onChange={e=>{let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&editLogVal.length===1)v+=':';setEditLogVal(v);}}
+                    style={{textAlign:'center',fontSize:18,fontWeight:700,marginBottom:16}}
+                    autoFocus/>
+                  {hasBreakdown&&(
+                    <div style={{fontSize:12,color:T.text+"66",marginBottom:14,lineHeight:1.6}}>
+                      内訳がある場合、変更すると内訳がリセットされます
+                    </div>
+                  )}
+                  <div style={{display:"flex",gap:8,marginBottom:hasBreakdown?8:0}}>
+                    {hasBreakdown&&(
+                      <button className="btn bs" style={{color:T.text+"66",fontSize:13}} onClick={()=>{
+                        const log={...(state.dailyWearLog||{})};
+                        log[sel]=parseHH(editLogVal);
+                        const newSess=(state.timerSessions||[]).filter(x=>
+                          !(x.start>=dayMs2&&x.start<dayMs2+86400000)&&!(!x.start&&x.day===sel)
+                        );
+                        update({dailyWearLog:log,timerSessions:newSess});
+                        setShowWearEditConfirm(false);
+                      }}>内訳をリセット</button>
+                    )}
+                    <button className="btn bs" style={{flex:1}} onClick={()=>setShowWearEditConfirm(false)}>キャンセル</button>
+                    {!hasBreakdown&&(
+                      <button className="btn bp" style={{flex:1}} onClick={()=>{
+                        const log={...(state.dailyWearLog||{})};
+                        log[sel]=parseHH(editLogVal);
+                        update({dailyWearLog:log});
+                        setShowWearEditConfirm(false);
+                      }}>保存</button>
+                    )}
                   </div>
+                  {hasBreakdown&&(
+                    <div style={{display:"flex",gap:8}}>
+                      <button className="btn bs" style={{flex:1}} onClick={()=>setShowWearEditConfirm(false)}>キャンセル</button>
+                      <button className="btn bp" style={{flex:1}} onClick={()=>{
+                        setShowWearEditConfirm(false);
+                        setEditLogDay(sel);
+                      }}>内訳を編集</button>
+                    </div>
+                  )}
                 </>
               )}
-              <div style={{display:"flex",gap:8}}>
-                <button className="btn bs" style={{flex:1}} onClick={()=>setShowWearEditConfirm(false)}>キャンセル</button>
-                {!hasBreakdown&&(
-                  <button className="btn bp" style={{flex:1}} onClick={()=>{
-                    const log={...(state.dailyWearLog||{})};
-                    const parseHH=str=>{const p=(str||"").split(":");return Math.min(86400,Math.max(0,(parseInt(p[0])||0)*3600+(parseInt(p[1])||0)*60));};
-                    log[sel]=parseHH(editLogVal);
-                    update({dailyWearLog:log});
-                    setShowWearEditConfirm(false);
-                  }}>保存</button>
-                )}
-              </div>
             </div>
           </div>
         );

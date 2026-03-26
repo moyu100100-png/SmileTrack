@@ -9,7 +9,7 @@ const THEMES = {
   amber:      { primary:"#C89040", accent:"#9A6A20", bg:"#FDF9F2", card:"#FFFFFF", soft:"#FAF0D8", text:"#3A2408", secondary:"#FAF0D8", removedColor:"#ECDCB8" },
   night:      { primary:"#6C9EFF", accent:"#4F7FFF", bg:"#0F1117", card:"#1C1F2E", soft:"#1E2235", text:"#E8EAF6", secondary:"#A78BFA", removedColor:"#2A3050" },
   // ── A1〜A6 アクセントカラーあり ─────────────────────────────────────────
-  atrium:     { primary:"#98C8CC", accent:"#D8EFEF", bg:"#F8F7F5", card:"#FFFFFF", soft:"#5A452C", text:"#2C1E10", secondary:"#5A452C", removedColor:"#D8EFEF" },
+  atrium:     { primary:"#98C8CC", accent:"#5A9EA4", bg:"#F8F7F5", card:"#FFFFFF", soft:"#5A452C", text:"#2C1E10", secondary:"#5A452C", removedColor:"#D8EFEF" },
   navyrose:   { primary:"#023059", accent:"#708BB2", bg:"#F4F6FA", card:"#FFFFFF", soft:"#8C613B", text:"#011828", secondary:"#8C613B", removedColor:"#C0CCDC" },
   deepteal:   { primary:"#2E6858", accent:"#1c3f35", bg:"#F2EDE4", card:"#FFFFFF", soft:"#C8A870", text:"#0E2418", secondary:"#C8A870", removedColor:"#B0D8CC" },
   elegan:     { primary:"#773335", accent:"#6e6466", bg:"#cdcdc3", card:"#FFFFFF", soft:"#bbada9", text:"#373838", secondary:"#bbada9", removedColor:"#C8B0B0" },
