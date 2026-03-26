@@ -231,7 +231,11 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
           const saveWear=()=>{
             const log={...(state.dailyWearLog||{})};
             log[sel]=parseHHMM(editLogVal);
-            update({dailyWearLog:log});
+            // 内訳をリセット
+            const newSess=(state.timerSessions||[]).filter(x=>
+              !(x.start>=dayMs&&x.start<dayMs+86400000)&&!(!x.start&&x.day===sel)
+            );
+            update({dailyWearLog:log,timerSessions:newSess});
             setEditLogDay(sel);
           };
           const deleteSess=(sid)=>{
@@ -433,8 +437,10 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
             const end=dayMs2+th*3600000+tm*60000;
             const ms=Math.max(60000,end-start);
             patch={...patch,start,end,ms};
-          } else if(!isFromTimer){
-            patch={...patch,ms:parseHHMM(editSessDur)*1000};
+          } else {
+            // 時刻なし→時間から計算（タイマー由来でも編集可能）
+            const toHHMMparse=str=>{const p=(str||"").split(":");return Math.min(86400,Math.max(0,(parseInt(p[0])||0)*3600+(parseInt(p[1])||0)*60));};
+            patch={...patch,ms:toHHMMparse(editSessDur)*1000};
           }
           const newSess=(state.timerSessions||[]).map(x=>x.id===editSessId?{...x,...patch}:x);
           const newRem=newSess.filter(x=>(x.start>=new Date(sel+'T00:00:00').getTime()&&x.start<new Date(sel+'T00:00:00').getTime()+86400000)||(!x.start&&x.day===sel)).reduce((a,x)=>a+x.ms,0);
@@ -491,9 +497,8 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
               </div>
               <label>時間</label>
               <input type='text' inputMode='numeric' maxLength={5} autoComplete='off' value={editSessDur}
-                onChange={e=>{if(isFromTimer)return;let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&editSessDur.length===1)v+=':';setEditSessDur(v);}}
-                readOnly={isFromTimer}
-                style={{marginBottom:14,textAlign:'center',opacity:isFromTimer?0.6:1,background:isFromTimer?T.soft:T.bg,fontSize:16}}/>
+                onChange={e=>{let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&editSessDur.length===1)v+=':';setEditSessDur(v);}}
+                style={{marginBottom:14,textAlign:'center',fontSize:16}}/>
               <label>コメント</label>
               <input type='text' value={editSessComment} onChange={e=>setEditSessComment(e.target.value)}
                 placeholder='コメントを入力…' style={{marginBottom:16}}/>
@@ -646,6 +651,10 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
       {editEventId&&(()=>{
         const ev=(state.appointments||[]).find(a=>a.id===editEventId);
         if(!ev) return null;
+        const saveEvField=(patch)=>{
+          const newAppts=(state.appointments||[]).map(a=>a.id===editEventId?{...a,...patch}:a);
+          update({appointments:newAppts});
+        };
         return(
           <div className="mo" onClick={()=>setEditEventId(null)} style={{alignItems:"center"}}>
             <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:400}}>
@@ -655,10 +664,28 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                   onClick={()=>{deleteEvent(ev);setEditEventId(null);}}>削除</button>
               </div>
               <label>タイトル</label>
-              <input value={ev.title||""} onChange={e=>{
-                const newAppts=(state.appointments||[]).map(a=>a.id===editEventId?{...a,title:e.target.value}:a);
-                update({appointments:newAppts});
-              }} style={{marginBottom:8}}/>
+              <input value={ev.title||""} onChange={e=>saveEvField({title:e.target.value})} style={{marginBottom:8}}/>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
+                <label style={{margin:0}}>時間</label>
+                <div style={{display:"flex",alignItems:"center",gap:8}}>
+                  <span style={{fontSize:13,color:T.text+"66"}}>終日</span>
+                  <button onClick={()=>saveEvField({allDay:!ev.allDay})}
+                    style={{width:44,height:24,borderRadius:12,border:"none",cursor:"pointer",
+                      background:ev.allDay?T.primary:T.soft,position:"relative",flexShrink:0,transition:"background .2s"}}>
+                    <div style={{width:20,height:20,borderRadius:"50%",background:"#fff",position:"absolute",
+                      top:2,left:ev.allDay?22:2,transition:"left .2s",boxShadow:"0 1px 3px #0003"}}/>
+                  </button>
+                </div>
+              </div>
+              {!ev.allDay&&(
+                <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:14}}>
+                  <input type="time" value={ev.time||''} onChange={e=>saveEvField({time:e.target.value})}
+                    style={{flex:1,height:44,fontSize:16,borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,padding:'0 12px',WebkitAppearance:'none',appearance:'none'}}/>
+                  <span style={{color:T.text+'55'}}>〜</span>
+                  <input type="time" value={ev.timeTo||''} onChange={e=>saveEvField({timeTo:e.target.value})}
+                    style={{flex:1,height:44,fontSize:16,borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,padding:'0 12px',WebkitAppearance:'none',appearance:'none'}}/>
+                </div>
+              )}
               <div style={{display:"flex",gap:8,marginTop:8}}>
                 <button className="btn bs" style={{flex:1}} onClick={()=>setEditEventId(null)}>閉じる</button>
               </div>
