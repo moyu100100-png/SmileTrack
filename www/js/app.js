@@ -5,7 +5,7 @@ function ObDatePicker({value,onChange,T}){
   const [y,m,d]=dateVal.split("-");
   return(
     <div style={{textAlign:"center",position:"relative",display:"inline-block"}}>
-      <div style={{userSelect:"none",pointerEvents:"none",borderBottom:`2px solid ${T.soft}`,paddingBottom:8,fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:40,fontWeight:800,color:T.primary,letterSpacing:-1,lineHeight:1.2}}>
+      <div style={{userSelect:"none",pointerEvents:"none",borderBottom:`2px solid ${T.soft}`,paddingBottom:8,fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:35,fontWeight:800,color:T.primary,letterSpacing:-1,lineHeight:1.2}}>
         {y}－{m}－{d}
       </div>
       <input type="date" value={value} onChange={e=>onChange(e.target.value)}
@@ -80,7 +80,7 @@ function OnboardingScreen({T,onComplete}){
       <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
         <input type="number" className="ob-num" value={totalPieces} min={1} max={999} inputMode="numeric"
           onChange={e=>setTotalPieces(Math.max(1,parseInt(e.target.value)||1))}
-          style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:60,fontWeight:800,
+          style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:55,fontWeight:800,
             color:T.primary,width:150,textAlign:"center",outline:"none",
             letterSpacing:-2,lineHeight:1,borderBottomColor:T.soft}}/>
         <span style={{fontSize:15,fontWeight:700,color:T.text+"66",paddingBottom:10}}>枚</span>
@@ -89,7 +89,7 @@ function OnboardingScreen({T,onComplete}){
     if(step===2) return(
       <div style={{flex:1,display:"flex",flexDirection:"column",justifyContent:"center",padding:"0 4px"}}>
         <div style={{display:"flex",alignItems:"baseline",justifyContent:"center",gap:5,marginBottom:20}}>
-          <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:60,fontWeight:800,color:T.primary,letterSpacing:-2,lineHeight:1}}>{intervalDays}</span>
+          <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:55,fontWeight:800,color:T.primary,letterSpacing:-2,lineHeight:1}}>{intervalDays}</span>
           <span style={{fontSize:15,fontWeight:700,color:T.text+"66",paddingBottom:10}}>日ごと</span>
         </div>
         <input type="range" min={3} max={15} value={intervalDays}
@@ -106,7 +106,7 @@ function OnboardingScreen({T,onComplete}){
     if(step===3) return(
       <div style={{flex:1,display:"flex",flexDirection:"column",justifyContent:"center",padding:"0 4px"}}>
         <div style={{display:"flex",alignItems:"baseline",justifyContent:"center",gap:5,marginBottom:20}}>
-          <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:60,fontWeight:800,color:T.primary,letterSpacing:-2,lineHeight:1}}>{targetHours}</span>
+          <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:55,fontWeight:800,color:T.primary,letterSpacing:-2,lineHeight:1}}>{targetHours}</span>
           <span style={{fontSize:15,fontWeight:700,color:T.text+"66",paddingBottom:10}}>時間</span>
         </div>
         <input type="range" min={16} max={24} value={targetHours}
@@ -158,17 +158,17 @@ function OnboardingScreen({T,onComplete}){
             <path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/>
           </svg>
         </div>
-        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:26,fontWeight:900,color:T.text+"99",marginBottom:16}}>設定完了</div>
+        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:26,fontWeight:900,color:T.text+"99",marginBottom:8}}>設定完了</div>
+        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:13,fontWeight:600,color:T.text+"66",lineHeight:1.75,marginBottom:16}}>
+          素敵な笑顔に向けて、一緒に頑張りましょう。
+        </div>
         <div style={{width:"100%",height:1,background:T.soft,marginBottom:16}}/>
-        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:12,fontWeight:700,letterSpacing:1.6,textTransform:"uppercase",color:T.text+"44",marginBottom:8}}>
+        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:14,fontWeight:700,letterSpacing:1.2,textTransform:"uppercase",color:T.text+"77",marginBottom:8}}>
           治療終了予定日
         </div>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:36,fontWeight:900,
-          color:T.primary,letterSpacing:-1,lineHeight:1.1,marginBottom:12}}>
+          color:T.primary,letterSpacing:-1,lineHeight:1.1}}>
           {endDate||"—"}
-        </div>
-        <div style={{fontSize:13,fontWeight:600,color:T.text+"77",lineHeight:1.75}}>
-          素敵な笑顔に向けて、一緒に頑張りましょう。
         </div>
       </div>
 
