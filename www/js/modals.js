@@ -424,25 +424,6 @@ function ScheduleModal({T,state,update,onClose}){
       <div className="md" onClick={e=>e.stopPropagation()}>
         <div className="mdtitle">交換スケジュール</div>
 
-        {/* ラベル表示方式トグル */}
-        {(state.extraPieces?.length>0)&&(
-          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10,padding:"8px 12px",background:T.soft,borderRadius:10}}>
-            <span style={{fontSize:13,color:T.text+"88"}}>追加ピースの番号</span>
-            <div style={{display:"flex",gap:6}}>
-              {[{key:"relative",label:"+1〜"},{key:"absolute",label:"通し番号"}].map(opt=>(
-                <button key={opt.key}
-                  onClick={()=>update({extraLabelMode:opt.key})}
-                  style={{padding:"5px 12px",borderRadius:8,border:`1.5px solid ${(state.extraLabelMode||"relative")===opt.key?T.primary:T.soft}`,
-                    background:(state.extraLabelMode||"relative")===opt.key?T.primary:"transparent",
-                    color:(state.extraLabelMode||"relative")===opt.key?"#fff":T.text,
-                    fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Piece list - 日付範囲をタップで個別設定 */}
         <div style={{maxHeight:"38dvh",overflowY:"auto",marginBottom:10}}>
           {list.map((p)=>{
@@ -489,6 +470,24 @@ function ScheduleModal({T,state,update,onClose}){
               {showAddExtra?"▲ 閉じる":"＋ 追加"}
             </button>
           </div>
+          {/* 番号方式トグル：追加ピースがある or 追加UI開いている時に表示 */}
+          {(state.extraPieces?.length>0||showAddExtra)&&(
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8,marginTop:4}}>
+              <span style={{fontSize:12,color:T.text+"88"}}>番号方式</span>
+              <div style={{display:"flex",gap:6}}>
+                {[{key:"relative",label:"+1〜"},{key:"absolute",label:"通し番号"}].map(opt=>(
+                  <button key={opt.key}
+                    onClick={()=>update({extraLabelMode:opt.key})}
+                    style={{padding:"4px 12px",borderRadius:8,border:`1.5px solid ${(state.extraLabelMode||"relative")===opt.key?T.primary:T.soft}`,
+                      background:(state.extraLabelMode||"relative")===opt.key?T.primary:"transparent",
+                      color:(state.extraLabelMode||"relative")===opt.key?"#fff":T.text,
+                      fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           {showAddExtra&&(<>
             {/* 枚数入力 */}
             <div style={{display:"flex",alignItems:"center",gap:8,marginTop:6,marginBottom:10}}>
@@ -502,17 +501,16 @@ function ScheduleModal({T,state,update,onClose}){
                 {Array.from({length:14},(_,i)=>i+1).map(d=><option key={d} value={d}>{d}日</option>)}
               </select>
             </div>
-            {/* カウント方式はトグルで一元管理のため選択不要 */}
             {/* プレビュー */}
             {tempExtraCount>0&&(()=>{
-              const baseIdx=state.extraPieces?.length||0;
               const baseN=state.totalPieces+(state.extraPieces?.length||0);
               const mode=state.extraLabelMode||"relative";
               let preview;
               if(mode==="absolute"){
                 preview=Array.from({length:Math.min(tempExtraCount,5)},(_,i)=>baseN+i+1).join(", ")+(tempExtraCount>5?"...":"");
               } else {
-                preview=Array.from({length:Math.min(tempExtraCount,5)},(_,i)=>`+${baseIdx+i+1}`).join(", ")+(tempExtraCount>5?"...":"");
+                // 常に+1から始まる
+                preview=Array.from({length:Math.min(tempExtraCount,5)},(_,i)=>`+${i+1}`).join(", ")+(tempExtraCount>5?"...":"");
               }
               return <div style={{fontSize:12,color:T.accent,marginBottom:8}}>追加後: {preview}</div>;
             })()}
