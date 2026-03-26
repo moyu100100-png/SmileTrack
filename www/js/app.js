@@ -146,43 +146,48 @@ function OnboardingScreen({T,onComplete}){
   if(step===4) return(
     <div style={{position:"fixed",inset:0,background:T.bg,display:"flex",flexDirection:"column",padding:"52px 26px 36px",zIndex:9999}}>
       <Header allDone={true}/>
+      {/* Step行分の空白でカード位置を入力画面と揃える */}
+      <div style={{height:28,flexShrink:0}}/>
 
-      <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
-        <div style={{width:"100%",background:T.card,borderRadius:26,border:`1px solid ${T.primary}14`,
-          boxShadow:`0 4px 24px ${T.primary}12`,padding:"28px 24px 24px",textAlign:"center"}}>
-          {/* 握手アイコン */}
-          <div style={{display:"flex",justifyContent:"center",marginBottom:12}}>
-            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/>
-            </svg>
-          </div>
-          <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:26,fontWeight:900,color:T.text+"99",marginBottom:20}}>設定完了</div>
-          <div style={{width:"100%",height:1,background:T.soft,marginBottom:20}}/>
-          <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:12,fontWeight:700,letterSpacing:1.6,textTransform:"uppercase",color:T.text+"44",marginBottom:8}}>
-            治療終了予定日
-          </div>
-          <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:36,fontWeight:900,
-            color:T.primary,letterSpacing:-1,lineHeight:1.1,marginBottom:16}}>
-            {endDate||"—"}
-          </div>
-          <div style={{fontSize:13,fontWeight:600,color:T.text+"77",lineHeight:1.75,marginBottom:24}}>
-            素敵な笑顔に向けて、一緒に頑張りましょう。
-          </div>
-          {/* ボタンをカード内下部に */}
-          <button onClick={()=>onComplete({startDate,totalPieces,intervalDays,targetWearHours:targetHours})}
-            style={{width:"100%",height:56,border:"none",borderRadius:16,
-              background:T.primary,color:"#fff",fontFamily:"'M PLUS Rounded 1c',sans-serif",
-              fontSize:16,fontWeight:800,cursor:"pointer",letterSpacing:0.3,
-              boxShadow:`0 6px 20px ${T.primary}44`,marginBottom:4}}>
-            はじめる →
-          </button>
-          <button onClick={()=>setStep(3)}
-            style={{background:"none",border:"none",fontFamily:"'M PLUS Rounded 1c',sans-serif",
-              fontSize:13,fontWeight:700,color:T.text+"44",cursor:"pointer",
-              padding:12,textAlign:"center",width:"100%"}}>
-            ← 戻る
-          </button>
+      {/* カード（height:320固定） */}
+      <div style={{width:"100%",background:T.card,borderRadius:26,border:`1px solid ${T.primary}14`,
+        boxShadow:`0 4px 24px ${T.primary}12`,padding:"28px 24px 28px",textAlign:"center",
+        height:320,flexShrink:0,display:"flex",flexDirection:"column",justifyContent:"center"}}>
+        <div style={{display:"flex",justifyContent:"center",marginBottom:12}}>
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/>
+          </svg>
         </div>
+        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:26,fontWeight:900,color:T.text+"99",marginBottom:16}}>設定完了</div>
+        <div style={{width:"100%",height:1,background:T.soft,marginBottom:16}}/>
+        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:12,fontWeight:700,letterSpacing:1.6,textTransform:"uppercase",color:T.text+"44",marginBottom:8}}>
+          治療終了予定日
+        </div>
+        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:36,fontWeight:900,
+          color:T.primary,letterSpacing:-1,lineHeight:1.1,marginBottom:12}}>
+          {endDate||"—"}
+        </div>
+        <div style={{fontSize:13,fontWeight:600,color:T.text+"77",lineHeight:1.75}}>
+          素敵な笑顔に向けて、一緒に頑張りましょう。
+        </div>
+      </div>
+
+      <div style={{flex:1,minHeight:0}}/>
+      {/* ボタン（カード外・下） */}
+      <div style={{flexShrink:0,paddingTop:16}}>
+        <button onClick={()=>onComplete({startDate,totalPieces,intervalDays,targetWearHours:targetHours})}
+          style={{width:"100%",height:56,border:"none",borderRadius:16,
+            background:T.primary,color:"#fff",fontFamily:"'M PLUS Rounded 1c',sans-serif",
+            fontSize:16,fontWeight:800,cursor:"pointer",letterSpacing:0.3,
+            boxShadow:`0 6px 20px ${T.primary}44`,marginBottom:4}}>
+          はじめる →
+        </button>
+        <button onClick={()=>setStep(3)}
+          style={{background:"none",border:"none",fontFamily:"'M PLUS Rounded 1c',sans-serif",
+            fontSize:13,fontWeight:700,color:T.text+"44",cursor:"pointer",
+            padding:12,textAlign:"center",width:"100%"}}>
+          ← 戻る
+        </button>
       </div>
     </div>
   );
@@ -192,9 +197,10 @@ function OnboardingScreen({T,onComplete}){
     <div style={{position:"fixed",inset:0,background:T.bg,display:"flex",flexDirection:"column",padding:"52px 26px 36px",zIndex:9999}}>
       <Header/>
 
-      {/* カード＋ボタン */}
+      {/* カード（height:320固定） */}
       <div style={{background:T.card,borderRadius:26,border:`1px solid ${T.primary}14`,
-        padding:"26px 24px 24px",marginTop:20,flex:1,display:"flex",flexDirection:"column",
+        padding:"26px 24px 28px",marginTop:20,flexShrink:0,
+        height:320,display:"flex",flexDirection:"column",
         boxShadow:`0 4px 24px ${T.primary}12`}}>
         {/* アイコン＋タイトル */}
         <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:12,marginBottom:16,flexShrink:0}}>
@@ -206,26 +212,29 @@ function OnboardingScreen({T,onComplete}){
           </div>
         </div>
         {cardContent()}
-        {/* ボタンをカード内下部に */}
-        <div style={{flexShrink:0,marginTop:"auto",paddingTop:20}}>
-          <button onClick={handleNext}
-            style={{width:"100%",height:56,border:"none",borderRadius:16,
-              background:canNext()?T.primary:T.soft,
-              color:canNext()?"#fff":T.text+"44",
-              fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16,fontWeight:800,
-              cursor:canNext()?"pointer":"default",letterSpacing:0.3,
-              boxShadow:canNext()?`0 6px 20px ${T.primary}44`:"none",transition:"all 0.2s",marginBottom:4}}>
-            {step===3?"はじめる →":"次へ →"}
+      </div>
+
+      <div style={{flex:1,minHeight:0}}/>
+
+      {/* ボタン（カード外・下） */}
+      <div style={{flexShrink:0,paddingTop:16}}>
+        <button onClick={handleNext}
+          style={{width:"100%",height:56,border:"none",borderRadius:16,
+            background:canNext()?T.primary:T.soft,
+            color:canNext()?"#fff":T.text+"44",
+            fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16,fontWeight:800,
+            cursor:canNext()?"pointer":"default",letterSpacing:0.3,
+            boxShadow:canNext()?`0 6px 20px ${T.primary}44`:"none",transition:"all 0.2s",marginBottom:4}}>
+          {step===3?"はじめる →":"次へ →"}
+        </button>
+        {step>0?(
+          <button onClick={()=>setStep(s=>s-1)}
+            style={{background:"none",border:"none",fontFamily:"'M PLUS Rounded 1c',sans-serif",
+              fontSize:13,fontWeight:700,color:T.text+"44",cursor:"pointer",
+              padding:12,textAlign:"center",width:"100%"}}>
+            ← 戻る
           </button>
-          {step>0?(
-            <button onClick={()=>setStep(s=>s-1)}
-              style={{background:"none",border:"none",fontFamily:"'M PLUS Rounded 1c',sans-serif",
-                fontSize:13,fontWeight:700,color:T.text+"44",cursor:"pointer",
-                padding:12,textAlign:"center",width:"100%"}}>
-              ← 戻る
-            </button>
-          ):<div style={{height:37}}/>}
-        </div>
+        ):<div style={{height:37}}/>}
       </div>
     </div>
   );

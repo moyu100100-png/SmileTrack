@@ -279,23 +279,12 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                   装着時間
                 </span>
                 {isWearEdit
-                  ?<input type='text' inputMode='numeric' maxLength={5} autoComplete='off' autoCorrect='off' autoCapitalize='off' spellCheck={false} value={editLogVal}
-                      autoFocus
-                      onFocus={e=>e.target.select()}
-                      onChange={e=>{let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&editLogVal.length===1)v+=':';setEditLogVal(v);}}
-                      onBlur={saveWear}
-                      onKeyDown={e=>{if(e.key==='Enter')saveWear();if(e.key==='Escape')setEditLogDay(isExpanded?sel:null);}}
-                      style={{width:52,textAlign:'right',fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16,fontWeight:700,
-                        border:'none',borderBottom:'2px solid '+T.primary,outline:'none',background:'transparent',
-                        color:T.primary,letterSpacing:1,padding:'1px 0',borderRadius:0,flexShrink:0}}/>
+                  ?null
                   :<span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16,fontWeight:700,color:wearColor,cursor:'text',flexShrink:0}}
                       onClick={e=>{
                         e.stopPropagation();
-                        if(selSessions.length>0){
-                          setShowWearEditConfirm(true);
-                        } else {
-                          setEditLogDay(sel+'_wear');setEditLogVal(toHHMM(wearSec));
-                        }
+                        setEditLogVal(toHHMM(wearSec));
+                        setShowWearEditConfirm(true);
                       }}>
                       {hasLog?toHHMM(wearSec):'--:--'}
                     </span>
@@ -392,29 +381,58 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
         }
       </div>
 
-      {/* 装着時間手動編集確認 */}
+      {/* 装着時間編集ポップアップ */}
       {showWearEditConfirm&&(()=>{
         const dayMs2=new Date(sel+"T00:00:00").getTime();
-        const isToday2=sel===todayStr;
-        const wearSec2=isToday2
-          ? Math.max(0,Math.floor((Date.now()-dayMs2)/1000)-Math.floor((todaySavedMs+runningMs)/1000))
-          : (wearLog[sel]||0);
-        const toHHMM2=sec=>`${String(Math.floor(sec/3600)).padStart(2,"0")}:${String(Math.floor((sec%3600)/60)).padStart(2,"0")}`;
+        const selSess2=(state.timerSessions||[]).filter(s=>
+          s.start>=dayMs2&&s.start<dayMs2+86400000||(!s.start&&s.day===sel)
+        );
+        const hasBreakdown=selSess2.length>0;
         return(
           <div className="mo" onClick={()=>setShowWearEditConfirm(false)} style={{alignItems:"center"}}>
-            <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:340,textAlign:"center"}}>
-              <div className="mdtitle" style={{marginBottom:8}}>手動変更すると内訳がリセットされます</div>
-              <div style={{fontSize:13,color:T.text+"77",marginBottom:20,lineHeight:1.7}}>内訳を編集しますか？</div>
+            <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:340}}>
+              <div className="mdtitle" style={{marginBottom:12}}>装着時間を変更</div>
+              {/* 時間入力（常に表示） */}
+              <label>時間</label>
+              <input type='text' inputMode='numeric' maxLength={5} autoComplete='off'
+                value={editLogVal}
+                onChange={e=>{let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&editLogVal.length===1)v+=':';setEditLogVal(v);}}
+                style={{textAlign:'center',fontSize:18,fontWeight:700,marginBottom:hasBreakdown?16:20}}
+                autoFocus/>
+              {hasBreakdown&&(
+                <>
+                  <div style={{fontSize:12,color:"#E74C3C",marginBottom:14,lineHeight:1.6,padding:"8px 12px",background:"#E74C3C11",borderRadius:10}}>
+                    内訳がある場合、手動変更すると内訳がリセットされます
+                  </div>
+                  <div style={{display:"flex",gap:8,marginBottom:8}}>
+                    <button className="btn bs" style={{flex:1,fontSize:13}} onClick={()=>{
+                      setShowWearEditConfirm(false);
+                      setEditLogDay(sel);
+                    }}>内訳を編集</button>
+                    <button className="btn bp" style={{flex:1,fontSize:13,background:"#E74C3C"}} onClick={()=>{
+                      const log={...(state.dailyWearLog||{})};
+                      const parseHH=str=>{const p=(str||"").split(":");return Math.min(86400,Math.max(0,(parseInt(p[0])||0)*3600+(parseInt(p[1])||0)*60));};
+                      log[sel]=parseHH(editLogVal);
+                      const newSess=(state.timerSessions||[]).filter(x=>
+                        !(x.start>=dayMs2&&x.start<dayMs2+86400000)&&!(!x.start&&x.day===sel)
+                      );
+                      update({dailyWearLog:log,timerSessions:newSess});
+                      setShowWearEditConfirm(false);
+                    }}>内訳をリセットして変更</button>
+                  </div>
+                </>
+              )}
               <div style={{display:"flex",gap:8}}>
-                <button className="btn bs" style={{flex:1}} onClick={()=>{
-                  setShowWearEditConfirm(false);
-                  setEditLogDay(sel+'_wear');
-                  setEditLogVal(toHHMM2(wearSec2));
-                }}>手動で変更</button>
-                <button className="btn bp" style={{flex:1}} onClick={()=>{
-                  setShowWearEditConfirm(false);
-                  setEditLogDay(sel);
-                }}>内訳を編集</button>
+                <button className="btn bs" style={{flex:1}} onClick={()=>setShowWearEditConfirm(false)}>キャンセル</button>
+                {!hasBreakdown&&(
+                  <button className="btn bp" style={{flex:1}} onClick={()=>{
+                    const log={...(state.dailyWearLog||{})};
+                    const parseHH=str=>{const p=(str||"").split(":");return Math.min(86400,Math.max(0,(parseInt(p[0])||0)*3600+(parseInt(p[1])||0)*60));};
+                    log[sel]=parseHH(editLogVal);
+                    update({dailyWearLog:log});
+                    setShowWearEditConfirm(false);
+                  }}>保存</button>
+                )}
               </div>
             </div>
           </div>
