@@ -84,15 +84,10 @@ function buildPieceList(state) {
   const list = [];
   for(let i=1;i<=state.totalPieces;i++) list.push({n:i, label:`${i}`, intervalDays: state.customIntervals?.[i] || state.intervalDays});
   const extras = state.extraPieces || [];
+  const mode = state.extraLabelMode || "relative";
   extras.forEach((ep,idx) => {
     const n = state.totalPieces + idx + 1;
-    let label;
-    if(ep.countMode==="absolute"){
-      label = `${n}`;
-    } else {
-      // 常に+1から（batchに関係なく通し番号）
-      label = `+${idx+1}`;
-    }
+    const label = mode==="absolute" ? `${n}` : `+${idx+1}`;
     list.push({n, label, intervalDays: ep.intervalDays || state.intervalDays, isExtra:true, epIdx:idx});
   });
   return list;
