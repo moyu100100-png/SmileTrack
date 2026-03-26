@@ -69,7 +69,7 @@ function PremiumModal({T,state,onClose,showCoffee=false}){
       <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center"}}>
         <div style={{fontSize:40,marginBottom:8}}>☕</div>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16,fontWeight:700,color:T.primary,marginBottom:6}}>開発者にコーヒーを差し入れ</div>
-        <div style={{fontSize:13,color:T.text+"88",marginBottom:20}}>¥200 · 開発継続の大きな励みになります</div>
+        <div style={{fontSize:13,color:T.text+"88",marginBottom:20}}>開発継続の大きな励みになります</div>
         <button className="btn bp" style={{width:"100%",marginBottom:8}} onClick={()=>setThankYou(true)}>差し入れる ☕</button>
         <button className="btn bs" style={{width:"100%"}} onClick={onClose}>閉じる</button>
       </div>
@@ -476,13 +476,12 @@ function ScheduleModal({T,state,update,onClose}){
             </button>
           </div>
           {showAddExtra&&(<>
-            {/* 枚数スピナー */}
+            {/* 枚数入力 */}
             <div style={{display:"flex",alignItems:"center",gap:8,marginTop:6,marginBottom:10}}>
               <span style={{fontSize:13,color:T.text+"77",flexShrink:0}}>枚数</span>
-              <select value={tempExtraCount} onChange={e=>setTempExtraCount(parseInt(e.target.value))}
-                style={{flex:1,textAlign:"center",textAlignLast:"center"}}>
-                {Array.from({length:50},(_,i)=>i+1).map(n=><option key={n} value={n}>{n}枚</option>)}
-              </select>
+              <input type="number" min={1} inputMode="numeric" value={tempExtraCount}
+                onChange={e=>setTempExtraCount(Math.max(1,parseInt(e.target.value)||1))}
+                style={{flex:1,textAlign:"center"}}/>
               <span style={{fontSize:13,color:T.text+"77",flexShrink:0}}>間隔</span>
               <select value={tempExtraInterval} onChange={e=>setTempExtraInterval(parseInt(e.target.value))}
                 style={{flex:1,textAlign:"center",textAlignLast:"center"}}>
@@ -507,15 +506,13 @@ function ScheduleModal({T,state,update,onClose}){
             </div>
             {/* プレビュー */}
             {tempExtraCount>0&&(()=>{
+              const baseIdx=state.extraPieces?.length||0;
               const baseN=state.totalPieces+(state.extraPieces?.length||0);
-              const curMaxBatch=(state.extraPieces?.length>0)?Math.max(...(state.extraPieces).map(e=>e.batch||1)):0;
-              const nb=curMaxBatch+1;
               let preview;
               if(extraCountMode==="absolute"){
                 preview=Array.from({length:Math.min(tempExtraCount,5)},(_,i)=>baseN+i+1).join(", ")+(tempExtraCount>5?"...":"");
               } else {
-                const plusStr="+".repeat(nb);
-                preview=Array.from({length:Math.min(tempExtraCount,5)},(_,i)=>`${plusStr}${i+1}`).join(", ")+(tempExtraCount>5?"...":"");
+                preview=Array.from({length:Math.min(tempExtraCount,5)},(_,i)=>`+${baseIdx+i+1}`).join(", ")+(tempExtraCount>5?"...":"");
               }
               return <div style={{fontSize:12,color:T.accent,marginBottom:8}}>追加後: {preview}</div>;
             })()}
@@ -540,33 +537,52 @@ function ScheduleModal({T,state,update,onClose}){
       </div>
 
       {/* 個別ピース編集 */}
-      {editPiece!==null&&(
-        <div className="mo" style={{zIndex:400}} onClick={()=>setEditPiece(null)}>
-          <div className="md" onClick={e=>e.stopPropagation()}>
-            <div className="mdtitle">{editPiece}枚目の装着間隔</div>
-            <div style={{fontSize:14,color:T.text+"77",marginBottom:10}}>
-              {(() => {
-                const exStart=getExchangeDate(state,editPiece);
-                const exEnd=getExchangeEndDate(state,editPiece);
-                return exStart&&exEnd ? `${fmtDateJP(dsFromDate(exStart))}〜${fmtDateJP(dsFromDate(exEnd))}` : "—";
-              })()}
+      {editPiece!==null&&(()=>{
+        const pieceInfo=list.find(p=>p.n===editPiece);
+        const isExtra=pieceInfo?.isExtra;
+        const deletePiece=()=>{
+          if(!isExtra)return;
+          const newExtras=(state.extraPieces||[]).filter((_,i)=>i!==pieceInfo.epIdx);
+          update({extraPieces:newExtras});
+          setEditPiece(null);
+        };
+        return(
+          <div className="mo" style={{zIndex:400}} onClick={()=>setEditPiece(null)}>
+            <div className="md" onClick={e=>e.stopPropagation()}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
+                <div className="mdtitle" style={{margin:0}}>{editPiece}枚目の装着間隔</div>
+                {isExtra&&(
+                  <button onClick={deletePiece} style={{background:"none",border:"none",cursor:"pointer",padding:"4px 8px"}}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E74C3C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                    </svg>
+                  </button>
+                )}
+              </div>
+              <div style={{fontSize:14,color:T.text+"77",marginBottom:10}}>
+                {(() => {
+                  const exStart=getExchangeDate(state,editPiece);
+                  const exEnd=getExchangeEndDate(state,editPiece);
+                  return exStart&&exEnd ? `${fmtDateJP(dsFromDate(exStart))}〜${fmtDateJP(dsFromDate(exEnd))}` : "—";
+                })()}
+              </div>
+              <select value={editDays} onChange={e=>setEditDays(parseInt(e.target.value))} style={{marginBottom:14}}>
+                {Array.from({length:21},(_,i)=>i+1).map(d=><option key={d} value={d}>{d}日間</option>)}
+              </select>
+              <div style={{display:"flex",gap:8,marginBottom:8}}>
+                <button className="btn bs" style={{flex:1}} onClick={()=>setEditPiece(null)}>キャンセル</button>
+                <button className="btn bp" style={{flex:1}} onClick={()=>{const ci={...(state.customIntervals||{})};ci[editPiece]=editDays;update({customIntervals:ci});setEditPiece(null);}}>保存</button>
+              </div>
+              {state.customIntervals?.[editPiece]&&(
+                <button style={{width:"100%",padding:"9px",border:"none",borderRadius:10,background:"#FFF0F0",color:"#E74C3C",cursor:"pointer",fontWeight:600,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}
+                  onClick={()=>{const ci={...(state.customIntervals||{})};delete ci[editPiece];update({customIntervals:ci});setEditPiece(null);}}>
+                  デフォルトに戻す ({state.intervalDays}日)
+                </button>
+              )}
             </div>
-            <select value={editDays} onChange={e=>setEditDays(parseInt(e.target.value))} style={{marginBottom:14}}>
-              {Array.from({length:21},(_,i)=>i+1).map(d=><option key={d} value={d}>{d}日間</option>)}
-            </select>
-            <div style={{display:"flex",gap:8,marginBottom:8}}>
-              <button className="btn bs" style={{flex:1}} onClick={()=>setEditPiece(null)}>キャンセル</button>
-              <button className="btn bp" style={{flex:1}} onClick={()=>{const ci={...(state.customIntervals||{})};ci[editPiece]=editDays;update({customIntervals:ci});setEditPiece(null);}}>保存</button>
-            </div>
-            {state.customIntervals?.[editPiece]&&(
-              <button style={{width:"100%",padding:"9px",border:"none",borderRadius:10,background:"#FFF0F0",color:"#E74C3C",cursor:"pointer",fontWeight:600,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}
-                onClick={()=>{const ci={...(state.customIntervals||{})};delete ci[editPiece];update({customIntervals:ci});setEditPiece(null);}}>
-                デフォルトに戻す ({state.intervalDays}日)
-              </button>
-            )}
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }

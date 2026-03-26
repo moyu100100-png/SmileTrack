@@ -86,9 +86,13 @@ function buildPieceList(state) {
   const extras = state.extraPieces || [];
   extras.forEach((ep,idx) => {
     const n = state.totalPieces + idx + 1;
-    // バッチ番号に応じて + の数を増やす: batch=1 → +1, batch=2 → ++1, …
-    const plusStr = "+".repeat(ep.batch||1);
-    const label = `${plusStr}${ep.batchIdx+1}`;
+    let label;
+    if(ep.countMode==="absolute"){
+      label = `${n}`;
+    } else {
+      // 常に+1から（batchに関係なく通し番号）
+      label = `+${idx+1}`;
+    }
     list.push({n, label, intervalDays: ep.intervalDays || state.intervalDays, isExtra:true, epIdx:idx});
   });
   return list;
