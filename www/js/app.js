@@ -149,7 +149,7 @@ function OnboardingScreen({T,onComplete}){
 
       <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
         <div style={{width:"100%",background:T.card,borderRadius:26,border:`1px solid ${T.primary}14`,
-          boxShadow:`0 4px 24px ${T.primary}12`,padding:"28px 24px 28px",textAlign:"center"}}>
+          boxShadow:`0 4px 24px ${T.primary}12`,padding:"28px 24px 24px",textAlign:"center"}}>
           {/* 握手アイコン */}
           <div style={{display:"flex",justifyContent:"center",marginBottom:12}}>
             <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -165,26 +165,24 @@ function OnboardingScreen({T,onComplete}){
             color:T.primary,letterSpacing:-1,lineHeight:1.1,marginBottom:16}}>
             {endDate||"—"}
           </div>
-          <div style={{fontSize:13,fontWeight:600,color:T.text+"77",lineHeight:1.75}}>
+          <div style={{fontSize:13,fontWeight:600,color:T.text+"77",lineHeight:1.75,marginBottom:24}}>
             素敵な笑顔に向けて、一緒に頑張りましょう。
           </div>
+          {/* ボタンをカード内下部に */}
+          <button onClick={()=>onComplete({startDate,totalPieces,intervalDays,targetWearHours:targetHours})}
+            style={{width:"100%",height:56,border:"none",borderRadius:16,
+              background:T.primary,color:"#fff",fontFamily:"'M PLUS Rounded 1c',sans-serif",
+              fontSize:16,fontWeight:800,cursor:"pointer",letterSpacing:0.3,
+              boxShadow:`0 6px 20px ${T.primary}44`,marginBottom:4}}>
+            はじめる →
+          </button>
+          <button onClick={()=>setStep(3)}
+            style={{background:"none",border:"none",fontFamily:"'M PLUS Rounded 1c',sans-serif",
+              fontSize:13,fontWeight:700,color:T.text+"44",cursor:"pointer",
+              padding:12,textAlign:"center",width:"100%"}}>
+            ← 戻る
+          </button>
         </div>
-      </div>
-
-      <div style={{flexShrink:0,paddingTop:16}}>
-        <button onClick={()=>onComplete({startDate,totalPieces,intervalDays,targetWearHours:targetHours})}
-          style={{width:"100%",height:56,border:"none",borderRadius:16,
-            background:T.primary,color:"#fff",fontFamily:"'M PLUS Rounded 1c',sans-serif",
-            fontSize:16,fontWeight:800,cursor:"pointer",letterSpacing:0.3,
-            boxShadow:`0 6px 20px ${T.primary}44`,marginBottom:4}}>
-          はじめる →
-        </button>
-        <button onClick={()=>setStep(3)}
-          style={{background:"none",border:"none",fontFamily:"'M PLUS Rounded 1c',sans-serif",
-            fontSize:13,fontWeight:700,color:T.text+"44",cursor:"pointer",
-            padding:12,textAlign:"center",width:"100%"}}>
-          ← 戻る
-        </button>
       </div>
     </div>
   );
@@ -194,10 +192,9 @@ function OnboardingScreen({T,onComplete}){
     <div style={{position:"fixed",inset:0,background:T.bg,display:"flex",flexDirection:"column",padding:"52px 26px 36px",zIndex:9999}}>
       <Header/>
 
-      {/* カード */}
+      {/* カード＋ボタン */}
       <div style={{background:T.card,borderRadius:26,border:`1px solid ${T.primary}14`,
-        padding:"26px 24px 28px",marginTop:20,flexShrink:0,
-        height:320,display:"flex",flexDirection:"column",
+        padding:"26px 24px 24px",marginTop:20,flex:1,display:"flex",flexDirection:"column",
         boxShadow:`0 4px 24px ${T.primary}12`}}>
         {/* アイコン＋タイトル */}
         <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:12,marginBottom:16,flexShrink:0}}>
@@ -209,29 +206,26 @@ function OnboardingScreen({T,onComplete}){
           </div>
         </div>
         {cardContent()}
-      </div>
-
-      <div style={{flex:1,minHeight:0}}/>
-
-      {/* ボタン */}
-      <div style={{flexShrink:0,paddingTop:16}}>
-        <button onClick={handleNext}
-          style={{width:"100%",height:56,border:"none",borderRadius:16,
-            background:canNext()?T.primary:T.soft,
-            color:canNext()?"#fff":T.text+"44",
-            fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16,fontWeight:800,
-            cursor:canNext()?"pointer":"default",letterSpacing:0.3,
-            boxShadow:canNext()?`0 6px 20px ${T.primary}44`:"none",transition:"all 0.2s",marginBottom:4}}>
-          {step===3?"はじめる →":"次へ →"}
-        </button>
-        {step>0?(
-          <button onClick={()=>setStep(s=>s-1)}
-            style={{background:"none",border:"none",fontFamily:"'M PLUS Rounded 1c',sans-serif",
-              fontSize:13,fontWeight:700,color:T.text+"44",cursor:"pointer",
-              padding:12,textAlign:"center",width:"100%"}}>
-            ← 戻る
+        {/* ボタンをカード内下部に */}
+        <div style={{flexShrink:0,marginTop:"auto",paddingTop:20}}>
+          <button onClick={handleNext}
+            style={{width:"100%",height:56,border:"none",borderRadius:16,
+              background:canNext()?T.primary:T.soft,
+              color:canNext()?"#fff":T.text+"44",
+              fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16,fontWeight:800,
+              cursor:canNext()?"pointer":"default",letterSpacing:0.3,
+              boxShadow:canNext()?`0 6px 20px ${T.primary}44`:"none",transition:"all 0.2s",marginBottom:4}}>
+            {step===3?"はじめる →":"次へ →"}
           </button>
-        ):<div style={{height:37}}/>}
+          {step>0?(
+            <button onClick={()=>setStep(s=>s-1)}
+              style={{background:"none",border:"none",fontFamily:"'M PLUS Rounded 1c',sans-serif",
+                fontSize:13,fontWeight:700,color:T.text+"44",cursor:"pointer",
+                padding:12,textAlign:"center",width:"100%"}}>
+              ← 戻る
+            </button>
+          ):<div style={{height:37}}/>}
+        </div>
       </div>
     </div>
   );
