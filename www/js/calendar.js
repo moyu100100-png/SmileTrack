@@ -28,10 +28,14 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
   const [editSessTo,setEditSessTo] = useState("");
   const [editSessDur,setEditSessDur] = useState("00:30");
   const [editSessHasRange,setEditSessHasRange] = useState(false);
+  const [showWearEditConfirm,setShowWearEditConfirm] = useState(false);
+  const [editEventId,setEditEventId] = useState(null);
   // 削除確認
   const [confirmDeleteId,setConfirmDeleteId] = useState(null);
 
   // 時刻が変わったら時間を自動計算
+  const toHHMM=sec=>`${String(Math.floor(sec/3600)).padStart(2,"0")}:${String(Math.floor((sec%3600)/60)).padStart(2,"0")}`;
+
   React.useEffect(()=>{
     if(editSessFrom&&editSessTo){
       const [fh,fm]=editSessFrom.split(':').map(Number);
@@ -281,7 +285,14 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                         border:'none',borderBottom:'2px solid '+T.primary,outline:'none',background:'transparent',
                         color:T.primary,letterSpacing:1,padding:'1px 0',borderRadius:0,flexShrink:0}}/>
                   :<span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16,fontWeight:700,color:wearColor,cursor:'text',flexShrink:0}}
-                      onClick={e=>{e.stopPropagation();setEditLogDay(sel+'_wear');setEditLogVal(toHHMM(wearSec));}}>
+                      onClick={e=>{
+                        e.stopPropagation();
+                        if(selSessions.length>0){
+                          setShowWearEditConfirm(true);
+                        } else {
+                          setEditLogDay(sel+'_wear');setEditLogVal(toHHMM(wearSec));
+                        }
+                      }}>
                       {hasLog?toHHMM(wearSec):'--:--'}
                     </span>
                 }
@@ -320,7 +331,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                           <span style={{flex:1,fontSize:12,color:T.text+'55',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',padding:'0 3px'}}>
                             {s.comment||''}
                           </span>
-                          {rangeStr&&<span style={{fontSize:11,color:T.text+'44',flexShrink:0,marginLeft:4,whiteSpace:'nowrap'}}>{rangeStr}</span>}
+                          {rangeStr&&<span style={{fontSize:14,fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:600,color:T.text+'66',flexShrink:0,marginLeft:4,whiteSpace:'nowrap'}}>{rangeStr}</span>}
                           <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:14,fontWeight:700,color:T.accent,flexShrink:0,minWidth:40,textAlign:'right',marginLeft:4}}>{durStr}</span>
                         </div>
                       </div>
@@ -367,15 +378,44 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
           ? <div style={{fontSize:14,color:T.text+"40",padding:"4px 0"}}>この日の予定はありません</div>
           : <div style={{display:"flex",flexDirection:"column",gap:5}}>
               {selEvents.map((ev,i)=>(
-                <div key={i} style={{display:"flex",alignItems:"center",padding:"7px 10px",background:T.bg,borderRadius:9,borderLeft:`3px solid ${ev.color}`,position:"relative",minHeight:32}}>
+                <div key={i} onClick={()=>ev.id&&setEditEventId(ev.id)}
+                  style={{display:"flex",alignItems:"center",padding:"7px 10px",background:T.bg,borderRadius:9,borderLeft:`3px solid ${ev.color}`,position:"relative",minHeight:32,cursor:ev.id?"pointer":"default"}}>
                   <span style={{flex:1,fontSize:14,color:T.text,fontWeight:600}}>{ev.title||ev.label}</span>
                   {ev.time&&<span style={{position:"absolute",left:"50%",transform:"translateX(-50%)",fontSize:13,color:T.text+"66",fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:600,whiteSpace:"nowrap",pointerEvents:"none"}}>{ev.time}</span>}
-                  {ev.id&&<button onClick={()=>deleteEvent(ev)} style={{background:"none",border:"none",color:T.text+"33",cursor:"pointer",padding:"0 0 0 8px",flexShrink:0}}>{Icons.trash(T.text+"33",12)}</button>}
                 </div>
               ))}
             </div>
         }
       </div>
+
+      {/* 装着時間手動編集確認 */}
+      {showWearEditConfirm&&(()=>{
+        const dayMs2=new Date(sel+"T00:00:00").getTime();
+        const isToday2=sel===todayStr;
+        const wearSec2=isToday2
+          ? Math.max(0,Math.floor((Date.now()-dayMs2)/1000)-Math.floor((todaySavedMs+runningMs)/1000))
+          : (wearLog[sel]||0);
+        const toHHMM2=sec=>`${String(Math.floor(sec/3600)).padStart(2,"0")}:${String(Math.floor((sec%3600)/60)).padStart(2,"0")}`;
+        return(
+          <div className="mo" onClick={()=>setShowWearEditConfirm(false)} style={{alignItems:"center"}}>
+            <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:340,textAlign:"center"}}>
+              <div className="mdtitle" style={{marginBottom:8}}>手動変更すると内訳がリセットされます</div>
+              <div style={{fontSize:13,color:T.text+"77",marginBottom:20,lineHeight:1.7}}>内訳を編集しますか？</div>
+              <div style={{display:"flex",gap:8}}>
+                <button className="btn bs" style={{flex:1}} onClick={()=>{
+                  setShowWearEditConfirm(false);
+                  setEditLogDay(sel+'_wear');
+                  setEditLogVal(toHHMM2(wearSec2));
+                }}>手動で変更</button>
+                <button className="btn bp" style={{flex:1}} onClick={()=>{
+                  setShowWearEditConfirm(false);
+                  setEditLogDay(sel);
+                }}>内訳を編集</button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* セッション編集モーダル */}
       {editSessId&&(()=>{
@@ -424,7 +464,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                 ))}
               </div>
               <label>時刻</label>
-              <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:14}}>
+              <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:8}}>
                 <input type='time' value={editSessFrom}
                   onChange={e=>{setEditSessFrom(e.target.value);}}
                   onBlur={e=>{
@@ -453,7 +493,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
               <input type='text' inputMode='numeric' maxLength={5} autoComplete='off' value={editSessDur}
                 onChange={e=>{if(isFromTimer)return;let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&editSessDur.length===1)v+=':';setEditSessDur(v);}}
                 readOnly={isFromTimer}
-                style={{marginBottom:14,textAlign:'center',opacity:isFromTimer?0.6:1,background:isFromTimer?T.soft:T.bg}}/>
+                style={{marginBottom:14,textAlign:'center',opacity:isFromTimer?0.6:1,background:isFromTimer?T.soft:T.bg,fontSize:16}}/>
               <label>コメント</label>
               <input type='text' value={editSessComment} onChange={e=>setEditSessComment(e.target.value)}
                 placeholder='コメントを入力…' style={{marginBottom:16}}/>
@@ -536,9 +576,10 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
               <button className='btn bs' style={{flex:1}} onClick={()=>setAddBreakdownDay(null)}>キャンセル</button>
               <button className='btn bp' style={{flex:1}} onClick={()=>{
                 const sel=addBreakdownDay;
+                const parseHH=str=>{const p=(str||"").split(":");return Math.min(86400,Math.max(0,(parseInt(p[0])||0)*3600+(parseInt(p[1])||0)*60));};
                 const dayMs2=new Date(sel+'T00:00:00').getTime();
-                let startTs=undefined,endTs=undefined,ms=parseHHMM(addBreakdownDur)*1000;
-                if(addBreakdownTimeFrom&&addBreakdownTimeTo){
+                let startTs=undefined,endTs=undefined,ms=parseHH(addBreakdownDur)*1000;
+                if(addUseTime&&addBreakdownTimeFrom&&addBreakdownTimeTo){
                   const [fh,fm]=addBreakdownTimeFrom.split(':').map(Number);
                   const [th,tm]=addBreakdownTimeTo.split(':').map(Number);
                   startTs=dayMs2+fh*3600000+fm*60000;
@@ -562,8 +603,8 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
 
       {/* Add event modal */}
       {showAddModal&&(
-        <div className="mo" onClick={()=>setShowAddModal(false)}>
-          <div className="md" onClick={e=>e.stopPropagation()}>
+        <div className="mo" onClick={()=>setShowAddModal(false)} style={{alignItems:"center"}}>
+          <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:400}}>
             <div className="mdtitle">予定を追加</div>
             <label>タイトル</label>
             <input value={apptForm.title} onChange={e=>setApptForm(f=>({...f,title:e.target.value}))} placeholder="タイトル" style={{marginBottom:8}}/>
@@ -600,6 +641,31 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
           </div>
         </div>
       )}
+
+      {/* 予定編集モーダル */}
+      {editEventId&&(()=>{
+        const ev=(state.appointments||[]).find(a=>a.id===editEventId);
+        if(!ev) return null;
+        return(
+          <div className="mo" onClick={()=>setEditEventId(null)} style={{alignItems:"center"}}>
+            <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:400}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
+                <div className="mdtitle" style={{margin:0}}>予定を編集</div>
+                <button style={{background:"none",border:"none",color:"#E74C3C",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",padding:"4px 8px"}}
+                  onClick={()=>{deleteEvent(ev);setEditEventId(null);}}>削除</button>
+              </div>
+              <label>タイトル</label>
+              <input value={ev.title||""} onChange={e=>{
+                const newAppts=(state.appointments||[]).map(a=>a.id===editEventId?{...a,title:e.target.value}:a);
+                update({appointments:newAppts});
+              }} style={{marginBottom:8}}/>
+              <div style={{display:"flex",gap:8,marginTop:8}}>
+                <button className="btn bs" style={{flex:1}} onClick={()=>setEditEventId(null)}>閉じる</button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

@@ -169,7 +169,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
           : <>
             {todaySess.map((s,i)=>{
               const displayReason=(!s.noReason&&s.reason)?s.reason:null;
-              const durStr=secToHHMMSS(Math.floor(s.ms/1000));
+              const durStr=secToHHMM(Math.floor(s.ms/1000));
               const hasRange=s.start&&s.end&&s.end>s.start;
               const rangeStr=hasRange?`${fmtTime(s.start)}〜${fmtTime(s.end)}`:'';
               return(
@@ -264,7 +264,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
               <input type='text' inputMode='numeric' maxLength={5} autoComplete='off' value={timerEditSessDur}
                 onChange={e=>{if(isFromTimer)return;let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&timerEditSessDur.length===1)v+=':';setTimerEditSessDur(v);}}
                 readOnly={isFromTimer}
-                style={{marginBottom:14,textAlign:'center',opacity:isFromTimer?0.6:1,background:isFromTimer?T.soft:T.bg}}/>
+                style={{marginBottom:14,textAlign:'center',opacity:isFromTimer?0.6:1,background:isFromTimer?T.soft:T.bg,fontSize:16}}/>
               <label>コメント</label>
               <input type='text' value={timerEditSessComment} onChange={e=>setTimerEditSessComment(e.target.value)}
                 placeholder='コメントを入力…' style={{marginBottom:16}}/>

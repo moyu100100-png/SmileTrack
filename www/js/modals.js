@@ -462,7 +462,7 @@ function ScheduleModal({T,state,update,onClose}){
         {/* 追加マウスピース */}
         <div style={{background:T.soft,borderRadius:12,padding:"8px 12px",marginBottom:10}}>
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:showAddExtra?6:0}}>
-            <div style={{fontSize:13,fontWeight:700,color:T.accent}}>
+            <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>
               追加マウスピース
               {(state.extraPieces?.length>0)&&<span style={{marginLeft:6,color:T.primary,fontWeight:700}}>{state.extraPieces.length}枚登録済</span>}
             </div>
@@ -626,8 +626,10 @@ function NotifyModal({T,state,onSave,onClose}){
 
 
         {/* 交換リマインダー */}
-        <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif",marginBottom:8}}>交換リマインダー</div>
-        <Toggle T={T} on={!!sf.reminderExchange} onToggle={async()=>{if(!sf.reminderExchange){const ok=await ensureNotifPermission();if(!ok)return;}setSf(s=>({...s,reminderExchange:!s.reminderExchange}));}}/>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
+          <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>交換リマインダー</div>
+          <Toggle T={T} on={!!sf.reminderExchange} onToggle={async()=>{if(!sf.reminderExchange){const ok=await ensureNotifPermission();if(!ok)return;}setSf(s=>({...s,reminderExchange:!s.reminderExchange}));}}/>
+        </div>
         {sf.reminderExchange&&expandBox(
           <div>
             <div style={{fontSize:11,color:T.text+"77",marginBottom:10}}>通知タイミング・時間</div>
@@ -643,8 +645,10 @@ function NotifyModal({T,state,onSave,onClose}){
         )}
 
         {/* 写真リマインダー */}
-        {sec("写真リマインダー")}
-        <Toggle T={T} on={!!sf.reminderPhoto} onToggle={async()=>{if(!sf.reminderPhoto){const ok=await ensureNotifPermission();if(!ok)return;}setSf(s=>({...s,reminderPhoto:!s.reminderPhoto}));}}/>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8,marginTop:16,paddingTop:14,borderTop:`1px solid ${T.soft}`}}>
+          <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>写真リマインダー</div>
+          <Toggle T={T} on={!!sf.reminderPhoto} onToggle={async()=>{if(!sf.reminderPhoto){const ok=await ensureNotifPermission();if(!ok)return;}setSf(s=>({...s,reminderPhoto:!s.reminderPhoto}));}}/>
+        </div>
         {sf.reminderPhoto&&expandBox(
           <div>
             <div style={{fontSize:11,color:T.text+"77",marginBottom:10}}>通知タイミング・時間</div>
@@ -662,15 +666,17 @@ function NotifyModal({T,state,onSave,onClose}){
         )}
 
         {/* タイマー放置防止 */}
-        {sec("タイマー放置防止アラート")}
-        <Toggle T={T} on={f.forgetTimerAlert} onToggle={async()=>{if(!f.forgetTimerAlert){const ok=await ensureNotifPermission();if(!ok)return;}setF(x=>({...x,forgetTimerAlert:!x.forgetTimerAlert}));}}/>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8,marginTop:16,paddingTop:14,borderTop:`1px solid ${T.soft}`}}>
+          <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>タイマー放置防止アラート</div>
+          <Toggle T={T} on={f.forgetTimerAlert} onToggle={async()=>{if(!f.forgetTimerAlert){const ok=await ensureNotifPermission();if(!ok)return;}setF(x=>({...x,forgetTimerAlert:!x.forgetTimerAlert}));}}/>
+        </div>
         {f.forgetTimerAlert&&expandBox(
           <div style={{display:"flex",alignItems:"center",gap:8}}>
-            <span style={{fontSize:13,color:T.text+"88",flexShrink:0}}>取り外し中が</span>
+            <span style={{fontSize:13,color:T.text+"88",flexShrink:0}}>取り外しが</span>
             <button className="btn bs bsm" style={{padding:"2px 10px",fontSize:16}} onClick={()=>setF(x=>({...x,forgetTimerHours:Math.max(1,x.forgetTimerHours-1)}))}>－</button>
             <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:700,color:T.primary,minWidth:24,textAlign:"center"}}>{f.forgetTimerHours}</span>
             <button className="btn bs bsm" style={{padding:"2px 10px",fontSize:16}} onClick={()=>setF(x=>({...x,forgetTimerHours:Math.min(24,x.forgetTimerHours+1)}))}>＋</button>
-            <span style={{fontSize:13,color:T.text+"88",flexShrink:0}}>時間超えたら1時間おき</span>
+            <span style={{fontSize:13,color:T.text+"88",flexShrink:0}}>時間を超えたら</span>
           </div>
         )}
 
@@ -722,7 +728,7 @@ function BackupModal({T,state,onImport,onClose}){
         <div style={{fontSize:12,color:T.text+"77",marginBottom:12}}>写真を含む全データをバックアップします</div>
         <button className="btn bp blg" style={{width:"100%",marginBottom:10,opacity:exporting?0.6:1}}
           onClick={doExport} disabled={exporting}>
-          {exporting?"エクスポート中...":"エクスポート（写真込み）"}
+          {exporting?"エクスポート中...":"エクスポート"}
         </button>
         <button className="btn bs blg" style={{width:"100%"}} onClick={()=>fileRef.current?.click()}>インポート</button>
         <input ref={fileRef} type="file" accept=".json" style={{display:"none"}} onChange={e=>{
@@ -734,14 +740,10 @@ function BackupModal({T,state,onImport,onClose}){
           };
           r.readAsText(f);
         }}/>
-        <div style={{marginTop:16,padding:"10px 12px",background:T.soft,borderRadius:10,fontSize:11,color:T.text+"77"}}>
-          ※写真が多い場合、エクスポートに時間がかかる場合があります
-        </div>
         <div style={{borderTop:`1px solid ${T.soft}`,marginTop:16,paddingTop:16}}>
           <div style={{fontSize:13,fontWeight:700,color:T.accent,marginBottom:8}}>購入の復元</div>
           <div style={{fontSize:12,color:T.text+"77",marginBottom:10}}>機種変更後などに購入済みのプランを復元できます</div>
-          <button className="btn bs" style={{width:"100%"}} onClick={()=>{
-            // RevenueCat導入後にここを実装
+          <button className="btn bs blg" style={{width:"100%"}} onClick={()=>{
             alert("購入の復元はアプリ版でご利用いただけます");
           }}>購入を復元する</button>
         </div>
@@ -814,8 +816,8 @@ function CameraSettingsModal({T,state,onSave,onClose}){
               <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",
                 background:T.soft,borderRadius:10,padding:"8px 12px",cursor:"pointer"}}
                 onClick={()=>setSelectingSlot(isOpen?null:slotN)}>
-                <span style={{fontSize:13,fontWeight:600,color:T.text}}>{slotN}：{modeInfo.labelJP}</span>
-                <span style={{fontSize:12,color:T.primary}}>{isOpen?"▲ 閉じる":"▼ 変更"}</span>
+                <span style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>{slotN}：{modeInfo.labelJP}</span>
+                <span style={{fontSize:13,fontWeight:600,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>{isOpen?"▲ 閉じる":"▼ 変更"}</span>
               </div>
               {isOpen&&(
                 <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6,marginTop:8,padding:"8px",background:T.bg,borderRadius:10}}>

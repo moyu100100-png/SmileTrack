@@ -200,9 +200,9 @@ function OnboardingScreen({T,onComplete}){
         height:320,display:"flex",flexDirection:"column",
         boxShadow:`0 4px 24px ${T.primary}12`}}>
         {/* アイコン＋タイトル */}
-        <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16,flexShrink:0}}>
+        <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:10,marginBottom:16,flexShrink:0}}>
           {steps[step].icon}
-          <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:20,fontWeight:800,color:T.text+"99",letterSpacing:-0.3}}>
+          <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:25,fontWeight:800,color:T.text+"99",letterSpacing:-0.3,textAlign:"center"}}>
             {steps[step].title}
           </div>
         </div>
