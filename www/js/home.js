@@ -62,7 +62,7 @@ function HomePage({T,state,todayStr,todayDayStartMs,onGoTimer}){
               <div style={{fontSize:Math.round(centerFontSize*.5),color:T.text+"77",fontWeight:600}}>本日の装着時間</div>
               {(()=>{
                 const tn=state.themeName;
-                const circleNumC=["ashviolet","blushhemp"].includes(tn)?T.soft:T.primary;
+                const circleNumC=["atrium","navyrose","deepteal","ashviolet","blushhemp"].includes(tn)?T.soft:T.primary;
                 return <>
                   <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:centerFontSize,fontWeight:700,color:circleNumC,lineHeight:1}}>{fmt(actualWearSec)}</div>
                   <div style={{fontSize:Math.round(centerFontSize*.5),color:T.text+"77"}}>取り外し</div>
@@ -85,10 +85,8 @@ function HomePage({T,state,todayStr,todayDayStartMs,onGoTimer}){
           {(()=>{
             const tn=state.themeName;
             const nC=
-              tn==="atrium"?T.soft:
-              tn==="navyrose"?T.soft:
-              tn==="deepteal"?T.soft:
-              tn==="blushhemp"?T.soft:
+              tn==="atrium"?T.soft:      // 7: #5A452C 茶色
+              tn==="blushhemp"?T.soft:   // 12: #402924 茶色っぽい
               T.primary;
             return <>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
