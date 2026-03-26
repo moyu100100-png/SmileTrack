@@ -2,8 +2,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
   const isPremium=IS_PREMIUM;
   useTick(1000, state.timerRunning);
   const fmtShort = ds => { if(!ds) return "—"; const d=new Date(ds+"T00:00:00"); return `${d.getMonth()+1}/${d.getDate()}`; };
-  const greyThemesFail=["blush","wisteria","atrium","ashviolet","navyrose","elegan","glacier","amber","deepteal","blushhemp"];
-  const failCol=greyThemesFail.includes(state.themeName)?"#A0A0A0":state.themeName==="night"?"#DC2626":"#E88080";
+  const failCol=state.themeName==="night"?"rgba(220,38,38,0.8)":"#E88080";
 
   const [period,setPeriod]=useState("daily");
   const [statsView,setStatsView]=useState("breakdown");

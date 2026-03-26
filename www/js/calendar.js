@@ -151,7 +151,6 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
             const dow = d.getDay();
             const isSun2 = ws===0?dow===0:dow===1;
             const isSat2 = ws===0?dow===6:dow===0;
-            const greyThemes=["blush","wisteria","atrium","ashviolet","navyrose","elegan","glacier","amber","deepteal","blushhemp"];
             const isNight=state.themeName==="night";
             let numBg="transparent",numColor=isPast?(T.text+"66"):isSun2?"#DC2626":isSat2?"#2563EB":T.text,numFw=400;
             if(isSel){ numBg=T.primary; numColor="#fff"; numFw=700; }
@@ -161,8 +160,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
               else numBg=`${T.primary}22`;
             }
             else if(failed){
-              if(greyThemes.includes(state.themeName)) numBg="rgba(160,160,160,0.18)";
-              else if(isNight) numBg="rgba(220,38,38,0.28)";
+              if(isNight) numBg="rgba(220,38,38,0.28)";
               else numBg="rgba(220,38,38,0.12)";
             }
             return(
@@ -194,7 +192,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
         {/* Legend */}
         <div style={{display:"flex",gap:10,flexWrap:"wrap",paddingTop:6,borderTop:`1px solid ${T.soft}`,marginTop:4}}>
           <span style={{fontSize:11,display:"flex",alignItems:"center",gap:3,color:T.text+"77"}}><span style={{width:10,height:10,borderRadius:2,background:`${T.primary}22`,border:`1.5px solid ${T.primary}`,display:"inline-block"}}/>達成</span>
-          <span style={{fontSize:11,display:"flex",alignItems:"center",gap:3,color:T.text+"77"}}><span style={{width:10,height:10,borderRadius:2,background:["blush","wisteria","atrium","ashviolet","navyrose","elegan","glacier","amber","deepteal","blushhemp"].includes(state.themeName)?"rgba(160,160,160,0.25)":state.themeName==="night"?"rgba(220,38,38,0.35)":"rgba(220,38,38,0.12)",border:["blush","wisteria","atrium","ashviolet","navyrose","elegan","glacier","amber","deepteal","blushhemp"].includes(state.themeName)?"1.5px solid #aaa":state.themeName==="night"?"1.5px solid rgba(220,38,38,0.7)":"1.5px solid #DC2626",display:"inline-block"}}/>未達</span>
+          <span style={{fontSize:11,display:"flex",alignItems:"center",gap:3,color:T.text+"77"}}><span style={{width:10,height:10,borderRadius:2,background:state.themeName==="night"?"rgba(220,38,38,0.35)":"rgba(220,38,38,0.12)",border:state.themeName==="night"?"1.5px solid rgba(220,38,38,0.7)":"1.5px solid #DC2626",display:"inline-block"}}/>未達</span>
           <span style={{fontSize:11,display:"flex",alignItems:"center",gap:3,color:T.text+"77"}}><span style={{width:10,height:10,borderRadius:"2px",border:`2px solid ${T.accent}`,display:"inline-block"}}/>交換日</span>
         </div>
       </div>
@@ -230,11 +228,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
           const parseHHMM=str=>{const p=(str||"").split(":");return Math.min(86400,Math.max(0,(parseInt(p[0])||0)*3600+(parseInt(p[1])||0)*60));};
           const toHHMM=sec=>`${String(Math.floor(sec/3600)).padStart(2,"0")}:${String(Math.floor((sec%3600)/60)).padStart(2,"0")}`;
           const fmtTs=ts=>{const d=new Date(ts);return`${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;};
-          const accentThemes=["atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"];
-          const greyThemes2=["blush","wisteria","atrium","ashviolet","navyrose","elegan","glacier","amber","deepteal","blushhemp"];
-          const failColor=greyThemes2.includes(state.themeName)
-            ?"#A0A0A0"
-            :state.themeName==="night"?"rgba(220,38,38,0.8)":"#E88080";
+          const failColor=state.themeName==="night"?"rgba(220,38,38,0.8)":"#E88080";
               const wearColor=hasLog?(wearSec>=targetSecs?T.primary:failColor):T.text+"44";
           const ROW=38;
 
@@ -425,9 +419,9 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                       内訳がある場合、変更すると内訳がリセットされます
                     </div>
                   )}
-                  <div style={{display:"flex",gap:8,marginBottom:hasBreakdown?8:0}}>
-                    {hasBreakdown&&(
-                      <button className="btn bs" style={{color:T.text+"66",fontSize:13}} onClick={()=>{
+                  {hasBreakdown?(
+                    <div style={{display:"flex",gap:8}}>
+                      <button className="btn bs" style={{flex:1,color:T.text+"66",fontSize:13}} onClick={()=>{
                         const log={...(state.dailyWearLog||{})};
                         log[sel]=parseHH(editLogVal);
                         const newSess=(state.timerSessions||[]).filter(x=>
@@ -436,24 +430,20 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                         update({dailyWearLog:log,timerSessions:newSess});
                         setShowWearEditConfirm(false);
                       }}>内訳をリセット</button>
-                    )}
-                    <button className="btn bs" style={{flex:1}} onClick={()=>setShowWearEditConfirm(false)}>キャンセル</button>
-                    {!hasBreakdown&&(
+                      <button className="btn bp" style={{flex:1,fontSize:13}} onClick={()=>{
+                        setShowWearEditConfirm(false);
+                        setEditLogDay(sel);
+                      }}>内訳を編集</button>
+                    </div>
+                  ):(
+                    <div style={{display:"flex",gap:8}}>
+                      <button className="btn bs" style={{flex:1}} onClick={()=>setShowWearEditConfirm(false)}>戻る</button>
                       <button className="btn bp" style={{flex:1}} onClick={()=>{
                         const log={...(state.dailyWearLog||{})};
                         log[sel]=parseHH(editLogVal);
                         update({dailyWearLog:log});
                         setShowWearEditConfirm(false);
                       }}>保存</button>
-                    )}
-                  </div>
-                  {hasBreakdown&&(
-                    <div style={{display:"flex",gap:8}}>
-                      <button className="btn bs" style={{flex:1}} onClick={()=>setShowWearEditConfirm(false)}>キャンセル</button>
-                      <button className="btn bp" style={{flex:1}} onClick={()=>{
-                        setShowWearEditConfirm(false);
-                        setEditLogDay(sel);
-                      }}>内訳を編集</button>
                     </div>
                   )}
                 </>
