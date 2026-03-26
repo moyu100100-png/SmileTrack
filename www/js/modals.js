@@ -477,7 +477,7 @@ function ScheduleModal({T,state,update,onClose}){
               <div style={{display:"flex",gap:6}}>
                 {[{key:"relative",label:"+1〜"},{key:"absolute",label:"通し番号"}].map(opt=>(
                   <button key={opt.key}
-                    onClick={()=>update({extraLabelMode:opt.key})}
+                    onClick={e=>{e.stopPropagation();update({extraLabelMode:opt.key});}}
                     style={{padding:"4px 12px",borderRadius:8,border:`1.5px solid ${(state.extraLabelMode||"relative")===opt.key?T.primary:T.soft}`,
                       background:(state.extraLabelMode||"relative")===opt.key?T.primary:"transparent",
                       color:(state.extraLabelMode||"relative")===opt.key?"#fff":T.text,
