@@ -61,8 +61,8 @@ function HomePage({T,state,todayStr,todayDayStartMs,onGoTimer}){
             <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2}}>
               <div style={{fontSize:Math.round(centerFontSize*.5),color:T.text+"77",fontWeight:600}}>本日の装着時間</div>
               {(()=>{
-                const accentNum=["atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"].includes(state.themeName);
-                const numC=accentNum?T.removedColor:T.primary;
+                const accentNum=["atrium","navyrose","deepteal","ashviolet","blushhemp"].includes(state.themeName);
+                const numC=accentNum?T.soft:T.primary;
                 return <>
                   <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:centerFontSize,fontWeight:700,color:numC,lineHeight:1}}>{fmt(actualWearSec)}</div>
                   <div style={{fontSize:Math.round(centerFontSize*.5),color:T.text+"77"}}>取り外し</div>
@@ -83,8 +83,8 @@ function HomePage({T,state,todayStr,todayDayStartMs,onGoTimer}){
         ):(
           <>
           {(()=>{
-            const accentNum=["atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"].includes(state.themeName);
-            const nC=accentNum?T.removedColor:T.primary;
+            const accentNum=["atrium","navyrose","deepteal","ashviolet","blushhemp"].includes(state.themeName);
+            const nC=accentNum?T.soft:T.primary;
             return <>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
               {/* 今日 */}

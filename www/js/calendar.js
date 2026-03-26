@@ -152,8 +152,8 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
             const isSun2 = ws===0?dow===0:dow===1;
             const isSat2 = ws===0?dow===6:dow===0;
             const greyFailThemes=["blush","wisteria","powder","glacier","amber"];
-            const accentFailThemes=["atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"];
             const isNight=state.themeName==="night";
+            const failBgColor=isNight?"rgba(220,38,38,0.28)":greyFailThemes.includes(state.themeName)?"rgba(160,160,160,0.22)":"rgba(220,38,38,0.12)";
             let numBg="transparent",numColor=isPast?(T.text+"66"):isSun2?"#DC2626":isSat2?"#2563EB":T.text,numFw=400;
             if(isSel){ numBg=T.primary; numColor="#fff"; numFw=700; }
             else if(isToday){ numBg=T.soft; numColor=T.primary; numFw=700; }
@@ -161,11 +161,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
               if(state.themeName==="wisteria") numBg=`${T.primary}55`;
               else numBg=`${T.primary}22`;
             }
-            else if(failed){
-              if(isNight) numBg="rgba(220,38,38,0.28)";
-              else if(greyFailThemes.includes(state.themeName)) numBg="rgba(160,160,160,0.22)";
-              else numBg="rgba(220,38,38,0.12)";
-            }
+            else if(failed){ numBg=failBgColor; }
             return(
               <div key={ds} onClick={()=>setSel(ds)}
                 style={{display:"flex",flexDirection:"column",alignItems:"center",cursor:"pointer",borderRadius:5,padding:"2px 1px",minHeight:44}}>
