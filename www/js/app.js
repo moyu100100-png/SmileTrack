@@ -73,33 +73,31 @@ function OnboardingScreen({T,onComplete}){
   const TimerIcon=()=><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/></svg>;
 
   const steps=[
-    {icon:<CalIcon/>,   title:"矯正開始日",        desc:"マウスピース矯正を始める日を設定してください。進捗の基準日になります。"},
-    {icon:<ListIcon/>,  title:"マウスピース合計枚数", desc:"治療で使用するマウスピースの総枚数を入力してください。"},
-    {icon:<RepeatIcon/>,title:"交換スケジュール",    desc:"マウスピースを何日ごとに交換しますか？"},
-    {icon:<TimerIcon/>, title:"装着目標時間",        desc:"1日に装着したい目標時間を教えてください。"},
+    {icon:<CalIcon/>,   title:"矯正開始日"},
+    {icon:<ListIcon/>,  title:"マウスピース合計枚数"},
+    {icon:<RepeatIcon/>,title:"交換スケジュール"},
+    {icon:<TimerIcon/>, title:"装着目標時間"},
   ];
 
   const cardContent=()=>{
     if(step===0) return(
-      <div style={{marginTop:"auto",textAlign:"center",display:"flex",justifyContent:"center"}}>
+      <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center"}}>
         <ObDatePicker value={startDate} onChange={setStartDate} T={T}/>
       </div>
     );
     if(step===1) return(
-      <div style={{marginTop:"auto",padding:"0 4px"}}>
-        <div style={{display:"flex",alignItems:"baseline",justifyContent:"center",gap:5,marginBottom:8}}>
-          <input type="number" value={totalPieces} min={1} max={999} inputMode="numeric"
-            onChange={e=>setTotalPieces(Math.max(1,parseInt(e.target.value)||1))}
-            style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:68,fontWeight:800,
-              color:T.primary,background:"transparent",border:"none",
-              borderBottom:`2px solid ${T.soft}`,width:160,textAlign:"center",outline:"none",
-              letterSpacing:-3,padding:"0 0 4px",lineHeight:1}}/>
-          <span style={{fontSize:15,fontWeight:700,color:T.text+"66",paddingBottom:10}}>枚</span>
-        </div>
+      <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
+        <input type="number" value={totalPieces} min={1} max={999} inputMode="numeric"
+          onChange={e=>setTotalPieces(Math.max(1,parseInt(e.target.value)||1))}
+          style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:68,fontWeight:800,
+            color:T.primary,background:"transparent",border:"none",
+            borderBottom:`2px solid ${T.soft}`,width:160,textAlign:"center",outline:"none",
+            letterSpacing:-3,padding:"0 0 4px",lineHeight:1}}/>
+        <span style={{fontSize:15,fontWeight:700,color:T.text+"66",paddingBottom:10}}>枚</span>
       </div>
     );
     if(step===2) return(
-      <div style={{marginTop:"auto",padding:"0 4px"}}>
+      <div style={{flex:1,display:"flex",flexDirection:"column",justifyContent:"center",padding:"0 4px"}}>
         <div style={{display:"flex",alignItems:"baseline",justifyContent:"center",gap:5,marginBottom:20}}>
           <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:68,fontWeight:800,color:T.primary,letterSpacing:-3,lineHeight:1}}>{intervalDays}</span>
           <span style={{fontSize:15,fontWeight:700,color:T.text+"66",paddingBottom:10}}>日ごと</span>
@@ -116,7 +114,7 @@ function OnboardingScreen({T,onComplete}){
       </div>
     );
     if(step===3) return(
-      <div style={{marginTop:"auto",padding:"0 4px"}}>
+      <div style={{flex:1,display:"flex",flexDirection:"column",justifyContent:"center",padding:"0 4px"}}>
         <div style={{display:"flex",alignItems:"baseline",justifyContent:"center",gap:5,marginBottom:20}}>
           <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:68,fontWeight:800,color:T.primary,letterSpacing:-3,lineHeight:1}}>{targetHours}</span>
           <span style={{fontSize:15,fontWeight:700,color:T.text+"66",paddingBottom:10}}>時間</span>
@@ -137,10 +135,10 @@ function OnboardingScreen({T,onComplete}){
   // 共通ヘッダー
   const Header=({allDone=false})=>(
     <div style={{paddingTop:18,flexShrink:0}}>
-      <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:28,fontWeight:900,letterSpacing:-0.5}}>
+      <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:30,fontWeight:900,letterSpacing:-0.5}}>
         <span style={{color:T.text+"99"}}>Smile</span><span style={{color:T.primary}}>Track</span>
       </div>
-      <div style={{fontSize:10,fontWeight:600,color:T.text+"44",letterSpacing:2,marginTop:2}}>マウスピース矯正管理</div>
+      <div style={{fontSize:12,fontWeight:600,color:T.text+"66",letterSpacing:2,marginTop:2}}>マウスピース矯正管理</div>
       <div style={{display:"flex",gap:5,marginTop:18}}>
         {[0,1,2,3].map(i=>(
           <div key={i} style={{flex:1,height:5,borderRadius:99,overflow:"hidden",background:T.soft}}>
@@ -150,7 +148,7 @@ function OnboardingScreen({T,onComplete}){
           </div>
         ))}
       </div>
-      {!allDone&&<div style={{fontSize:10,fontWeight:700,color:T.text+"44",letterSpacing:0.5,marginTop:8}}>Step {step+1} / 4</div>}
+      {!allDone&&<div style={{fontSize:12,fontWeight:700,color:T.text+"66",letterSpacing:0.5,marginTop:8}}>Step {step+1} / 4</div>}
     </div>
   );
 
@@ -160,33 +158,25 @@ function OnboardingScreen({T,onComplete}){
       <Header allDone={true}/>
 
       <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}}>
-        {/* 完了カード */}
         <div style={{width:"100%",background:T.card,borderRadius:26,border:`1px solid ${T.primary}14`,
-          boxShadow:`0 4px 24px ${T.primary}12`,padding:"28px 24px 28px",textAlign:"center",
-          position:"relative",overflow:"hidden"}}>
-          {/* 背景に大きく握手アイコン */}
-          <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none"}}>
-            <svg width="220" height="220" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" style={{opacity:0.06}}>
+          boxShadow:`0 4px 24px ${T.primary}12`,padding:"28px 24px 28px",textAlign:"center"}}>
+          {/* 握手アイコン */}
+          <div style={{display:"flex",justifyContent:"center",marginBottom:12}}>
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/>
             </svg>
           </div>
-          {/* コンテンツ */}
-          <div style={{position:"relative",zIndex:1}}>
-            <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:26,fontWeight:900,color:T.text+"99",marginBottom:6}}>設定完了</div>
-            <div style={{fontSize:13,fontWeight:600,color:T.text+"55",lineHeight:1.75,marginBottom:20}}>
-              終わるまで一緒に頑張ろう。
-            </div>
-            <div style={{width:"100%",height:1,background:T.soft,marginBottom:20}}/>
-            <div style={{fontSize:10,fontWeight:700,letterSpacing:1.6,textTransform:"uppercase",color:T.text+"44",marginBottom:8}}>
-              治療終了予定日
-            </div>
-            <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:34,fontWeight:900,
-              color:T.primary,letterSpacing:-1,lineHeight:1.1,marginBottom:16}}>
-              {endDate||"—"}
-            </div>
-            <div style={{fontSize:13,fontWeight:600,color:T.text+"55",lineHeight:1.75}}>
-              素敵な笑顔に向けて、一緒に頑張りましょう。
-            </div>
+          <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:26,fontWeight:900,color:T.text+"99",marginBottom:20}}>設定完了</div>
+          <div style={{width:"100%",height:1,background:T.soft,marginBottom:20}}/>
+          <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:12,fontWeight:700,letterSpacing:1.6,textTransform:"uppercase",color:T.text+"44",marginBottom:8}}>
+            治療終了予定日
+          </div>
+          <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:36,fontWeight:900,
+            color:T.primary,letterSpacing:-1,lineHeight:1.1,marginBottom:16}}>
+            {endDate||"—"}
+          </div>
+          <div style={{fontSize:13,fontWeight:600,color:T.text+"77",lineHeight:1.75}}>
+            素敵な笑顔に向けて、一緒に頑張りましょう。
           </div>
         </div>
       </div>
@@ -216,18 +206,15 @@ function OnboardingScreen({T,onComplete}){
 
       {/* カード */}
       <div style={{background:T.card,borderRadius:26,border:`1px solid ${T.primary}14`,
-        padding:"26px 24px 28px",marginTop:20,flexShrink:0,position:"relative",overflow:"hidden",
+        padding:"26px 24px 28px",marginTop:20,flexShrink:0,
         height:320,display:"flex",flexDirection:"column",
         boxShadow:`0 4px 24px ${T.primary}12`}}>
         {/* アイコン＋タイトル */}
-        <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:8,flexShrink:0}}>
+        <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16,flexShrink:0}}>
           {steps[step].icon}
-          <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:800,color:T.text+"99",letterSpacing:-0.3}}>
+          <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:20,fontWeight:800,color:T.text+"99",letterSpacing:-0.3}}>
             {steps[step].title}
           </div>
-        </div>
-        <div style={{fontSize:12,fontWeight:500,color:T.text+"55",lineHeight:1.65,marginBottom:18,flexShrink:0}}>
-          {steps[step].desc}
         </div>
         {cardContent()}
       </div>
