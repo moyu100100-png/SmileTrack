@@ -1,25 +1,17 @@
 // ── ONBOARDING ───────────────────────────────────────────────────────────────
 function ObDatePicker({value,onChange,T}){
   const today=new Date();
-  const display=value
-    ? value.replace(/-/g,"－")
-    : `${today.getFullYear()}－${String(today.getMonth()+1).padStart(2,"0")}－${String(today.getDate()).padStart(2,"0")}`;
+  const dateVal=value||`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}-${String(today.getDate()).padStart(2,"0")}`;
+  const [y,m,d]=dateVal.split("-");
   return(
     <div style={{textAlign:"center",position:"relative",display:"inline-block"}}>
-      <div style={{
-        fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:28,fontWeight:700,color:T.primary,
-        borderBottom:`3px solid ${T.primary}`,paddingBottom:4,letterSpacing:1,
-        userSelect:"none",pointerEvents:"none"}}>
-        {display}
+      <div style={{userSelect:"none",pointerEvents:"none"}}>
+        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:36,fontWeight:800,color:T.text+"55",lineHeight:1.1,letterSpacing:-1}}>{y}</div>
+        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:68,fontWeight:800,color:T.primary,letterSpacing:-3,lineHeight:1,borderBottom:`2px solid ${T.soft}`,paddingBottom:4}}>{m}.{d}</div>
       </div>
       <input type="date" value={value} onChange={e=>onChange(e.target.value)}
         className="ob-input"
-        style={{
-          position:"absolute",inset:0,width:"100%",height:"100%",
-          opacity:0,cursor:"pointer",
-          WebkitAppearance:"none",appearance:"none",
-          fontSize:16
-        }}/>
+        style={{position:"absolute",inset:0,width:"100%",height:"100%",opacity:0,cursor:"pointer",WebkitAppearance:"none",appearance:"none",fontSize:16}}/>
     </div>
   );
 }
@@ -87,12 +79,11 @@ function OnboardingScreen({T,onComplete}){
     );
     if(step===1) return(
       <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
-        <input type="number" value={totalPieces} min={1} max={999} inputMode="numeric"
+        <input type="number" className="ob-num" value={totalPieces} min={1} max={999} inputMode="numeric"
           onChange={e=>setTotalPieces(Math.max(1,parseInt(e.target.value)||1))}
           style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:68,fontWeight:800,
-            color:T.primary,background:"transparent",border:"none",
-            borderBottom:`2px solid ${T.soft}`,width:160,textAlign:"center",outline:"none",
-            letterSpacing:-3,padding:"0 0 4px",lineHeight:1}}/>
+            color:T.primary,width:160,textAlign:"center",outline:"none",
+            letterSpacing:-3,lineHeight:1,borderBottomColor:T.soft}}/>
         <span style={{fontSize:15,fontWeight:700,color:T.text+"66",paddingBottom:10}}>枚</span>
       </div>
     );
