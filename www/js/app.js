@@ -5,9 +5,8 @@ function ObDatePicker({value,onChange,T}){
   const [y,m,d]=dateVal.split("-");
   return(
     <div style={{textAlign:"center",position:"relative",display:"inline-block"}}>
-      <div style={{userSelect:"none",pointerEvents:"none",borderBottom:`2px solid ${T.soft}`,paddingBottom:8}}>
-        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:40,fontWeight:800,color:T.text+"66",lineHeight:1.2,letterSpacing:-1}}>{y}</div>
-        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:40,fontWeight:800,color:T.primary,letterSpacing:-1,lineHeight:1.2}}>{m}/{d}</div>
+      <div style={{userSelect:"none",pointerEvents:"none",borderBottom:`2px solid ${T.soft}`,paddingBottom:8,fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:40,fontWeight:800,color:T.primary,letterSpacing:-1,lineHeight:1.2}}>
+        {y}－{m}－{d}
       </div>
       <input type="date" value={value} onChange={e=>onChange(e.target.value)}
         className="ob-input"
@@ -81,16 +80,16 @@ function OnboardingScreen({T,onComplete}){
       <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
         <input type="number" className="ob-num" value={totalPieces} min={1} max={999} inputMode="numeric"
           onChange={e=>setTotalPieces(Math.max(1,parseInt(e.target.value)||1))}
-          style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:40,fontWeight:800,
-            color:T.primary,width:120,textAlign:"center",outline:"none",
-            letterSpacing:-1,lineHeight:1,borderBottomColor:T.soft}}/>
+          style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:68,fontWeight:800,
+            color:T.primary,width:160,textAlign:"center",outline:"none",
+            letterSpacing:-3,lineHeight:1,borderBottomColor:T.soft}}/>
         <span style={{fontSize:15,fontWeight:700,color:T.text+"66",paddingBottom:10}}>枚</span>
       </div>
     );
     if(step===2) return(
       <div style={{flex:1,display:"flex",flexDirection:"column",justifyContent:"center",padding:"0 4px"}}>
         <div style={{display:"flex",alignItems:"baseline",justifyContent:"center",gap:5,marginBottom:20}}>
-          <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:40,fontWeight:800,color:T.primary,letterSpacing:-1,lineHeight:1}}>{intervalDays}</span>
+          <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:68,fontWeight:800,color:T.primary,letterSpacing:-3,lineHeight:1}}>{intervalDays}</span>
           <span style={{fontSize:15,fontWeight:700,color:T.text+"66",paddingBottom:10}}>日ごと</span>
         </div>
         <input type="range" min={3} max={15} value={intervalDays}
@@ -107,7 +106,7 @@ function OnboardingScreen({T,onComplete}){
     if(step===3) return(
       <div style={{flex:1,display:"flex",flexDirection:"column",justifyContent:"center",padding:"0 4px"}}>
         <div style={{display:"flex",alignItems:"baseline",justifyContent:"center",gap:5,marginBottom:20}}>
-          <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:40,fontWeight:800,color:T.primary,letterSpacing:-1,lineHeight:1}}>{targetHours}</span>
+          <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:68,fontWeight:800,color:T.primary,letterSpacing:-3,lineHeight:1}}>{targetHours}</span>
           <span style={{fontSize:15,fontWeight:700,color:T.text+"66",paddingBottom:10}}>時間</span>
         </div>
         <input type="range" min={16} max={24} value={targetHours}
