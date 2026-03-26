@@ -411,7 +411,7 @@ function ScheduleModal({T,state,update,onClose}){
     const existing = state.extraPieces || [];
     const newExtras = [...existing];
     for(let i=0;i<tempExtraCount;i++){
-      newExtras.push({ intervalDays:tempExtraInterval });
+      newExtras.push({ intervalDays:tempExtraInterval, batchIdx:i });
     }
     update({extraPieces:newExtras});
     setExtraConfirmed(true);

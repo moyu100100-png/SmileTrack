@@ -87,7 +87,13 @@ function buildPieceList(state) {
   const mode = state.extraLabelMode || "relative";
   extras.forEach((ep,idx) => {
     const n = state.totalPieces + idx + 1;
-    const label = mode==="absolute" ? `${n}` : `+${idx+1}`;
+    let label;
+    if(mode==="absolute"){
+      label = `${n}`;
+    } else {
+      // バッチ内のインデックスで+1から始める
+      label = `+${(ep.batchIdx||0)+1}`;
+    }
     list.push({n, label, intervalDays: ep.intervalDays || state.intervalDays, isExtra:true, epIdx:idx});
   });
   return list;
