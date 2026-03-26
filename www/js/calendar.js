@@ -151,16 +151,19 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
             const dow = d.getDay();
             const isSun2 = ws===0?dow===0:dow===1;
             const isSat2 = ws===0?dow===6:dow===0;
+            const greyFailThemes=["blush","wisteria","powder","glacier","amber"];
+            const accentFailThemes=["atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"];
             const isNight=state.themeName==="night";
             let numBg="transparent",numColor=isPast?(T.text+"66"):isSun2?"#DC2626":isSat2?"#2563EB":T.text,numFw=400;
             if(isSel){ numBg=T.primary; numColor="#fff"; numFw=700; }
             else if(isToday){ numBg=T.soft; numColor=T.primary; numFw=700; }
             else if(achieved){
-              if(state.themeName==="wisteria") numBg=`${T.primary}44`;
+              if(state.themeName==="wisteria") numBg=`${T.primary}55`;
               else numBg=`${T.primary}22`;
             }
             else if(failed){
               if(isNight) numBg="rgba(220,38,38,0.28)";
+              else if(greyFailThemes.includes(state.themeName)) numBg="rgba(160,160,160,0.22)";
               else numBg="rgba(220,38,38,0.12)";
             }
             return(
@@ -181,7 +184,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                 <div style={{display:"flex",gap:1,marginTop:1,flexWrap:"wrap",justifyContent:"center",maxWidth:34}}>
                   {hasCam&&<span style={{display:"flex"}}>{Icons.camera(isSel?"rgba(255,255,255,0.9)":T.accent,7)}</span>}
                   {appts.slice(0,1).map((a,j)=>(
-                    <div key={j} style={{fontSize:12,background:isSel?"rgba(255,255,255,0.25)":T.primary+"22",color:isSel?"#fff":T.primary,borderRadius:2,padding:"0 2px",lineHeight:"11px",maxWidth:32,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{a.title}</div>
+                    <div key={j} style={{fontSize:9,background:isSel?"rgba(255,255,255,0.25)":T.primary+"22",color:isSel?"#fff":T.primary,borderRadius:2,padding:"0 2px",lineHeight:"12px",maxWidth:42,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{a.title}</div>
                   ))}
                 </div>
               </div>
@@ -192,7 +195,13 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
         {/* Legend */}
         <div style={{display:"flex",gap:10,flexWrap:"wrap",paddingTop:6,borderTop:`1px solid ${T.soft}`,marginTop:4}}>
           <span style={{fontSize:11,display:"flex",alignItems:"center",gap:3,color:T.text+"77"}}><span style={{width:10,height:10,borderRadius:2,background:`${T.primary}22`,border:`1.5px solid ${T.primary}`,display:"inline-block"}}/>達成</span>
-          <span style={{fontSize:11,display:"flex",alignItems:"center",gap:3,color:T.text+"77"}}><span style={{width:10,height:10,borderRadius:2,background:state.themeName==="night"?"rgba(220,38,38,0.35)":"rgba(220,38,38,0.12)",border:state.themeName==="night"?"1.5px solid rgba(220,38,38,0.7)":"1.5px solid #DC2626",display:"inline-block"}}/>未達</span>
+          {(()=>{
+            const gf=["blush","wisteria","powder","glacier","amber"];
+            const isN=state.themeName==="night";
+            const failBg=isN?"rgba(220,38,38,0.35)":gf.includes(state.themeName)?"rgba(160,160,160,0.25)":"rgba(220,38,38,0.12)";
+            const failBd=isN?"1.5px solid rgba(220,38,38,0.7)":gf.includes(state.themeName)?"1.5px solid #aaa":"1.5px solid #DC2626";
+            return <span style={{fontSize:11,display:"flex",alignItems:"center",gap:3,color:T.text+"77"}}><span style={{width:10,height:10,borderRadius:2,background:failBg,border:failBd,display:"inline-block"}}/>未達</span>;
+          })()}
           <span style={{fontSize:11,display:"flex",alignItems:"center",gap:3,color:T.text+"77"}}><span style={{width:10,height:10,borderRadius:"2px",border:`2px solid ${T.accent}`,display:"inline-block"}}/>交換日</span>
         </div>
       </div>
@@ -228,7 +237,8 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
           const parseHHMM=str=>{const p=(str||"").split(":");return Math.min(86400,Math.max(0,(parseInt(p[0])||0)*3600+(parseInt(p[1])||0)*60));};
           const toHHMM=sec=>`${String(Math.floor(sec/3600)).padStart(2,"0")}:${String(Math.floor((sec%3600)/60)).padStart(2,"0")}`;
           const fmtTs=ts=>{const d=new Date(ts);return`${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;};
-          const failColor=state.themeName==="night"?"rgba(220,38,38,0.8)":"#E88080";
+          const greyFailT=["blush","wisteria","powder","glacier","amber"];
+          const failColor=state.themeName==="night"?"rgba(220,38,38,0.8)":greyFailT.includes(state.themeName)?"#A0A0A0":"#E88080";
               const wearColor=hasLog?(wearSec>=targetSecs?T.primary:failColor):T.text+"44";
           const ROW=38;
 
