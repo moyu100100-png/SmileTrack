@@ -185,7 +185,7 @@ function PhotoPage({T,state,update,todayStr}){
   return(
     <div style={{padding:12}}>
       <div className="card" style={{marginBottom:10}}>
-        <div className="ct" style={{marginBottom:8}}>写真を撮影</div>
+        <div className="ct" style={{marginBottom:8,fontSize:14}}>写真を撮影</div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9}}>
           <button className="btn bp" onClick={()=>openCam(slot1Id)} style={{padding:"12px 8px",flexDirection:"column"}}>
             <div style={{display:"flex",alignItems:"center",gap:4}}>{Icons.camera("#fff",14)}<span style={{fontSize:14}}>{slot1Info.labelJP}</span></div>
@@ -239,7 +239,7 @@ function PhotoPage({T,state,update,todayStr}){
       <div className="card">
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
           <div style={{display:"flex",alignItems:"center",gap:8}}>
-            <div className="ct" style={{margin:0}}>フォトアルバム</div>
+            <div className="ct" style={{margin:0,fontSize:14}}>フォトアルバム</div>
             {!isLocked&&filter!=="all"&&(isPremium?(
               <button className={`btn bsm ${compareMode?"bp":"bs"}`} onClick={()=>{setCompareMode(v=>!v);setComparePick([]);}} style={{fontSize:11}}>
                 {compareMode?"キャンセル":"比較"}

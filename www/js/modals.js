@@ -51,9 +51,6 @@ function AboutModal({T,onClose}){
         <Row icon={docIcon} label="利用規約" onClick={()=>window.open("https://pickled-runner-04f.notion.site/ebd//329470522fe180399354fbae6be51bfb","_blank")}/>
         <Row icon={lockIcon} label="プライバシーポリシー" onClick={()=>window.open("https://pickled-runner-04f.notion.site/ebd//329470522fe180d884bfc0afe2d3dd94","_blank")}/>
         <Row icon={mailIcon} label="お問い合わせ" onClick={()=>window.open("mailto:contact.appname@gmail.com")}/>
-
-        <div style={{height:16}}/>
-
         <Row icon={starIcon} label="App Storeでレビューを書く" onClick={()=>window.open("https://apps.apple.com/app/smiletrack","_blank")}/>
         <Row icon={starIcon} label="Google Playでレビューを書く" onClick={()=>window.open("https://play.google.com/store/apps/details?id=app.smiletrack","_blank")}/>
         <Row icon={shareIcon} label="友人にアプリを教える" onClick={share}/>
@@ -73,7 +70,7 @@ function PremiumModal({T,state,onClose,showCoffee=false}){
         <div style={{fontSize:40,marginBottom:8}}>☕</div>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16,fontWeight:700,color:T.primary,marginBottom:6}}>開発者にコーヒーを差し入れ</div>
         <div style={{fontSize:13,color:T.text+"88",marginBottom:20}}>¥200 · 開発継続の大きな励みになります</div>
-        <button className="btn bp" style={{width:"100%",marginBottom:8}} onClick={()=>setThankYou(true)}>差し入れる ☕ ¥200</button>
+        <button className="btn bp" style={{width:"100%",marginBottom:8}} onClick={()=>setThankYou(true)}>差し入れる ☕</button>
         <button className="btn bs" style={{width:"100%"}} onClick={onClose}>閉じる</button>
       </div>
     </div>
@@ -401,10 +398,11 @@ function ScheduleModal({T,state,update,onClose}){
   const [editPiece,setEditPiece]=useState(null);
   const [editDays,setEditDays]=useState(7);
   const [globalDays,setGlobalDays]=useState(state.intervalDays||7);
-  const [tempExtraCount,setTempExtraCount]=useState(0);
+  const [tempExtraCount,setTempExtraCount]=useState(1);
   const [tempExtraInterval,setTempExtraInterval]=useState(state.intervalDays||7);
   const [extraConfirmed,setExtraConfirmed]=useState(false);
   const [showAddExtra,setShowAddExtra]=useState(false);
+  const [extraCountMode,setExtraCountMode]=useState("relative");
 
   const list = buildPieceList(state);
   const today = todayISO();
@@ -415,14 +413,15 @@ function ScheduleModal({T,state,update,onClose}){
     const maxBatch = existing.length > 0 ? Math.max(...existing.map(e=>e.batch||1)) : 0;
     const newBatch = maxBatch + 1;
     const newExtras = [...existing];
+    const baseN = state.totalPieces + existing.length;
     for(let i=0;i<tempExtraCount;i++){
-      const newId = state.totalPieces + existing.length + i + 1;
-      newExtras.push({ id:newId, intervalDays:tempExtraInterval, batch:newBatch, batchIdx:i });
+      const newId = extraCountMode==="absolute" ? baseN+i+1 : state.totalPieces + existing.length + i + 1;
+      newExtras.push({ id:newId, intervalDays:tempExtraInterval, batch:newBatch, batchIdx:i, countMode:extraCountMode });
     }
     update({extraPieces:newExtras});
     setExtraConfirmed(true);
     setShowAddExtra(false);
-    setTempExtraCount(0);
+    setTempExtraCount(1);
   };
 
   return(
@@ -477,27 +476,50 @@ function ScheduleModal({T,state,update,onClose}){
             </button>
           </div>
           {showAddExtra&&(<>
-            <div style={{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",marginTop:6}}>
-              <div style={{display:"flex",alignItems:"center",gap:6}}>
-                <button className="btn bs bsm" style={{fontSize:16,padding:"3px 12px",minWidth:32}} onClick={()=>setTempExtraCount(v=>Math.max(0,v-1))}>－</button>
-                <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:700,color:T.primary,minWidth:28,textAlign:"center"}}>{tempExtraCount}</span>
-                <span style={{fontSize:13,color:T.text+"77"}}>枚</span>
-                <button className="btn bs bsm" style={{fontSize:16,padding:"3px 12px",minWidth:32}} onClick={()=>setTempExtraCount(v=>v+1)}>＋</button>
-              </div>
-              <div style={{display:"flex",alignItems:"center",gap:6}}>
-                <span style={{fontSize:13,color:T.text+"77"}}>間隔</span>
-                <select value={tempExtraInterval} onChange={e=>setTempExtraInterval(parseInt(e.target.value))} style={{width:80,padding:"4px 6px",fontSize:13}}>
-                  {Array.from({length:14},(_,i)=>i+1).map(d=><option key={d} value={d}>{d}日</option>)}
-                </select>
+            {/* 枚数スピナー */}
+            <div style={{display:"flex",alignItems:"center",gap:8,marginTop:6,marginBottom:10}}>
+              <span style={{fontSize:13,color:T.text+"77",flexShrink:0}}>枚数</span>
+              <select value={tempExtraCount} onChange={e=>setTempExtraCount(parseInt(e.target.value))}
+                style={{flex:1,textAlign:"center",textAlignLast:"center"}}>
+                {Array.from({length:50},(_,i)=>i+1).map(n=><option key={n} value={n}>{n}枚</option>)}
+              </select>
+              <span style={{fontSize:13,color:T.text+"77",flexShrink:0}}>間隔</span>
+              <select value={tempExtraInterval} onChange={e=>setTempExtraInterval(parseInt(e.target.value))}
+                style={{flex:1,textAlign:"center",textAlignLast:"center"}}>
+                {Array.from({length:14},(_,i)=>i+1).map(d=><option key={d} value={d}>{d}日</option>)}
+              </select>
+            </div>
+            {/* カウント方式 */}
+            <div style={{marginBottom:10}}>
+              <div style={{fontSize:12,color:T.text+"77",marginBottom:6}}>番号の付け方</div>
+              <div style={{display:"flex",gap:8}}>
+                {[{key:"relative",label:"+1〜（追加番号）"},{key:"absolute",label:"続き番号（21〜）"}].map(opt=>(
+                  <button key={opt.key}
+                    onClick={()=>setExtraCountMode(opt.key)}
+                    style={{flex:1,padding:"8px 4px",borderRadius:10,border:`1.5px solid ${extraCountMode===opt.key?T.primary:T.soft}`,
+                      background:extraCountMode===opt.key?T.primary:"transparent",
+                      color:extraCountMode===opt.key?"#fff":T.text,
+                      fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>
+                    {opt.label}
+                  </button>
+                ))}
               </div>
             </div>
+            {/* プレビュー */}
             {tempExtraCount>0&&(()=>{
+              const baseN=state.totalPieces+(state.extraPieces?.length||0);
               const curMaxBatch=(state.extraPieces?.length>0)?Math.max(...(state.extraPieces).map(e=>e.batch||1)):0;
               const nb=curMaxBatch+1;
-              const plusStr="+".repeat(nb);
-              return <div style={{fontSize:12,color:T.accent,marginTop:5}}>追加後: {Array.from({length:tempExtraCount},(_,i)=>`${plusStr}${i+1}`).join(", ")}</div>;
+              let preview;
+              if(extraCountMode==="absolute"){
+                preview=Array.from({length:Math.min(tempExtraCount,5)},(_,i)=>baseN+i+1).join(", ")+(tempExtraCount>5?"...":"");
+              } else {
+                const plusStr="+".repeat(nb);
+                preview=Array.from({length:Math.min(tempExtraCount,5)},(_,i)=>`${plusStr}${i+1}`).join(", ")+(tempExtraCount>5?"...":"");
+              }
+              return <div style={{fontSize:12,color:T.accent,marginBottom:8}}>追加後: {preview}</div>;
             })()}
-            <button className="btn bp" style={{width:"100%",marginTop:8,padding:"8px"}} onClick={confirmExtras}>
+            <button className="btn bp" style={{width:"100%",padding:"8px"}} onClick={confirmExtras}>
               ✓ {tempExtraCount}枚追加を確定
             </button>
           </>)}
@@ -591,7 +613,7 @@ function NotifyModal({T,state,onSave,onClose}){
 
         {/* 交換リマインダー */}
         <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif",marginBottom:8}}>交換リマインダー</div>
-        <Toggle T={T} on={!!sf.reminderExchange} label="交換リマインダー" onToggle={async()=>{if(!sf.reminderExchange){const ok=await ensureNotifPermission();if(!ok)return;}setSf(s=>({...s,reminderExchange:!s.reminderExchange}));}}/>
+        <Toggle T={T} on={!!sf.reminderExchange} onToggle={async()=>{if(!sf.reminderExchange){const ok=await ensureNotifPermission();if(!ok)return;}setSf(s=>({...s,reminderExchange:!s.reminderExchange}));}}/>
         {sf.reminderExchange&&expandBox(
           <div>
             <div style={{fontSize:11,color:T.text+"77",marginBottom:10}}>通知タイミング・時間</div>
@@ -608,7 +630,7 @@ function NotifyModal({T,state,onSave,onClose}){
 
         {/* 写真リマインダー */}
         {sec("写真リマインダー")}
-        <Toggle T={T} on={!!sf.reminderPhoto} label="写真リマインダー" onToggle={async()=>{if(!sf.reminderPhoto){const ok=await ensureNotifPermission();if(!ok)return;}setSf(s=>({...s,reminderPhoto:!s.reminderPhoto}));}}/>
+        <Toggle T={T} on={!!sf.reminderPhoto} onToggle={async()=>{if(!sf.reminderPhoto){const ok=await ensureNotifPermission();if(!ok)return;}setSf(s=>({...s,reminderPhoto:!s.reminderPhoto}));}}/>
         {sf.reminderPhoto&&expandBox(
           <div>
             <div style={{fontSize:11,color:T.text+"77",marginBottom:10}}>通知タイミング・時間</div>
@@ -627,7 +649,7 @@ function NotifyModal({T,state,onSave,onClose}){
 
         {/* タイマー放置防止 */}
         {sec("タイマー放置防止アラート")}
-        <Toggle T={T} on={f.forgetTimerAlert} label="放置防止アラートを使う" onToggle={async()=>{if(!f.forgetTimerAlert){const ok=await ensureNotifPermission();if(!ok)return;}setF(x=>({...x,forgetTimerAlert:!x.forgetTimerAlert}));}}/>
+        <Toggle T={T} on={f.forgetTimerAlert} onToggle={async()=>{if(!f.forgetTimerAlert){const ok=await ensureNotifPermission();if(!ok)return;}setF(x=>({...x,forgetTimerAlert:!x.forgetTimerAlert}));}}/>
         {f.forgetTimerAlert&&expandBox(
           <div style={{display:"flex",alignItems:"center",gap:8}}>
             <span style={{fontSize:13,color:T.text+"88",flexShrink:0}}>取り外し中が</span>
@@ -761,7 +783,7 @@ function CameraSettingsModal({T,state,onSave,onClose}){
 
         {/* ミラー設定 */}
         <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif",marginBottom:6}}>保存設定</div>
-        <Toggle T={T} on={mirror} label="カメラ画像を左右反転（ミラー）して保存" onToggle={()=>setMirror(v=>!v)}/>
+        <Toggle T={T} on={mirror} label="カメラ画像を左右反転して保存" onToggle={()=>setMirror(v=>!v)}/>
 
 
         {/* 撮影スロット */}
