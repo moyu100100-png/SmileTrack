@@ -172,7 +172,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                   display:"flex",alignItems:"center",justifyContent:"center",
                   fontSize:15,fontWeight:numFw,
                   background:numBg,color:numColor,
-                  border: isEx&&!isSel ? `2px solid ${T.accent}` : "2px solid transparent",
+                  border: isEx ? (isSel ? "2px solid rgba(255,255,255,0.7)" : `2px solid ${T.accent}`) : "2px solid transparent",
                   borderRadius: isEx&&!isSel ? "4px" : "4px",
                   flexShrink:0
                 }}>
