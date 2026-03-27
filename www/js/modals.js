@@ -473,7 +473,7 @@ function ScheduleModal({T,state,update,onClose}){
           {/* 番号方式トグル：追加ピースがある or 追加UI開いている時に表示 */}
           {(state.extraPieces?.length>0||showAddExtra)&&(
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8,marginTop:4}}>
-              <span style={{fontSize:12,color:state.themeName==="night"?T.text+"88":"#555555"}}">番号方式</span>
+              <span style={{fontSize:12,color:state.themeName==="night"?T.text+"88":"#555555"}}>番号方式</span>
               <div style={{display:"flex",gap:6}}>
                 {[{key:"relative",label:"+1〜"},{key:"absolute",label:"通し番号"}].map(opt=>(
                   <button key={opt.key}
