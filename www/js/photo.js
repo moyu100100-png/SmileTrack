@@ -631,6 +631,7 @@ function PhotoPage({T,state,update,todayStr}){
           </div>
         </div>
       )}
+      {showComparePreview&&<ComparePreviewModal T={T} onClose={()=>setShowComparePreview(false)}/>}
       {showSetPin&&(<div className="mo" onClick={()=>setShowSetPin(false)}><div className="md" onClick={e=>e.stopPropagation()}><div className="mdtitle">アルバムをロック</div>{state.photoLockEnabled?<><div style={{fontSize:14,color:T.text+"88",marginBottom:12}}>解除するにはPINを入力してください</div><PinPad T={T} title="PINを入力" onDone={p=>{if(p===state.photoLock){update({photoLockEnabled:false,photoLock:null});setUnlocked(false);setShowSetPin(false);}else alert("PINが違います");}}/></>:<PinPad T={T} title="PINを設定（4桁）" onDone={p=>{update({photoLock:p,photoLockEnabled:true});alert("PINを設定しました");setShowSetPin(false);}}/>}<button className="btn bs" style={{width:"100%",marginTop:10}} onClick={()=>setShowSetPin(false)}>キャンセル</button></div></div>)}
     </div>
   );
