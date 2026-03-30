@@ -1,4 +1,4 @@
-const IS_PREMIUM = false; // RevenueCatで動的に管理
+const IS_PREMIUM = true; // スクショ用・リリース前にfalseに戻す
 
 const THEMES = {
   // ── S1〜S6 単色テーマ ────────────────────────────────────────────────────
