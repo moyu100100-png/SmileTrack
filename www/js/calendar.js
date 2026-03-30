@@ -29,6 +29,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
   const [editSessDur,setEditSessDur] = useState("00:30");
   const [editSessHasRange,setEditSessHasRange] = useState(false);
   const [showWearEditConfirm,setShowWearEditConfirm] = useState(false);
+  const [showResetConfirm,setShowResetConfirm] = useState(false);
   const [editEventId,setEditEventId] = useState(null);
   // 削除確認
   const [confirmDeleteId,setConfirmDeleteId] = useState(null);
@@ -430,19 +431,13 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                   )}
                   {hasBreakdown?(
                     <div style={{display:"flex",gap:8}}>
-                      <button className="btn bs" style={{flex:1,color:T.text+"66",fontSize:13}} onClick={()=>{
-                        const log={...(state.dailyWearLog||{})};
-                        log[sel]=parseHH(editLogVal);
-                        const newSess=(state.timerSessions||[]).filter(x=>
-                          !(x.start>=dayMs2&&x.start<dayMs2+86400000)&&!(!x.start&&x.day===sel)
-                        );
-                        update({dailyWearLog:log,timerSessions:newSess});
-                        setShowWearEditConfirm(false);
-                      }}>内訳をリセット</button>
                       <button className="btn bp" style={{flex:1,fontSize:13}} onClick={()=>{
                         setShowWearEditConfirm(false);
                         setEditLogDay(sel);
                       }}>内訳を編集</button>
+                      <button className="btn bs" style={{flex:1,color:T.text+"66",fontSize:13}} onClick={()=>{
+                        setShowResetConfirm(true);
+                      }}>内訳をリセット</button>
                     </div>
                   ):(
                     <div style={{display:"flex",gap:8}}>
@@ -457,6 +452,33 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                   )}
                 </>
               )}
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* 内訳リセット確認モーダル */}
+      {showResetConfirm&&(()=>{
+        const dayMs3=new Date(sel+"T00:00:00").getTime();
+        const parseHH2=str=>{const p=(str||"").split(":");return Math.min(86400,Math.max(0,(parseInt(p[0])||0)*3600+(parseInt(p[1])||0)*60));};
+        return(
+          <div className="mo" onClick={()=>setShowResetConfirm(false)} style={{alignItems:"center"}}>
+            <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:340,textAlign:"center"}}>
+              <div className="mdtitle" style={{marginBottom:8}}>内訳をリセットしますか？</div>
+              <div style={{fontSize:13,color:T.text+"77",marginBottom:20,lineHeight:1.7}}>この操作は元に戻せません。</div>
+              <div style={{display:"flex",gap:8}}>
+                <button className="btn bs" style={{flex:1}} onClick={()=>setShowResetConfirm(false)}>キャンセル</button>
+                <button className="btn bp" style={{flex:1}} onClick={()=>{
+                  const log={...(state.dailyWearLog||{})};
+                  log[sel]=parseHH2(editLogVal);
+                  const newSess=(state.timerSessions||[]).filter(x=>
+                    !(x.start>=dayMs3&&x.start<dayMs3+86400000)&&!(!x.start&&x.day===sel)
+                  );
+                  update({dailyWearLog:log,timerSessions:newSess});
+                  setShowResetConfirm(false);
+                  setShowWearEditConfirm(false);
+                }}>リセット</button>
+              </div>
             </div>
           </div>
         );

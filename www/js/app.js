@@ -406,7 +406,7 @@ function App(){
       if(Notif.isCapacitor()&&state.alarmEnabled){
         const mins=state.alarmMinutes||30;
         Notif.cancel([1001]);
-        Notif.schedule(1001,"⏰ アラーム",`取り外しから${mins}分が経過しました`,startMs+mins*60000);
+        Notif.schedule(1001,"アラーム",`取り外しから${mins}分が経過しました`,startMs+mins*60000);
       }
       // 放置防止アラート通知予約（設定した時間から1時間おき・最大12本）
       if(Notif.isCapacitor()&&state.forgetTimerAlert){
@@ -495,7 +495,9 @@ function App(){
       {showForgetAlert&&(
         <div className="mo">
           <div className="md" style={{textAlign:"center"}}>
-            <div style={{fontSize:32,marginBottom:8}}>⏰</div>
+            <div style={{display:"flex",justifyContent:"center",marginBottom:8}}>
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/></svg>
+            </div>
             <div className="mdtitle" style={{marginBottom:8}}>タイマー止め忘れでは？</div>
             <div style={{fontSize:15,color:T.text+"88",marginBottom:20,lineHeight:1.7}}>
               取り外し中のタイマーが<br/>

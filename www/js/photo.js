@@ -427,7 +427,7 @@ function PhotoPage({T,state,update,todayStr}){
             /* ── 撮影後プレビュー ── */
             <div style={{flex:1,display:"flex",flexDirection:"column",minHeight:0}}>
               <div style={{flex:1,overflow:"hidden",position:"relative",minHeight:0,background:"#000",display:"flex",alignItems:"center",justifyContent:"center"}}>
-                <img src={captured} alt="" style={{maxWidth:"100%",maxHeight:"100%",objectFit:"contain"}}/>
+                <img src={captured} alt="" style={{width:"100%",height:"100%",objectFit:"contain",position:"absolute",inset:0}}/>
               </div>
               <div style={{padding:14,background:"#111",flexShrink:0}}>
                 <input value={capComment} onChange={e=>setCapComment(e.target.value)} placeholder="コメントを入力…" style={{background:"#222",color:"#fff",border:"1px solid #444",borderRadius:10,marginBottom:6}}/>
@@ -631,7 +631,7 @@ function PhotoPage({T,state,update,todayStr}){
           </div>
         </div>
       )}
-      {showSetPin&&(<div className="mo" onClick={()=>setShowSetPin(false)}><div className="md" onClick={e=>e.stopPropagation()}><div className="mdtitle">アルバムをロック</div>{state.photoLockEnabled?<><div style={{fontSize:14,color:T.text+"88",marginBottom:12}}>現在ロックは有効です</div><button className="btn bs blg" style={{width:"100%",marginBottom:8}} onClick={()=>{update({photoLockEnabled:false,photoLock:null});setUnlocked(false);setShowSetPin(false);}}>ロックを解除する</button></>:<PinPad T={T} title="PINを設定（4桁）" onDone={p=>{update({photoLock:p,photoLockEnabled:true});alert("PINを設定しました");setShowSetPin(false);}}/>}<button className="btn bs" style={{width:"100%",marginTop:10}} onClick={()=>setShowSetPin(false)}>キャンセル</button></div></div>)}
+      {showSetPin&&(<div className="mo" onClick={()=>setShowSetPin(false)}><div className="md" onClick={e=>e.stopPropagation()}><div className="mdtitle">アルバムをロック</div>{state.photoLockEnabled?<><div style={{fontSize:14,color:T.text+"88",marginBottom:12}}>解除するにはPINを入力してください</div><PinPad T={T} title="PINを入力" onDone={p=>{if(p===state.photoLock){update({photoLockEnabled:false,photoLock:null});setUnlocked(false);setShowSetPin(false);}else alert("PINが違います");}}/></>:<PinPad T={T} title="PINを設定（4桁）" onDone={p=>{update({photoLock:p,photoLockEnabled:true});alert("PINを設定しました");setShowSetPin(false);}}/>}<button className="btn bs" style={{width:"100%",marginTop:10}} onClick={()=>setShowSetPin(false)}>キャンセル</button></div></div>)}
     </div>
   );
 }

@@ -14,7 +14,7 @@ const THEMES = {
   deepteal:   { primary:"#2E6858", accent:"#1c3f35", bg:"#F2EDE4", card:"#FFFFFF", soft:"#C8A870", text:"#0E2418", secondary:"#C8A870", removedColor:"#B0D8CC" },
   elegan:     { primary:"#773335", accent:"#6e6466", bg:"#cdcdc3", card:"#FFFFFF", soft:"#bbada9", text:"#373838", secondary:"#bbada9", removedColor:"#C8B0B0" },
   ashviolet:  { primary:"#092948", accent:"#7A8A9A", bg:"#F3EBD9", card:"#FFFFFF", soft:"#C49090", text:"#0A1828", secondary:"#D8E8F4", removedColor:"#C8D8E8" },
-  blushhemp:  { primary:"#C49090", accent:"#E8D8C8", bg:"#FAF6F2", card:"#FFFFFF", soft:"#7A5048", text:"#1A0C08", secondary:"#C49090", removedColor:"#D8C8B8" },
+  blushhemp:  { primary:"#C49090", accent:"#E8D8C8", bg:"#FAF6F2", card:"#FFFFFF", soft:"#402924", text:"#1A0C08", secondary:"#C49090", removedColor:"#D8C8B8" },
 };
 
 // 理由リストはstateから動的に取得する

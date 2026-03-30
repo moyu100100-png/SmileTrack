@@ -76,9 +76,9 @@ function PremiumModal({T,state,onClose,showCoffee=false}){
     </div>
   );
   const plans=[
-    {id:"monthly", label:"月額プラン", price:"¥480", sub:"月額", badge:null, desc:"いつでもキャンセル可能"},
-    {id:"yearly",  label:"年額プラン", price:"¥5,000", sub:"年額", badge:"おすすめ", desc:"月換算 ¥417 お得！"},
-    {id:"lifetime",label:"買い切りプラン", price:"¥12,000", sub:"一括", badge:null, desc:"永久に全機能使い放題"},
+    {id:"monthly", label:"月額プラン", price:"¥450", sub:"月額", badge:null, desc:"いつでもキャンセル可能"},
+    {id:"yearly",  label:"年額プラン", price:"¥4,800", sub:"年額", badge:"おすすめ", desc:"月換算 ¥400 お得！"},
+    {id:"lifetime",label:"買い切りプラン", price:"¥10,000", sub:"一括", badge:null, desc:"永久に全機能使い放題"},
   ];
   const extras=[
     {id:"no_ads", label:"広告削除", price:"¥200", desc:"一度購入したら広告が永久に非表示"},
@@ -217,7 +217,7 @@ function SettingsModal({T,state,onSave,onClose}){
         <input type="date" value={sd} onChange={e=>setSd(e.target.value)}
           style={{marginBottom:12,width:"100%",boxSizing:"border-box",display:"flex",alignItems:"center",
           height:44,lineHeight:"44px",fontSize:16,borderRadius:10,border:"none",
-          background:T.soft,color:T.text,padding:"0 12px",WebkitAppearance:"none",appearance:"none",textAlign:"center"}}/>
+          background:T.soft,color:state.themeName==="blushhemp"?T.primary:T.text,padding:"0 12px",WebkitAppearance:"none",appearance:"none",textAlign:"center"}}/>
         <div style={{fontSize:13,fontWeight:700,color:T.accent,marginBottom:4}}>合計枚数</div>
         <input type="number" min={1} max={100} value={tp} onChange={e=>setTp(parseInt(e.target.value)||1)} style={{textAlign:"center",marginBottom:12}}/>
         <div style={{fontSize:13,fontWeight:700,color:T.accent,marginBottom:6}}>装着目標時間</div>
@@ -297,7 +297,7 @@ function TimerSettingsModal({T,state,onSave,onClose}){
         <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif",marginBottom:8}}>取り外し理由のカスタマイズ</div>
 
 
-        <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:10,padding:"10px",background:T.soft,borderRadius:12,minHeight:44}}>
+        <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:10,padding:"10px",background:state.themeName==="blushhemp"?"#F5EDE4":T.soft,borderRadius:12,minHeight:44}}>
           {pool.map(r=>{
             const isActive=active.includes(r);
             return(
@@ -365,7 +365,7 @@ function TimerSettingsModal({T,state,onSave,onClose}){
               {soundOpen&&(
                 <div style={{display:"flex",flexDirection:"column",gap:4,marginTop:6}}>
                   {ALARM_SOUNDS.map(s=>(
-                    <div key={s.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 12px",borderRadius:10,background:alarmSound===s.id?T.soft:"transparent",border:`1.5px solid ${alarmSound===s.id?T.primary:T.soft}`,cursor:"pointer"}}
+                    <div key={s.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 12px",borderRadius:10,background:alarmSound===s.id?(state.themeName==="blushhemp"?"rgba(64,41,36,0.12)":T.soft):"transparent",border:`1.5px solid ${alarmSound===s.id?T.primary:T.soft}`,cursor:"pointer"}}
                       onClick={()=>{setAlarmSound(s.id);setSoundOpen(false);}}>
                       <div style={{flex:1}}>
                         <div style={{fontSize:13,fontWeight:600,color:alarmSound===s.id?T.primary:T.text}}>{s.label}</div>
@@ -442,7 +442,7 @@ function ScheduleModal({T,state,update,onClose}){
               <div key={p.n} className="wr" style={{background:isAct?T.soft+"88":"transparent",borderRadius:8,padding:"5px 7px",opacity:isPast&&!isAct?0.5:1,cursor:canEdit?"pointer":"default"}}
                 onClick={()=>{if(!canEdit)return;setEditPiece(p.n);setEditDays(p.intervalDays);}}>
                 <div style={{display:"flex",alignItems:"center",gap:8,flex:1}}>
-                  <div style={{width:26,height:26,borderRadius:"50%",background:isAct?T.primary:hasCustom?T.accent+"33":T.soft,color:isAct?"#fff":T.text,border:`1.5px solid ${hasCustom?T.accent:T.soft}`,fontSize:12,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                  <div style={{width:26,height:26,borderRadius:"50%",background:isAct?T.primary:hasCustom?T.accent+"33":T.soft,color:isAct?"#fff":(state.themeName==="blushhemp"?T.primary:T.text),border:`1.5px solid ${hasCustom?T.accent:T.soft}`,fontSize:12,fontWeight:700,fontFamily:"'M PLUS Rounded 1c',sans-serif",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
                     {p.label}
                   </div>
                   <div>

@@ -121,7 +121,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
           <span style={{fontSize:15,fontWeight:700,color:T.accent}}>アラーム</span>
           <div style={{display:"flex",alignItems:"center",gap:8}}>
             <button className="btn bs bsm" style={{padding:"3px 10px",fontSize:16}} onClick={()=>update({alarmMinutes:Math.max(5,(state.alarmMinutes||30)-5)})}>－</button>
-            <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,fontSize:17,color:T.accent,minWidth:28,textAlign:"center"}}>{state.alarmMinutes||30}</span>
+            <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,fontSize:17,color:state.themeName==="ashviolet"?"#ffffff":T.accent,minWidth:28,textAlign:"center"}}>{state.alarmMinutes||30}</span>
             <span style={{fontSize:13,color:T.text+"77"}}>分</span>
             <button className="btn bs bsm" style={{padding:"3px 10px",fontSize:16}} onClick={()=>update({alarmMinutes:Math.min(180,(state.alarmMinutes||30)+5)})}>＋</button>
             <button className="tg" style={{background:state.alarmEnabled?T.accent:T.soft+"aa"}} onClick={async()=>{if(!state.alarmEnabled){const ok=await ensureNotifPermission();if(!ok)return;}update({alarmEnabled:!state.alarmEnabled});}}>
