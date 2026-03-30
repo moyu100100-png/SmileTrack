@@ -240,7 +240,7 @@ function PhotoPage({T,state,update,todayStr}){
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
           <div style={{display:"flex",alignItems:"center",gap:8}}>
             <div className="ct" style={{margin:0,fontSize:14}}>フォトアルバム</div>
-            {!isLocked&&filter!=="all"&&(isPremium?(
+            {!isLocked&&(isPremium?(
               <button className={`btn bsm ${compareMode?"bp":"bs"}`} onClick={()=>{setCompareMode(v=>!v);setComparePick([]);}} style={{fontSize:11}}>
                 {compareMode?"キャンセル":"比較"}
               </button>
