@@ -46,7 +46,7 @@ const defaultState = () => {
     dailyWearLog:{},
     photos:[], dentistName:"", dentistPhone:"", dentistNote:"",
     appointments:[],
-    diary:[], alarmMinutes:30, alarmEnabled:false, alarmSound:"standard",
+    diary:[], alarmMinutes:30, alarmEnabled:false, alarmSound:"tone1",
     customIntervals:{},
     photoLock:null, photoLockEnabled:false, targetWearHours:22,
     notifyBefore:1440, notifyOnDay:true, notifyTime:"09:00", _pendingReason:null,
@@ -179,49 +179,29 @@ function getTotalEndDate(state) {
 
 
 // ── ALARM SOUND ──────────────────────────────────────────────────────────────
-// Capacitor導入後はplayAlarmSound内をネイティブ音源呼び出しに差し替えてください
 const ALARM_SOUNDS = [
-  {id:"standard", label:"標準",  desc:"電子音（ピピピッ）"},
-  {id:"soft",     label:"ソフト", desc:"優しいピアノ音"},
-  {id:"warning",  label:"警告",  desc:"強めのリバース音"},
-  {id:"nature",   label:"自然",  desc:"小鳥のさえずり"},
-  {id:"bell",     label:"ベル",  desc:"チリンチリン"},
+  {id:"tone1", label:"Tone 1", desc:""},
+  {id:"tone2", label:"Tone 2", desc:""},
+  {id:"tone3", label:"Tone 3", desc:""},
+  {id:"tone4", label:"Tone 4", desc:""},
+  {id:"tone5", label:"Tone 5", desc:""},
 ];
 
+let _currentAudio = null;
+
 function playAlarmSound(soundId){
-  // ── ここをCapacitor導入後にネイティブ音源に差し替え ──
   try {
-    const ctx = new (window.AudioContext||window.webkitAudioContext)();
-    const play = (freq, type, start, dur, gain=0.3) => {
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.connect(g); g.connect(ctx.destination);
-      o.type = type; o.frequency.value = freq;
-      g.gain.setValueAtTime(gain, ctx.currentTime + start);
-      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + start + dur);
-      o.start(ctx.currentTime + start);
-      o.stop(ctx.currentTime + start + dur + 0.05);
-    };
-    switch(soundId){
-      case "standard":
-        play(880,"sine",0,0.12); play(1046,"sine",0.15,0.12); play(1318,"sine",0.3,0.18);
-        break;
-      case "soft":
-        play(523,"sine",0,0.4,0.15); play(659,"sine",0.2,0.4,0.12); play(784,"sine",0.4,0.5,0.1);
-        break;
-      case "warning":
-        play(440,"sawtooth",0,0.15,0.25); play(330,"sawtooth",0.2,0.15,0.25); play(220,"sawtooth",0.4,0.2,0.3);
-        break;
-      case "nature":
-        [0,0.15,0.3,0.45,0.6].forEach((t,i)=>play(2000+i*200,"sine",t,0.1,0.12));
-        break;
-      case "bell":
-        play(1567,"sine",0,0.6,0.2); play(2093,"sine",0.05,0.4,0.1); play(1567,"sine",0.35,0.5,0.15);
-        break;
-      default:
-        play(880,"sine",0,0.2);
-    }
+    if(_currentAudio){ _currentAudio.pause(); _currentAudio.currentTime=0; }
+    const id = ALARM_SOUNDS.find(s=>s.id===soundId) ? soundId : "tone1";
+    const audio = new Audio("sounds/" + id + ".mp3");
+    audio.volume = 1.0;
+    _currentAudio = audio;
+    audio.play().catch(e=>console.warn("Audio play error:", e));
   } catch(e){ console.warn("Audio error:", e); }
+}
+
+function stopAlarmSound(){
+  if(_currentAudio){ _currentAudio.pause(); _currentAudio.currentTime=0; _currentAudio=null; }
 }
 
 
