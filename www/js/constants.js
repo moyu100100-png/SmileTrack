@@ -1,4 +1,4 @@
-const IS_PREMIUM = true; // スクショ用・リリース前にfalseに戻す
+const IS_PREMIUM = false;
 
 const THEMES = {
   // ── S1〜S6 単色テーマ ────────────────────────────────────────────────────
