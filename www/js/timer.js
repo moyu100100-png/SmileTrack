@@ -41,7 +41,13 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
 
   const onStartPress=()=>{
     if(!timerRunning){if(showBreakdown)setPendingReason("");else handleRemoveButton(runningMs);}
-    else handleRemoveButton(runningMs);
+    else {
+      handleRemoveButton(runningMs);
+      // 装着ボタン後（取り外し終了→装着）に広告表示
+      if(!state.isPremium&&!state.noAds){
+        AdMobHelper.showInterstitialIfReady();
+      }
+    }
   };
   const confirmReason=reason=>{setPendingReason(null);update({timerRunning:true,timerStart:Date.now(),timerElapsed:0,_pendingReason:reason});};
   const secToHHMM=sec=>`${String(Math.floor(sec/3600)).padStart(2,"0")}:${String(Math.floor((sec%3600)/60)).padStart(2,"0")}`;

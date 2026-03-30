@@ -15,6 +15,72 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="capacitor.js"></script>
   <script>
+  // ── AdMob 設定 ────────────────────────────────────────────────────────────
+  const ADMOB_APP_ID       = "ca-app-pub-5456814091467820~1944092541";
+  const ADMOB_BANNER_ID    = "ca-app-pub-5456814091467820/6020940488";
+  const ADMOB_INTER_ID     = "ca-app-pub-5456814091467820/6669903678";
+  // テスト用ID（実機テスト時はこちらを使う）
+  // const ADMOB_BANNER_ID = "ca-app-pub-3940256099942544/2934735716";
+  // const ADMOB_INTER_ID  = "ca-app-pub-3940256099942544/4411468910";
+
+  const AdMobHelper = {
+    _interCount: 0,
+    _isNative() {
+      return typeof Capacitor !== "undefined" && Capacitor.isNativePlatform?.();
+    },
+    async initialize() {
+      if (!this._isNative()) return;
+      try {
+        await Capacitor.Plugins.AdMob.initialize({
+          requestTrackingAuthorization: true,
+          testingDevices: [],
+          initializeForTesting: false,
+        });
+      } catch(e) { console.warn("[AdMob] initialize error", e); }
+    },
+    async showBanner() {
+      if (!this._isNative()) return;
+      try {
+        await Capacitor.Plugins.AdMob.showBanner({
+          adId: ADMOB_BANNER_ID,
+          adSize: "BANNER",
+          position: "BOTTOM_CENTER",
+          margin: 60,
+          isTesting: false,
+        });
+      } catch(e) { console.warn("[AdMob] showBanner error", e); }
+    },
+    async hideBanner() {
+      if (!this._isNative()) return;
+      try { await Capacitor.Plugins.AdMob.hideBanner(); } catch(e) {}
+    },
+    async removeBanner() {
+      if (!this._isNative()) return;
+      try { await Capacitor.Plugins.AdMob.removeBanner(); } catch(e) {}
+    },
+    async prepareInterstitial() {
+      if (!this._isNative()) return;
+      try {
+        await Capacitor.Plugins.AdMob.prepareInterstitial({
+          adId: ADMOB_INTER_ID,
+          isTesting: false,
+        });
+      } catch(e) { console.warn("[AdMob] prepareInterstitial error", e); }
+    },
+    async showInterstitialIfReady(forceShow=false) {
+      if (!this._isNative()) return;
+      this._interCount++;
+      if (!forceShow && this._interCount % 3 !== 0) return;
+      try {
+        await Capacitor.Plugins.AdMob.showInterstitial();
+        // 次回のために再プリロード
+        setTimeout(() => this.prepareInterstitial(), 1000);
+      } catch(e) {
+        console.warn("[AdMob] showInterstitial error", e);
+        this.prepareInterstitial();
+      }
+    },
+  };
   // ── RevenueCat ラッパー ───────────────────────────────────────────────────
   const RC_API_KEY_IOS = "appl_HrDpuICDgfGShogHiNmlmBubJSJ";
   const RC_ENTITLEMENT = "premium";

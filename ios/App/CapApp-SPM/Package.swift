@@ -13,7 +13,8 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", exact: "8.2.0"),
         .package(name: "CapacitorLocalNotifications", path: "..\..\..\node_modules\@capacitor\local-notifications"),
-        .package(name: "PurchasesCapacitor", path: "..\..\..\node_modules\@revenuecat\purchases-capacitor")
+        .package(name: "PurchasesCapacitor", path: "..\..\..\node_modules\@revenuecat\purchases-capacitor"),
+        .package(name: "CapacitorCommunityAdMob", path: "..\..\..\node_modules\@capacitor-community\admob")
     ],
     targets: [
         .target(
@@ -22,7 +23,8 @@ let package = Package(
                 .product(name: "Capacitor", package: "capacitor-swift-pm"),
                 .product(name: "Cordova", package: "capacitor-swift-pm"),
                 .product(name: "CapacitorLocalNotifications", package: "CapacitorLocalNotifications"),
-                .product(name: "PurchasesCapacitor", package: "PurchasesCapacitor")
+                .product(name: "PurchasesCapacitor", package: "PurchasesCapacitor"),
+                .product(name: "CapacitorCommunityAdMob", package: "CapacitorCommunityAdMob")
             ]
         )
     ]

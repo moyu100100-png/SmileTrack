@@ -281,6 +281,25 @@ function App(){
     })();
   },[]);
 
+  // AdMob初期化
+  useEffect(()=>{
+    (async()=>{
+      if(state.isPremium||state.noAds) return;
+      await AdMobHelper.initialize();
+      await AdMobHelper.prepareInterstitial();
+      await AdMobHelper.showBanner();
+    })();
+  },[]);
+
+  // isPremium/noAds変化時にバナー制御
+  useEffect(()=>{
+    if(state.isPremium||state.noAds){
+      AdMobHelper.removeBanner();
+    } else {
+      AdMobHelper.showBanner();
+    }
+  },[state.isPremium,state.noAds]);
+
   // アフィリエイトポップアップ: 矯正開始30日後から30日ごとに1回
   useEffect(()=>{
     if(!state.startDate) return;
@@ -479,7 +498,12 @@ function App(){
           {tab==="stats"   &&<StatsPage T={T} state={state} update={update} todayStr={todayStr} todayDayStartMs={todayDayStartMs}/>}
         </div>
         <div className="nav">
-          {tabs.map(t=>{const active=tab===t.id;return(<button key={t.id} className={`nb${active?" on":""}`} onClick={()=>setTab(t.id)}>{t.icon(active?T.primary:T.text+"44")}<span className="nb-lbl">{t.label}</span></button>);})}
+          {tabs.map(t=>{const active=tab===t.id;return(<button key={t.id} className={`nb${active?" on":""}`} onClick={()=>{
+  setTab(t.id);
+  if(!state.isPremium&&!state.noAds&&["calendar","stats","photo"].includes(t.id)&&t.id!==tab){
+    AdMobHelper.showInterstitialIfReady();
+  }
+}}>{t.icon(active?T.primary:T.text+"44")}<span className="nb-lbl">{t.label}</span></button>);})}}
         </div>
       </div>
       <Drawer T={T} open={drawerOpen} onClose={()=>setDrawerOpen(false)} onSection={setDrawerSection} onReset={()=>setShowResetConfirm(true)}/>
