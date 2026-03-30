@@ -1175,7 +1175,7 @@ function PhotoViewer({T,photos,initialId,onClose,onEdit,state}){
 
       {/* 写真エリア */}
       <div style={{flex:1,position:"relative",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center"}}>
-        <img key={photo.id} src={photo.data} alt="" style={{maxWidth:"100%",maxHeight:"100%",objectFit:"contain",transform:cs.mirrorSave?"scaleX(-1)":"none"}}/>
+        <img key={photo.id} src={photo.data} alt="" style={{width:"100%",height:"100%",objectFit:"contain",transform:cs.mirrorSave?"scaleX(-1)":"none"}}/>
         {!isPremium&&<svg style={{position:"absolute",inset:0,width:"100%",height:"100%",pointerEvents:"none"}} xmlns="http://www.w3.org/2000/svg">
           <defs><pattern id="wm-viewer" x="0" y="0" width="160" height="80" patternUnits="userSpaceOnUse" patternTransform="rotate(-26)">
             <text x="8" y="48" fontFamily="sans-serif" fontSize="18" fontWeight="700" fill="rgba(255,255,255,0.45)" letterSpacing="3">SmileTrack</text>

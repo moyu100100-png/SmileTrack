@@ -269,6 +269,18 @@ function App(){
   const [showResetConfirm,setShowResetConfirm]=useState(false);
   const [showAffiliatePopup,setShowAffiliatePopup]=useState(false);
 
+  // RevenueCat初期化 & プレミアム状態取得
+  useEffect(()=>{
+    (async()=>{
+      try{
+        await Purchases.configure();
+        const premium=await Purchases.isPremiumUser();
+        const noAds=await Purchases.hasNoAds();
+        setState(s=>({...s,isPremium:premium,noAds:noAds}));
+      }catch(e){ console.warn("[RC] init error",e); }
+    })();
+  },[]);
+
   // アフィリエイトポップアップ: 矯正開始30日後から30日ごとに1回
   useEffect(()=>{
     if(!state.startDate) return;
@@ -478,9 +490,9 @@ function App(){
       {drawerSection==="notify"       &&<NotifyModal T={T} state={state} onSave={f=>{update(f);setTimeout(()=>scheduleExchangeNotif({...state,...f}),500);schedulePhotoNotif({...state,...f});}} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="timerSettings"&&<TimerSettingsModal T={T} state={state} onSave={f=>update(f)} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="cameraSettings"&&<CameraSettingsModal T={T} state={state} onSave={f=>update(f)} onClose={()=>setDrawerSection(null)}/>}
-      {drawerSection==="premium"&&<PremiumModal T={T} state={state} onClose={()=>setDrawerSection(null)}/>}
+      {drawerSection==="premium"&&<PremiumModal T={T} state={state} onClose={()=>setDrawerSection(null)} onPurchased={({isPremium,noAds})=>update({isPremium,noAds})}/>}
       {drawerSection==="about"&&<AboutModal T={T} onClose={()=>setDrawerSection(null)}/>}
-      {drawerSection==="coffee"&&<PremiumModal T={T} state={state} onClose={()=>setDrawerSection(null)} showCoffee={true}/>}
+      {drawerSection==="coffee"&&<PremiumModal T={T} state={state} onClose={()=>setDrawerSection(null)} showCoffee={true} onPurchased={({isPremium,noAds})=>update({isPremium,noAds})}/>}
       {showAffiliatePopup&&<AffiliatePopup T={T} onClose={()=>setShowAffiliatePopup(false)}/>}
       {showResetConfirm&&<ResetConfirmModal T={T} onConfirm={()=>{
         localStorage.removeItem(LS_KEY);

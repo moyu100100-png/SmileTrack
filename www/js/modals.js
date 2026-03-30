@@ -62,15 +62,51 @@ function AboutModal({T,onClose}){
 }
 
 // ── PREMIUM MODAL ────────────────────────────────────────────────────────────
-function PremiumModal({T,state,onClose,showCoffee=false}){
+function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
   const [thankYou,setThankYou]=React.useState(false);
+  const [loading,setLoading]=React.useState(false);
+  const [errorMsg,setErrorMsg]=React.useState(null);
+
+  const handlePurchase=async(productKey)=>{
+    setErrorMsg(null);
+    setLoading(true);
+    try{
+      const productId=RC_PRODUCTS[productKey];
+      await Purchases.purchaseProduct(productId);
+      const isPremium=await Purchases.isPremiumUser();
+      const noAds=await Purchases.hasNoAds();
+      if(onPurchased) onPurchased({isPremium,noAds});
+      if(productKey==="coffee"){ setThankYou(true); }
+      else { onClose(); }
+    }catch(e){
+      if(e?.code==="PURCHASE_CANCELLED"||e?.message?.includes("cancel")||e?.message?.includes("Cancel")){
+        // キャンセルはno-op
+      } else {
+        setErrorMsg("購入に失敗しました。時間をおいて再試行してください。");
+      }
+    }finally{ setLoading(false); }
+  };
+
+  const handleRestore=async()=>{
+    setErrorMsg(null);
+    setLoading(true);
+    try{
+      await Purchases.restorePurchases();
+      const isPremium=await Purchases.isPremiumUser();
+      const noAds=await Purchases.hasNoAds();
+      if(onPurchased) onPurchased({isPremium,noAds});
+      if(isPremium){ onClose(); }
+      else{ setErrorMsg("復元できる購入履歴が見つかりませんでした。"); }
+    }catch(e){ setErrorMsg("復元に失敗しました。"); }
+    finally{ setLoading(false); }
+  };
   if(showCoffee&&!thankYou) return(
     <div className="mo" onClick={onClose}>
       <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center"}}>
         <div style={{fontSize:40,marginBottom:8}}>☕</div>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16,fontWeight:700,color:T.primary,marginBottom:6}}>開発者にコーヒーを差し入れ</div>
         <div style={{fontSize:13,color:T.text+"88",marginBottom:20}}>開発継続の大きな励みになります</div>
-        <button className="btn bp" style={{width:"100%",marginBottom:8}} onClick={()=>setThankYou(true)}>差し入れる ☕</button>
+        <button className="btn bp" style={{width:"100%",marginBottom:8}} onClick={()=>handlePurchase("coffee")} disabled={loading}>{loading?"処理中…":"差し入れる ☕"}</button>
         <button className="btn bs" style={{width:"100%"}} onClick={onClose}>閉じる</button>
       </div>
     </div>
@@ -118,7 +154,7 @@ function PremiumModal({T,state,onClose,showCoffee=false}){
         <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:14}}>
           {plans.map(p=>(
             <div key={p.id} style={{position:"relative",border:`2px solid ${p.badge?T.primary:T.soft}`,borderRadius:12,padding:"12px 14px",cursor:"pointer",background:p.badge?T.soft:"transparent"}}
-              onClick={()=>alert("RevenueCat連携後に実装予定です")}>
+              onClick={()=>!loading&&handlePurchase(p.id)}>
               {p.badge&&<div style={{position:"absolute",top:-10,left:14,background:T.primary,color:"#fff",fontSize:10,fontWeight:700,padding:"2px 10px",borderRadius:20}}>{p.badge}</div>}
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                 <div>
@@ -139,7 +175,7 @@ function PremiumModal({T,state,onClose,showCoffee=false}){
           <div style={{fontSize:11,fontWeight:700,color:T.text+"66",marginBottom:8}}>単品購入</div>
           {extras.map(p=>(
             <div key={p.id} style={{border:`1.5px solid ${T.soft}`,borderRadius:12,padding:"10px 14px",cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center"}}
-              onClick={()=>alert("RevenueCat連携後に実装予定です")}>
+              onClick={()=>!loading&&handlePurchase(p.id)}>
               <div>
                 <div style={{fontSize:14,fontWeight:600,color:T.text}}>{p.label}</div>
                 <div style={{fontSize:11,color:T.text+"66",marginTop:2}}>{p.desc}</div>
@@ -743,10 +779,9 @@ function BackupModal({T,state,onImport,onClose}){
         <div style={{borderTop:`1px solid ${T.soft}`,marginTop:16,paddingTop:16}}>
           <div style={{fontSize:13,fontWeight:700,color:T.accent,marginBottom:8}}>購入の復元</div>
           <div style={{fontSize:12,color:T.text+"77",marginBottom:10}}>機種変更後などに購入済みのプランを復元できます</div>
-          <button className="btn bs blg" style={{width:"100%"}} onClick={()=>{
-            alert("購入の復元はアプリ版でご利用いただけます");
-          }}>購入を復元する</button>
+          <button className="btn bs blg" style={{width:"100%"}} onClick={handleRestore} disabled={loading}>{loading?"処理中…":"購入を復元する"}</button>
         </div>
+        {errorMsg&&<div style={{fontSize:12,color:"#D4445A",textAlign:"center",margin:"8px 0",lineHeight:1.6}}>{errorMsg}</div>}
         <button className="btn bs" style={{width:"100%",marginTop:12}} onClick={onClose}>閉じる</button>
       </div>
     </div>
