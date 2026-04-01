@@ -1,4 +1,4 @@
-function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs}){
+function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,snoozedUntil,setSnoozedUntil,alarmStopped,setAlarmStopped}){
   // タイマーページは常に毎秒更新（メインのタイマー表示）
   useTick(1000);
 
@@ -9,8 +9,6 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
   const timerRunning=state.timerRunning;
 
   const [pendingReason,setPendingReason]=useState(null);
-  const [alarmStopped,setAlarmStopped]=useState(false);
-  const [snoozedUntil,setSnoozedUntil]=useState(null);
   // インライン編集 state（カレンダーと同じ構造）
   const [timerEditSessId,setTimerEditSessId]=useState(null);
   const [timerEditSessReason,setTimerEditSessReason]=useState("");
@@ -33,8 +31,6 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
       if(snoozeJustEnded) setSnoozedUntil(null);
     }
   },[isAlarmNow,snoozeJustEnded]);
-  // タイマー停止（装着ボタン）時にリセット
-  useEffect(()=>{ if(!timerRunning){setAlarmStopped(false);setSnoozedUntil(null);} },[timerRunning]);
   const cycleCount=Math.floor(currentSec/CYCLE);
   const cycleProgress=(currentSec%CYCLE)/CYCLE;
   const cycleColor=cycleCount%2===0?T.primary:T.accent;
@@ -344,4 +340,4 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
   );
 }
 
-// ── STATS PAGE ───────────────────────────────────────────────────────────────
+

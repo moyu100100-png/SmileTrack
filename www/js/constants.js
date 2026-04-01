@@ -1,4 +1,4 @@
-const IS_PREMIUM = false;
+const IS_PREMIUM = true;
 
 const THEMES = {
   // ── S1〜S6 単色テーマ ────────────────────────────────────────────────────
@@ -163,7 +163,7 @@ function getCurrentPieceInfo(state, todayStr) {
 
 function getDaysToNextExchange(state, todayStr) {
   const {pieceIdx, dayNum, interval} = getCurrentPieceInfo(state, todayStr);
-  return interval - dayNum; // 0=今日が最終日(交換日)
+  return interval - dayNum + 1; // 1=今日が最終日、0=交換日
 }
 
 function getTotalEndDate(state) {
@@ -224,13 +224,15 @@ function scheduleExchangeNotif(state){
   if(!state.nextExchangeDate) return;
   Notif.cancel([2001]);
   const hour = state.exchangeNotifyHour??9;
-  const before = state.notifyBefore??1440; // 分（0=当日、1440=前日、2880=2日前）
+  const before = state.notifyBefore??1440;
   const exchDate = new Date(state.nextExchangeDate+"T"+String(hour).padStart(2,"0")+":00:00");
-  // 通知日時 = 交換日のhour時 - before分（beforeが0なら当日、1440なら前日）
   const notifMs = exchDate.getTime() - before*60000;
-  if(notifMs > Date.now()){
+  // 通知時刻が過去の場合、当日の指定時刻にフォールバック
+  const fallbackMs = exchDate.getTime();
+  const targetMs = notifMs > Date.now() ? notifMs : (fallbackMs > Date.now() ? fallbackMs : null);
+  if(targetMs){
     const msg = before===0 ? "今日は交換日です！" : before===1440 ? "明日は交換日です！" : `${before/1440}日後に交換日があります`;
-    Notif.schedule(2001,"💎 マウスピース交換",msg,notifMs);
+    Notif.schedule(2001,"💎 マウスピース交換",msg,targetMs);
   }
 }
 

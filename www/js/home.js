@@ -1,4 +1,4 @@
-function HomePage({T,state,todayStr,todayDayStartMs,onGoTimer}){
+function HomePage({T,state,update,todayStr,todayDayStartMs,onGoTimer}){
   // タイマー動作中のみ毎秒更新、停止中は更新不要
   useTick(1000, state.timerRunning);
 
@@ -41,6 +41,11 @@ function HomePage({T,state,todayStr,todayDayStartMs,onGoTimer}){
 
   const isFirstPieceFirstDay = (pieceIdx===0 && dayNum===1);
   const isExchangeDay = (dayNum===1 && !isFirstPieceFirstDay);
+  const exchangedDates = state.exchangedDates || [];
+  const hasExchangedToday = exchangedDates.includes(todayStr);
+  // タップ前：交換日だがまだ交換していない
+  const isExchangeDayBeforeTap = isExchangeDay && !hasExchangedToday;
+  // タップ後：交換日で交換済み（通常の1日目として扱う）
   const isLastDay = totalEndDate && dsFromDate(totalEndDate)===todayStr;
 
   const lblStyle = {fontSize:14, color:T.text+"66", fontWeight:600, marginBottom:3};
@@ -94,16 +99,26 @@ function HomePage({T,state,todayStr,todayDayStartMs,onGoTimer}){
               <div style={{background:T.card,borderRadius:12,padding:"10px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:80}}>
                 <div style={lblStyle}>今日</div>
                 <div style={{position:"relative",width:"100%",display:"flex",justifyContent:"center",alignItems:"baseline",height:40}}>
-                  <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:36,fontWeight:700,color:nC,lineHeight:1,position:"absolute",left:"50%",transform:"translateX(-50%)",bottom:0}}>{dayNum}</span>
-                  <span style={{...subStyle,position:"absolute",left:"calc(50% + 22px + 4px)",bottom:2,whiteSpace:"nowrap"}}>日目/{interval}日間</span>
+                  <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:36,fontWeight:700,color:nC,lineHeight:1,position:"absolute",left:"50%",transform:"translateX(-50%)",bottom:0}}>
+                    {isExchangeDayBeforeTap ? list[pieceIdx>0?pieceIdx-1:0].intervalDays+1 : dayNum}
+                  </span>
+                  <span style={{...subStyle,position:"absolute",left:"calc(50% + 22px + 4px)",bottom:2,whiteSpace:"nowrap"}}>
+                    {isExchangeDayBeforeTap ? `日目/${list[pieceIdx>0?pieceIdx-1:0].intervalDays}日間` : `日目/${interval}日間`}
+                  </span>
                 </div>
               </div>
               {/* 交換まで */}
-              <div style={{background:T.card,borderRadius:12,padding:"10px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:80}}>
+              <div
+                style={{background:T.card,borderRadius:12,padding:"10px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:80,cursor:isExchangeDayBeforeTap?"pointer":"default"}}
+                onClick={isExchangeDayBeforeTap?()=>update({exchangedDates:[...exchangedDates,todayStr]}):undefined}
+              >
                 {isFirstPieceFirstDay ? (
                   <><div style={lblStyle}>開始日</div><div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:24,fontWeight:700,color:nC}}>今日</div></>
-                ) : isExchangeDay ? (
-                  <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:26,fontWeight:700,color:nC}}>交換日</div>
+                ) : isExchangeDayBeforeTap ? (
+                  <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
+                    <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:26,fontWeight:700,color:nC}}>交換日</div>
+                    <div style={{fontSize:10,color:T.text+"66"}}>交換後タップ</div>
+                  </div>
                 ) : isLastDay ? (
                   <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:24,fontWeight:700,color:nC}}>最終日✨</div>
                 ) : (

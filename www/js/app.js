@@ -268,6 +268,8 @@ function App(){
   const [drawerSection,setDrawerSection]=useState(null);
   const [showResetConfirm,setShowResetConfirm]=useState(false);
   const [showAffiliatePopup,setShowAffiliatePopup]=useState(false);
+  const [snoozedUntil,setSnoozedUntil]=useState(null);
+  const [alarmStopped,setAlarmStopped]=useState(false);
 
   // RevenueCat初期化 & プレミアム状態取得
   useEffect(()=>{
@@ -337,7 +339,20 @@ function App(){
     });
   },[]);
 
-  useEffect(()=>{scheduleExchangeNotif(state);schedulePhotoNotif(state);},[]);
+  useEffect(()=>{
+    // nextExchangeDateを計算してからスケジュール
+    const list = buildPieceList(state);
+    if(list.length && state.startDate){
+      const info = getCurrentPieceInfo(state, todayStr);
+      const daysLeft = info.interval - info.dayNum; // 0=今日が最終日
+      const exchMs = new Date(todayStr+"T00:00:00").getTime() + daysLeft*86400000;
+      const exchDate = new Date(exchMs);
+      const exchStr = `${exchDate.getFullYear()}-${String(exchDate.getMonth()+1).padStart(2,"0")}-${String(exchDate.getDate()).padStart(2,"0")}`;
+      const stateWithExch = {...state, nextExchangeDate: exchStr};
+      scheduleExchangeNotif(stateWithExch);
+      schedulePhotoNotif(stateWithExch);
+    }
+  },[]);
 
   const update=useCallback(patch=>setState(s=>({...s,...patch})),[]);
   const T=THEMES[state.themeName]||THEMES.blush||Object.values(THEMES)[0];
@@ -460,8 +475,9 @@ function App(){
       update({timerRunning:false,timerStart:null,timerElapsed:0,timerSessions:allSess,dailyWearLog:dailyLog,_pendingReason:null});
       // 通知キャンセル
       if(Notif.isCapacitor()) Notif.cancel([1001,...Array.from({length:12},(_,i)=>1002+i)]);
+      setAlarmStopped(false);setSnoozedUntil(null);
     }
-  },[state,todayStr,todayDayStartMs,todayDayEndMs,update]);
+  },[state,todayStr,todayDayStartMs,todayDayEndMs,update,setAlarmStopped,setSnoozedUntil]);
 
   const tabs=[
     {id:"home",   icon:c=>Icons.home(c),    label:"ホーム"},
@@ -491,10 +507,10 @@ function App(){
           <div style={{width:32}}/>
         </div>
         <div className="content">
-          {tab==="home"    &&<HomePage T={T} state={state} todayStr={todayStr} todayDayStartMs={todayDayStartMs} onGoTimer={()=>setTab("timer")}/>}
+          {tab==="home"    &&<HomePage T={T} state={state} update={update} todayStr={todayStr} todayDayStartMs={todayDayStartMs} onGoTimer={()=>setTab("timer")}/>}
           {tab==="calendar"&&<CalendarPage T={T} state={state} update={update} todayStr={todayStr} todayDayStartMs={todayDayStartMs}/>}
           {tab==="photo"   &&<PhotoPage T={T} state={state} update={update} todayStr={todayStr}/>}
-          {tab==="timer"   &&<TimerPage T={T} state={state} update={update} handleRemoveButton={handleRemoveButton} todayStr={todayStr} todayDayStartMs={todayDayStartMs}/>}
+          {tab==="timer"   &&<TimerPage T={T} state={state} update={update} handleRemoveButton={handleRemoveButton} todayStr={todayStr} todayDayStartMs={todayDayStartMs} snoozedUntil={snoozedUntil} setSnoozedUntil={setSnoozedUntil} alarmStopped={alarmStopped} setAlarmStopped={setAlarmStopped}/>}
           {tab==="stats"   &&<StatsPage T={T} state={state} update={update} todayStr={todayStr} todayDayStartMs={todayDayStartMs}/>}
         </div>
         <div className="nav">
@@ -503,7 +519,7 @@ function App(){
   if(!state.isPremium&&!state.noAds&&["calendar","stats","photo"].includes(t.id)&&t.id!==tab){
     AdMobHelper.showInterstitialIfReady();
   }
-}}>{t.icon(active?T.primary:T.text+"44")}<span className="nb-lbl">{t.label}</span></button>);})}}
+}}>{t.icon(active?T.primary:T.text+"44")}<span className="nb-lbl">{t.label}</span></button>);})}
         </div>
       </div>
       <Drawer T={T} open={drawerOpen} onClose={()=>setDrawerOpen(false)} onSection={setDrawerSection} onReset={()=>setShowResetConfirm(true)}/>
@@ -511,7 +527,20 @@ function App(){
       {drawerSection==="settings"     &&<SettingsModal T={T} state={state} onSave={(sf,th,sd,tp)=>update({settings:sf,targetWearHours:th,startDate:sd,totalPieces:tp})} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="schedule"     &&<ScheduleModal T={T} state={state} update={update} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="backup"       &&<BackupModal T={T} state={state} onImport={s=>setState(s)} onClose={()=>setDrawerSection(null)}/>}
-      {drawerSection==="notify"       &&<NotifyModal T={T} state={state} onSave={f=>{update(f);setTimeout(()=>scheduleExchangeNotif({...state,...f}),500);schedulePhotoNotif({...state,...f});}} onClose={()=>setDrawerSection(null)}/>}
+      {drawerSection==="notify"       &&<NotifyModal T={T} state={state} onSave={f=>{
+        update(f);
+        const list=buildPieceList(state);
+        if(list.length&&state.startDate){
+          const info=getCurrentPieceInfo(state,todayStr);
+          const daysLeft=info.interval-info.dayNum;
+          const exchMs=new Date(todayStr+"T00:00:00").getTime()+daysLeft*86400000;
+          const exchDate=new Date(exchMs);
+          const exchStr=`${exchDate.getFullYear()}-${String(exchDate.getMonth()+1).padStart(2,"0")}-${String(exchDate.getDate()).padStart(2,"0")}`;
+          const stateWithExch={...state,...f,nextExchangeDate:exchStr};
+          setTimeout(()=>scheduleExchangeNotif(stateWithExch),500);
+          schedulePhotoNotif(stateWithExch);
+        }
+      }} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="timerSettings"&&<TimerSettingsModal T={T} state={state} onSave={f=>update(f)} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="cameraSettings"&&<CameraSettingsModal T={T} state={state} onSave={f=>update(f)} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="premium"&&<PremiumModal T={T} state={state} onClose={()=>setDrawerSection(null)} onPurchased={({isPremium,noAds})=>update({isPremium,noAds})}/>}
