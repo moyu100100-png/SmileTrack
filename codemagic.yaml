@@ -6,6 +6,7 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: app.smiletrack.app
+        certificate: auto
       vars:
         XCODE_PROJECT: "App.xcodeproj"
         XCODE_SCHEME: "App"
