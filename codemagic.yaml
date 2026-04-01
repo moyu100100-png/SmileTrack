@@ -2,11 +2,12 @@ workflows:
   ios-release:
     name: iOS Release
     max_build_duration: 60
+    integrations:
+      app_store_connect: Codemagic
     environment:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: app.smiletrack.app
-        certificate: auto
       vars:
         XCODE_PROJECT: "App.xcodeproj"
         XCODE_SCHEME: "App"
@@ -29,9 +30,7 @@ workflows:
       - build/ios/ipa/*.ipa
     publishing:
       app_store_connect:
-        api_key: Codemagic
-        key_id: XNAN6B6BJM
-        issuer_id: 75772135-734c-40e8-b47a-77700dbcb93b
+        auth: integration
         submit_to_testflight: true
   android-release:
     name: Android Release
