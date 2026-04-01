@@ -53,7 +53,7 @@ function PinPad({T,title,onDone}){
       <div className="pin-dots">{[0,1,2,3].map(i=><div key={i} className={`pin-dot${val.length>i?" on":""}`}/>)}</div>
       <div className="pin-grid">
         {["1","2","3","4","5","6","7","8","9","","0","del"].map((k,i)=>
-          k===""?<div key={i}/>:<button key={i} className="pin-btn" style={k==="del"?{fontSize:32}:{}} onClick={()=>press(k)}>{k==="del"?"⌫":k}</button>
+          k===""?<div key={i}/>:<button key={i} className="pin-btn" style={k==="del"?{fontSize:32,color:T.accent}:{color:T.accent}} onClick={()=>press(k)}>{k==="del"?"⌫":k}</button>
         )}
       </div>
     </div>

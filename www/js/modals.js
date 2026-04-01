@@ -253,7 +253,7 @@ function SettingsModal({T,state,onSave,onClose}){
         <input type="date" value={sd} onChange={e=>setSd(e.target.value)}
           style={{marginBottom:12,width:"100%",boxSizing:"border-box",display:"flex",alignItems:"center",
           height:44,lineHeight:"44px",fontSize:16,borderRadius:10,border:"none",
-          background:T.soft,color:state.themeName==="blushhemp"?T.primary:T.text,padding:"0 12px",WebkitAppearance:"none",appearance:"none",textAlign:"center"}}/>
+          background:T.soft,color:["atrium","navyrose","deepteal","ashviolet","blushhemp"].includes(state.themeName)?T.accent:T.text,padding:"0 12px",WebkitAppearance:"none",appearance:"none",textAlign:"center"}}/>
         <div style={{fontSize:13,fontWeight:700,color:T.accent,marginBottom:4}}>合計枚数</div>
         <input type="number" min={1} max={100} value={tp} onChange={e=>setTp(parseInt(e.target.value)||1)} style={{textAlign:"center",marginBottom:12}}/>
         <div style={{fontSize:13,fontWeight:700,color:T.accent,marginBottom:6}}>装着目標時間</div>
