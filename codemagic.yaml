@@ -24,6 +24,11 @@ workflows:
           PLIST="ios/App/App/Info.plist"
           /usr/libexec/PlistBuddy -c "Add :NSCameraUsageDescription string '矯正の経過写真を撮影するためにカメラを使用します'" $PLIST
           /usr/libexec/PlistBuddy -c "Add :NSUserNotificationUsageDescription string 'マウスピースの交換日やタイマーのアラームをお知らせします'" $PLIST
+      - name: Resolve Swift packages
+        script: |
+          xcodebuild -resolvePackageDependencies \
+            -project "ios/App/$XCODE_PROJECT" \
+            -scheme "$XCODE_SCHEME"
       - name: Set up keychain
         script: keychain initialize
       - name: Add p12 certificate to keychain
