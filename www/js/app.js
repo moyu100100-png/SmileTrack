@@ -273,7 +273,7 @@ function App(){
   useEffect(()=>{
     (async()=>{
       try{
-        await Purchases.configure();
+        await Purchases.configure({apiKey:"appl_HrDpuICDgfGShogHiNmlmBubJSJ"});
         const premium=await Purchases.isPremiumUser();
         const noAds=await Purchases.hasNoAds();
         setState(s=>({...s,isPremium:premium,noAds:noAds}));

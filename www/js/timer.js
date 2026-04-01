@@ -9,6 +9,8 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
   const timerRunning=state.timerRunning;
 
   const [pendingReason,setPendingReason]=useState(null);
+  const [alarmStopped,setAlarmStopped]=useState(false);
+  const [snoozedUntil,setSnoozedUntil]=useState(null);
   // インライン編集 state（カレンダーと同じ構造）
   const [timerEditSessId,setTimerEditSessId]=useState(null);
   const [timerEditSessReason,setTimerEditSessReason]=useState("");
@@ -20,14 +22,23 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
   const currentSec=Math.floor(runningMs/1000);
   const CYCLE=3600;
   const alarmSecs=(state.alarmMinutes||30)*60;
-  const isAlarmNow=state.alarmEnabled&&timerRunning&&currentSec>=alarmSecs&&currentSec%60===0;
+  const nowMs=Date.now();
+  const isSnoozed=snoozedUntil&&nowMs<snoozedUntil;
+  const isAlarmNow=state.alarmEnabled&&timerRunning&&!alarmStopped&&!isSnoozed&&currentSec>=alarmSecs&&currentSec%60===0;
+  // スヌーズ終了チェック（スヌーズ時刻を過ぎたら再鳴動）
+  const snoozeJustEnded=snoozedUntil&&nowMs>=snoozedUntil&&!alarmStopped&&currentSec>=alarmSecs&&currentSec%60===0;
   useEffect(()=>{
-    if(isAlarmNow) playAlarmSound(state.alarmSound||"standard");
-  },[isAlarmNow]);
+    if(isAlarmNow||snoozeJustEnded){
+      playAlarmSound(state.alarmSound||"standard");
+      if(snoozeJustEnded) setSnoozedUntil(null);
+    }
+  },[isAlarmNow,snoozeJustEnded]);
+  // タイマー停止（装着ボタン）時にリセット
+  useEffect(()=>{ if(!timerRunning){setAlarmStopped(false);setSnoozedUntil(null);} },[timerRunning]);
   const cycleCount=Math.floor(currentSec/CYCLE);
   const cycleProgress=(currentSec%CYCLE)/CYCLE;
   const cycleColor=cycleCount%2===0?T.primary:T.accent;
-  const isAlarm=state.alarmEnabled&&timerRunning&&currentSec>=alarmSecs;
+  const isAlarm=state.alarmEnabled&&timerRunning&&!alarmStopped&&!isSnoozed&&currentSec>=alarmSecs;
   const showBreakdown=state.showReasonBreakdown!==false;
   const todaySess=(state.timerSessions||[]).filter(s=>
     (s.start>=todayDayStartMs&&s.start<todayDayEndMs)||(!s.start&&s.day===todayStr)
@@ -298,6 +309,33 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
               <button style={{flex:1,padding:"10px",border:"none",borderRadius:12,background:"#E74C3C",color:"#fff",fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16}}
                 onClick={()=>deleteSess(timerConfirmDeleteId)}>削除</button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* アラームオーバーレイバナー */}
+      {isAlarm&&(
+        <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,zIndex:500,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.55)",backdropFilter:"blur(4px)"}}>
+          <div style={{background:T.card,borderRadius:28,padding:"36px 28px 28px",width:"82%",maxWidth:340,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.25)"}}>
+            <div style={{fontSize:48,marginBottom:8}}>🔔</div>
+            <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:20,fontWeight:700,color:T.primary,marginBottom:6}}>アラーム</div>
+            <div style={{fontSize:14,color:T.text+"88",marginBottom:28}}>取り外しから{state.alarmMinutes||30}分が経過しました</div>
+            <button
+              onClick={()=>{stopAlarmSound();Notif.cancel([1001]);setAlarmStopped(true);}}
+              style={{width:"100%",padding:"16px",border:"none",borderRadius:16,fontSize:17,fontWeight:700,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",background:T.primary,color:"#fff",marginBottom:12}}>
+              停止
+            </button>
+            <button
+              onClick={()=>{
+                stopAlarmSound();
+                const snoozeMs=Date.now()+5*60*1000;
+                setSnoozedUntil(snoozeMs);
+                Notif.cancel([1001]);
+                Notif.schedule(1001,"アラーム",`取り外しから${state.alarmMinutes||30}分が経過しました`,snoozeMs);
+              }}
+              style={{width:"100%",padding:"14px",border:`1.5px solid ${T.soft}`,borderRadius:16,fontSize:15,fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",background:"transparent",color:T.text}}>
+              5分後にまた知らせる
+            </button>
           </div>
         </div>
       )}
