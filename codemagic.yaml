@@ -26,7 +26,7 @@ workflows:
           /usr/libexec/PlistBuddy -c "Add :NSUserNotificationUsageDescription string 'マウスピースの交換日やタイマーのアラームをお知らせします'" $PLIST
       - name: Set build number
         script: |
-          BUILD_NUMBER=$(($(app-store-connect get-latest-testflight-build-number "app.smiletrack.app") + 1))
+          BUILD_NUMBER=2
           echo "Setting build number to: $BUILD_NUMBER"
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" ios/App/App/Info.plist
       - name: Set up keychain
