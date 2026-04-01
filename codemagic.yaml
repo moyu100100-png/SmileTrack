@@ -8,6 +8,8 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: app.smiletrack.app
+      groups:
+        - code_signing
       vars:
         XCODE_PROJECT: "App.xcodeproj"
         XCODE_SCHEME: "App"
@@ -27,6 +29,7 @@ workflows:
         script: |
           app-store-connect fetch-signing-files "app.smiletrack.app" \
             --type IOS_APP_STORE \
+            --certificate-key "$CERTIFICATE_PRIVATE_KEY" \
             --create
       - name: Add certificates to keychain
         script: keychain add-certificates
