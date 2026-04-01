@@ -142,14 +142,14 @@
         return perm.display==="granted";
       }catch(e){return false;}
     },
-    async schedule(id,title,body,atMs){
+    async schedule(id,title,body,atMs,sound="default"){
       try{
         const {LocalNotifications}=Capacitor.Plugins;
         await LocalNotifications.schedule({notifications:[{
           id,title,body,
           schedule:{at:new Date(atMs)},
           smallIcon:"ic_stat_icon_config_sample",
-          sound:"default",
+          sound:sound,
         }]});
       }catch(e){console.warn("通知エラー:",e);}
     },

@@ -452,16 +452,21 @@ function App(){
       if(Notif.isCapacitor()&&state.alarmEnabled){
         const mins=state.alarmMinutes||30;
         Notif.cancel([1001]);
-        Notif.schedule(1001,"アラーム",`取り外しから${mins}分が経過しました`,startMs+mins*60000);
+        delete _scheduledTimes[1001];
+        const alarmMs=_getUniqueNotifTime(1001,startMs+mins*60000);
+        const alarmSound=(state.alarmSound||"tone1")+".mp3";
+        Notif.schedule(1001,"アラーム",`取り外しから${mins}分が経過しました`,alarmMs,alarmSound);
       }
       // 放置防止アラート通知予約（設定した時間から1時間おき・最大12本）
       if(Notif.isCapacitor()&&state.forgetTimerAlert){
         const hrs=state.forgetTimerHours||4;
         const ids=Array.from({length:12},(_,i)=>1002+i);
         Notif.cancel(ids);
+        ids.forEach(id=>delete _scheduledTimes[id]);
         for(let i=0;i<12;i++){
           const h=hrs+i;
-          Notif.schedule(1002+i,"⚠️ タイマー放置防止",`取り外し中のタイマーが${h}時間を超えています`,startMs+h*3600000);
+          const ms=_getUniqueNotifTime(1002+i,startMs+h*3600000);
+          Notif.schedule(1002+i,"タイマー放置防止",`取り外し中のタイマーが${h}時間を超えています`,ms);
         }
       }
     } else {
@@ -519,8 +524,9 @@ function App(){
   if(!state.isPremium&&!state.noAds&&["calendar","stats","photo"].includes(t.id)&&t.id!==tab){
     AdMobHelper.showInterstitialIfReady();
   }
-}}>{t.icon(active?T.primary:T.text+"44")}<span className="nb-lbl">{t.label}</span></button>);})}
-        </div>
+}}>{t.icon(active?T.primary:T.text+"44")}<span className="nb-lbl">{t.label}</span></button>);})}</div>
+        <div style={{height:15,background:state.themeName==="night"?T.bg:T.card,flexShrink:0}}/>
+      </div>
       </div>
       <Drawer T={T} open={drawerOpen} onClose={()=>setDrawerOpen(false)} onSection={setDrawerSection} onReset={()=>setShowResetConfirm(true)}/>
       {drawerSection==="color"        &&<ColorModal T={T} themeName={state.themeName} onPick={k=>update({themeName:k})} onClose={()=>setDrawerSection(null)}/>}

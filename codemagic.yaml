@@ -19,14 +19,9 @@ workflows:
         script: npm install
       - name: Capacitor sync
         script: npx cap sync ios
-      - name: Set camera & notification permissions
-        script: |
-          PLIST="ios/App/App/Info.plist"
-          /usr/libexec/PlistBuddy -c "Add :NSCameraUsageDescription string '矯正の経過写真を撮影するためにカメラを使用します'" $PLIST
-          /usr/libexec/PlistBuddy -c "Add :NSUserNotificationUsageDescription string 'マウスピースの交換日やタイマーのアラームをお知らせします'" $PLIST
       - name: Set build number
         script: |
-          BUILD_NUMBER=2
+          BUILD_NUMBER=3
           echo "Setting build number to: $BUILD_NUMBER"
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" ios/App/App/Info.plist
       - name: Set up keychain

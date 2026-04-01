@@ -469,9 +469,8 @@ function ScheduleModal({T,state,update,onClose}){
             const isAct=p.n===state.currentPiece;
             const cpIdx2=list.findIndex(p2=>p2.n===state.currentPiece);
             const pIdx=list.findIndex(p2=>p2.n===p.n);
-            // 装着中以降のすべてを編集可能
-            const canEdit=pIdx>=cpIdx2;
-            const isPast=!canEdit;
+            const canEdit=true; // 過去も含めて全て編集可能
+            const isPast=pIdx<cpIdx2;
             const hasCustom=!p.isExtra&&state.customIntervals?.[p.n];
             const rangeStr=exStart&&exEnd?`${fmtDateJP(dsFromDate(exStart))}〜${fmtDateJP(dsFromDate(exEnd))}`:"—";
             return(
@@ -729,6 +728,20 @@ function NotifyModal({T,state,onSave,onClose}){
 function BackupModal({T,state,onImport,onClose}){
   const fileRef=useRef(null);
   const [exporting,setExporting]=React.useState(false);
+  const [loading,setLoading]=React.useState(false);
+  const [errorMsg,setErrorMsg]=React.useState("");
+
+  const handleRestore=async()=>{
+    setLoading(true);setErrorMsg("");
+    try{
+      await Purchases.restorePurchases();
+      const isPremium=await Purchases.isPremiumUser();
+      const noAds=await Purchases.hasNoAds();
+      onImport({...state,isPremium,noAds});
+      onClose();
+    }catch(e){setErrorMsg("復元に失敗しました");}
+    setLoading(false);
+  };
 
   const doExport=async()=>{
     setExporting(true);

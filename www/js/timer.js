@@ -137,7 +137,26 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
             <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,fontSize:17,color:state.themeName==="ashviolet"?"#ffffff":T.accent,minWidth:28,textAlign:"center"}}>{state.alarmMinutes||30}</span>
             <span style={{fontSize:13,color:T.text+"77"}}>分</span>
             <button className="btn bs bsm" style={{padding:"3px 10px",fontSize:16}} onClick={()=>update({alarmMinutes:Math.min(180,(state.alarmMinutes||30)+5)})}>＋</button>
-            <button className="tg" style={{background:state.alarmEnabled?T.accent:T.soft+"aa"}} onClick={async()=>{if(!state.alarmEnabled){const ok=await ensureNotifPermission();if(!ok)return;}update({alarmEnabled:!state.alarmEnabled});}}>
+            <button className="tg" style={{background:state.alarmEnabled?T.accent:T.soft+"aa"}} onClick={async()=>{
+              if(!state.alarmEnabled){
+                const ok=await ensureNotifPermission();
+                if(!ok)return;
+                // ONにした時、タイマー動作中なら残り時間で再スケジュール
+                if(timerRunning&&Notif.isCapacitor()){
+                  const mins=state.alarmMinutes||30;
+                  const elapsed=Math.floor(runningMs/1000);
+                  const remaining=mins*60-elapsed;
+                  if(remaining>0){
+                    Notif.cancel([1001]);
+                    Notif.schedule(1001,"アラーム",`取り外しから${mins}分が経過しました`,Date.now()+remaining*1000,(state.alarmSound||"tone1")+".mp3");
+                  }
+                }
+              } else {
+                Notif.cancel([1001]);
+              }
+              update({alarmEnabled:!state.alarmEnabled});
+            }}>
+
               <div className="tg-k" style={{left:state.alarmEnabled?22:2}}/>
             </button>
           </div>
@@ -327,7 +346,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
                 const snoozeMs=Date.now()+5*60*1000;
                 setSnoozedUntil(snoozeMs);
                 Notif.cancel([1001]);
-                Notif.schedule(1001,"アラーム",`取り外しから${state.alarmMinutes||30}分が経過しました`,snoozeMs);
+                Notif.schedule(1001,"アラーム",`取り外しから${state.alarmMinutes||30}分が経過しました`,snoozeMs,(state.alarmSound||"tone1")+".mp3");
               }}
               style={{width:"100%",padding:"14px",border:`1.5px solid ${T.soft}`,borderRadius:16,fontSize:15,fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",background:"transparent",color:T.text}}>
               5分後にまた知らせる
