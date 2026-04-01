@@ -6,6 +6,8 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: app.smiletrack.app
+      integrations:
+        app_store_connect: Codemagic
       vars:
         XCODE_PROJECT: "App.xcodeproj"
         XCODE_SCHEME: "App"
@@ -31,7 +33,6 @@ workflows:
         api_key: $APP_STORE_CONNECT_PRIVATE_KEY
         key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
         issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-
   android-release:
     name: Android Release
     max_build_duration: 60
