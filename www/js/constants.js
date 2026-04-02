@@ -195,6 +195,7 @@ function playAlarmSound(soundId){
     const id = ALARM_SOUNDS.find(s=>s.id===soundId) ? soundId : "tone1";
     const audio = new Audio("sounds/" + id + ".mp3");
     audio.volume = 1.0;
+    audio.loop = true;
     _currentAudio = audio;
     audio.play().catch(e=>console.warn("Audio play error:", e));
   } catch(e){ console.warn("Audio error:", e); }

@@ -425,7 +425,7 @@ function App(){
     if(state.currentPiece!==autoCurrentPiece) setState(s=>({...s,currentPiece:autoCurrentPiece}));
   },[autoCurrentPiece]);
 
-  // dayStart境界を越えたらタイマーを自動終了
+  // dayStart境界を越えたらタイマーを自動終了して翌日継続
   useEffect(()=>{
     if(!state.timerRunning) return;
     const startMs=state.timerStart||Date.now();
@@ -439,7 +439,14 @@ function App(){
       const prevMs=allSess.filter(s=>s.start>=prevDayStart&&s.start<todayDayStartMs).reduce((a,s)=>a+s.ms,0);
       const dailyLog={...(state.dailyWearLog||{})};
       dailyLog[prevDs]=Math.max(0,86400-Math.floor(prevMs/1000));
-      setState(s=>({...s,timerRunning:false,timerStart:null,timerElapsed:0,timerSessions:allSess,dailyWearLog:dailyLog,_pendingReason:null}));
+      // 翌日も取り外し継続（0:00から新セッション開始）
+      setState(s=>({...s,
+        timerRunning:true,
+        timerStart:todayDayStartMs,
+        timerElapsed:0,
+        timerSessions:allSess,
+        dailyWearLog:dailyLog,
+      }));
     }
   },[todayStr]);
 
@@ -454,7 +461,7 @@ function App(){
         Notif.cancel([1001]);
         delete _scheduledTimes[1001];
         const alarmMs=_getUniqueNotifTime(1001,startMs+mins*60000);
-        const alarmSound=(state.alarmSound||"tone1")+".mp3";
+        const alarmSound=(state.alarmSound||"tone1")+".caf";
         Notif.schedule(1001,"アラーム",`取り外しから${mins}分が経過しました`,alarmMs,alarmSound);
       }
       // 放置防止アラート通知予約（設定した時間から1時間おき・最大12本）
@@ -526,7 +533,6 @@ function App(){
   }
 }}>{t.icon(active?T.primary:T.text+"44")}<span className="nb-lbl">{t.label}</span></button>);})}
         </div>
-        <div style={{height:15,background:state.themeName==="night"?T.bg:T.card,flexShrink:0}}/>
       </div>
       <Drawer T={T} open={drawerOpen} onClose={()=>setDrawerOpen(false)} onSection={setDrawerSection} onReset={()=>setShowResetConfirm(true)}/>
       {drawerSection==="color"        &&<ColorModal T={T} themeName={state.themeName} onPick={k=>update({themeName:k})} onClose={()=>setDrawerSection(null)}/>}

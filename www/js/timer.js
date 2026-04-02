@@ -148,7 +148,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
                   const remaining=mins*60-elapsed;
                   if(remaining>0){
                     Notif.cancel([1001]);
-                    Notif.schedule(1001,"アラーム",`取り外しから${mins}分が経過しました`,Date.now()+remaining*1000,(state.alarmSound||"tone1")+".mp3");
+                    Notif.schedule(1001,"アラーム",`取り外しから${mins}分が経過しました`,Date.now()+remaining*1000,(state.alarmSound||"tone1")+".caf");
                   }
                 }
               } else {
@@ -332,7 +332,9 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
       {isAlarm&&(
         <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,zIndex:500,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.55)",backdropFilter:"blur(4px)"}}>
           <div style={{background:T.card,borderRadius:28,padding:"36px 28px 28px",width:"82%",maxWidth:340,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.25)"}}>
-            <div style={{fontSize:48,marginBottom:8}}>🔔</div>
+            <div style={{fontSize:32,marginBottom:8}}>
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3 2 6"/><path d="m22 6-3-3"/><path d="M6.38 18.7 4 21"/><path d="M17.64 18.67 20 21"/></svg>
+            </div>
             <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:20,fontWeight:700,color:T.primary,marginBottom:6}}>アラーム</div>
             <div style={{fontSize:14,color:T.text+"88",marginBottom:28}}>取り外しから{state.alarmMinutes||30}分が経過しました</div>
             <button
@@ -346,10 +348,10 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
                 const snoozeMs=Date.now()+5*60*1000;
                 setSnoozedUntil(snoozeMs);
                 Notif.cancel([1001]);
-                Notif.schedule(1001,"アラーム",`取り外しから${state.alarmMinutes||30}分が経過しました`,snoozeMs,(state.alarmSound||"tone1")+".mp3");
+                Notif.schedule(1001,"アラーム",`取り外しから${state.alarmMinutes||30}分が経過しました`,snoozeMs,(state.alarmSound||"tone1")+".caf");
               }}
               style={{width:"100%",padding:"14px",border:`1.5px solid ${T.soft}`,borderRadius:16,fontSize:15,fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",background:"transparent",color:T.text}}>
-              5分後にまた知らせる
+              スヌーズ（5分）
             </button>
           </div>
         </div>

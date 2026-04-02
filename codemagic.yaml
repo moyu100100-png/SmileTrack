@@ -19,9 +19,14 @@ workflows:
         script: npm install
       - name: Capacitor sync
         script: npx cap sync ios
+      - name: Convert alarm sounds to caf
+        script: |
+          for i in 1 2 3 4 5; do
+            afconvert -f caff -d LEI16 www/sounds/tone${i}.mp3 ios/App/App/tone${i}.caf
+          done
       - name: Set build number
         script: |
-          BUILD_NUMBER=4
+          BUILD_NUMBER=6
           echo "Setting build number to: $BUILD_NUMBER"
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" ios/App/App/Info.plist
       - name: Set up keychain

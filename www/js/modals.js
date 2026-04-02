@@ -66,6 +66,7 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
   const [thankYou,setThankYou]=React.useState(false);
   const [loading,setLoading]=React.useState(false);
   const [errorMsg,setErrorMsg]=React.useState(null);
+  const [selectedPlan,setSelectedPlan]=React.useState("yearly");
 
   const handlePurchase=async(productKey)=>{
     setErrorMsg(null);
@@ -143,7 +144,7 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
 
         {/* 機能一覧 */}
         <div style={{background:T.soft,borderRadius:12,padding:"10px 14px",marginBottom:16}}>
-          {["写真スロット2・比較機能","カラーテーマ全種類","PDF月次レポート出力","取り外し理由カスタマイズ","PINロック","広告永久削除"].map((f,i)=>(
+          {["写真スロット2・比較機能","カラーテーマ全種類","PDF月次レポート出力","取り外し理由カスタマイズ","PINロック","広告永久削除","写真ウォーターマーク削除"].map((f,i)=>(
             <div key={i} style={{display:"flex",alignItems:"center",gap:8,padding:"4px 0",fontSize:13,color:T.text}}>
               <span style={{color:T.primary,fontWeight:700,flexShrink:0}}>✓</span>{f}
             </div>
@@ -153,8 +154,8 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
         {/* プラン */}
         <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:14}}>
           {plans.map(p=>(
-            <div key={p.id} style={{position:"relative",border:`2px solid ${p.badge?T.primary:T.soft}`,borderRadius:12,padding:"12px 14px",cursor:"pointer",background:p.badge?T.soft:"transparent"}}
-              onClick={()=>!loading&&handlePurchase(p.id)}>
+            <div key={p.id} style={{position:"relative",border:`2px solid ${selectedPlan===p.id?T.primary:T.soft}`,borderRadius:12,padding:"12px 14px",cursor:"pointer",background:selectedPlan===p.id?T.soft:"transparent"}}
+              onClick={()=>{setSelectedPlan(p.id);!loading&&handlePurchase(p.id);}}>
               {p.badge&&<div style={{position:"absolute",top:-10,left:14,background:T.primary,color:"#fff",fontSize:10,fontWeight:700,padding:"2px 10px",borderRadius:20}}>{p.badge}</div>}
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                 <div>
@@ -162,7 +163,7 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
                   <div style={{fontSize:11,color:T.text+"66",marginTop:2}}>{p.desc}</div>
                 </div>
                 <div style={{textAlign:"right",flexShrink:0}}>
-                  <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:700,color:p.badge?T.primary:T.text}}>{p.price}</div>
+                  <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:700,color:selectedPlan===p.id?T.primary:T.text}}>{p.price}</div>
                   <div style={{fontSize:10,color:T.text+"55"}}>{p.sub}</div>
                 </div>
               </div>
