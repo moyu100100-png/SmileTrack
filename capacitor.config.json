@@ -3,7 +3,7 @@
   "appName": "SmileTrack",
   "webDir": "www",
   "ios": {
-    "contentInset": "automatic"
+    "contentInset": "never"
   },
   "plugins": {
     "LocalNotifications": {
