@@ -251,7 +251,7 @@ function scheduleExchangeNotif(state){
   const fallbackMs = exchDate.getTime();
   const rawMs = notifMs > Date.now() ? notifMs : (fallbackMs > Date.now() ? fallbackMs : null);
   if(rawMs){
-    const msg = before===0 ? "今日は交換日です！" : before===1440 ? "明日は交換日です！" : `${before/1440}日後に交換日があります`;
+    const msg = before===0 ? "今日は交換日です！" : before===1440 ? "明日は交換日です！" : `${before/1440}日後は交換日です！`;
     Notif.schedule(2001,"マウスピース交換",msg,rawMs);
   }
 }
