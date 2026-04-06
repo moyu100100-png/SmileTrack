@@ -364,6 +364,11 @@ function App(){
 
   const update=useCallback(patch=>setState(s=>({...s,...patch})),[]);
   const T=THEMES[state.themeName]||THEMES.blush||Object.values(THEMES)[0];
+  // bodyの背景色をテーマに合わせて更新（セーフエリアの白帯を防ぐ）
+  useEffect(()=>{
+    document.body.style.background=T.bg;
+    document.documentElement.style.background=T.bg;
+  },[T.bg]);
 
   // オンボーディング完了処理
   const handleOnboardingComplete=useCallback(async(settings)=>{
