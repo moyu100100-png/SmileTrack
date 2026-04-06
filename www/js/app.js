@@ -364,10 +364,16 @@ function App(){
 
   const update=useCallback(patch=>setState(s=>({...s,...patch})),[]);
   const T=THEMES[state.themeName]||THEMES.blush||Object.values(THEMES)[0];
-  // bodyの背景色をテーマに合わせて更新（セーフエリアの白帯を防ぐ）
+  // bodyの背景色をテーマに合わせて更新（セーフエリア完全ゼロ）
   useEffect(()=>{
     document.body.style.background=T.bg;
     document.documentElement.style.background=T.bg;
+    document.documentElement.style.setProperty('--safe-area-inset-top','0px');
+    document.documentElement.style.setProperty('--safe-area-inset-bottom','0px');
+    document.body.style.paddingTop='0px';
+    document.body.style.paddingBottom='0px';
+    document.body.style.marginTop='0px';
+    document.body.style.marginBottom='0px';
   },[T.bg]);
 
   // オンボーディング完了処理
