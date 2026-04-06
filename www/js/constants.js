@@ -251,9 +251,8 @@ function scheduleExchangeNotif(state){
   const fallbackMs = exchDate.getTime();
   const rawMs = notifMs > Date.now() ? notifMs : (fallbackMs > Date.now() ? fallbackMs : null);
   if(rawMs){
-    const targetMs = _getUniqueNotifTime(2001, rawMs);
     const msg = before===0 ? "今日は交換日です！" : before===1440 ? "明日は交換日です！" : `${before/1440}日後に交換日があります`;
-    Notif.schedule(2001,"マウスピース交換",msg,targetMs);
+    Notif.schedule(2001,"マウスピース交換",msg,rawMs);
   }
 }
 
@@ -275,8 +274,7 @@ function schedulePhotoNotif(state){
     target.setDate(target.getDate()+diff);
   }
   if(target>now){
-    const targetMs = _getUniqueNotifTime(3001, target.getTime());
-    Notif.schedule(3001,"写真リマインダー","矯正の経過写真を撮りましょう！",targetMs);
+    Notif.schedule(3001,"写真リマインダー","矯正の経過写真を撮りましょう！",target.getTime());
   }
 }
 

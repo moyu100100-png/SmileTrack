@@ -302,28 +302,36 @@ function App(){
     }
   },[state.isPremium,state.noAds]);
 
-  // アフィリエイトポップアップ: 矯正開始30日後から30日ごとに1回
+  // アフィリエイトポップアップ: 7日後に1回、30日後から30日ごと
   useEffect(()=>{
     if(!state.startDate) return;
     const startMs=new Date(state.startDate+"T00:00:00").getTime();
     const now=Date.now();
     const elapsedDays=Math.floor((now-startMs)/86400000);
-    if(elapsedDays<30) return;
     const hour=new Date().getHours();
-    if(hour<15) return; // 15時以降のみ表示
+    if(hour<15) return;
     const today=todayStr;
     const lastShown=state.affiliatePopupShown||null;
     if(lastShown===today) return;
+    const shown7=state.affiliatePopupShown7||false;
+    if(elapsedDays>=7&&!shown7){
+      const t=setTimeout(()=>{
+        setShowAffiliatePopup("week1");
+        update({affiliatePopupShown:today,affiliatePopupShown7:true});
+      },3000);
+      return()=>clearTimeout(t);
+    }
+    if(elapsedDays<30) return;
     if(lastShown){
       const lastMs=new Date(lastShown+"T00:00:00").getTime();
       if((now-lastMs)<30*86400000) return;
     }
     const t=setTimeout(()=>{
-      setShowAffiliatePopup(true);
+      setShowAffiliatePopup("monthly");
       update({affiliatePopupShown:today});
     },3000);
     return()=>clearTimeout(t);
-  },[state.startDate,state.affiliatePopupShown]);
+  },[state.startDate,state.affiliatePopupShown,state.affiliatePopupShown7]);
 
   // 起動時: IndexedDBから写真dataを復元してstateに注入
   useEffect(()=>{
@@ -344,7 +352,7 @@ function App(){
     const list = buildPieceList(state);
     if(list.length && state.startDate){
       const info = getCurrentPieceInfo(state, todayStr);
-      const daysLeft = info.interval - info.dayNum; // 0=今日が最終日
+      const daysLeft = info.interval - info.dayNum + 1; // daysToExと同じ値
       const exchMs = new Date(todayStr+"T00:00:00").getTime() + daysLeft*86400000;
       const exchDate = new Date(exchMs);
       const exchStr = `${exchDate.getFullYear()}-${String(exchDate.getMonth()+1).padStart(2,"0")}-${String(exchDate.getDate()).padStart(2,"0")}`;
@@ -469,11 +477,10 @@ function App(){
         const hrs=state.forgetTimerHours||4;
         const ids=Array.from({length:12},(_,i)=>1002+i);
         Notif.cancel(ids);
-        ids.forEach(id=>delete _scheduledTimes[id]);
         for(let i=0;i<12;i++){
           const h=hrs+i;
-          const ms=_getUniqueNotifTime(1002+i,startMs+h*3600000);
-          Notif.schedule(1002+i,"タイマー放置防止",`取り外し中のタイマーが${h}時間を超えています`,ms);
+          const ms=startMs+h*3600000;
+          if(ms>Date.now()) Notif.schedule(1002+i,"タイマー放置防止",`取り外し中のタイマーが${h}時間を超えています`,ms);
         }
       }
     } else {
@@ -544,7 +551,7 @@ function App(){
         const list=buildPieceList(state);
         if(list.length&&state.startDate){
           const info=getCurrentPieceInfo(state,todayStr);
-          const daysLeft=info.interval-info.dayNum;
+          const daysLeft=info.interval-info.dayNum+1;
           const exchMs=new Date(todayStr+"T00:00:00").getTime()+daysLeft*86400000;
           const exchDate=new Date(exchMs);
           const exchStr=`${exchDate.getFullYear()}-${String(exchDate.getMonth()+1).padStart(2,"0")}-${String(exchDate.getDate()).padStart(2,"0")}`;
@@ -558,7 +565,7 @@ function App(){
       {drawerSection==="premium"&&<PremiumModal T={T} state={state} onClose={()=>setDrawerSection(null)} onPurchased={({isPremium,noAds})=>update({isPremium,noAds})}/>}
       {drawerSection==="about"&&<AboutModal T={T} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="coffee"&&<PremiumModal T={T} state={state} onClose={()=>setDrawerSection(null)} showCoffee={true} onPurchased={({isPremium,noAds})=>update({isPremium,noAds})}/>}
-      {showAffiliatePopup&&<AffiliatePopup T={T} onClose={()=>setShowAffiliatePopup(false)}/>}
+      {showAffiliatePopup&&<AffiliatePopup T={T} type={showAffiliatePopup} onClose={()=>setShowAffiliatePopup(false)}/>}
       {showResetConfirm&&<ResetConfirmModal T={T} onConfirm={()=>{
         localStorage.removeItem(LS_KEY);
         idbSavePhotos([]);
