@@ -268,11 +268,11 @@ function App(){
   const [drawerSection,setDrawerSection]=useState(null);
 
   // ドロワー・モーダル表示中は広告を非表示
-  const isOverlayOpen = drawerOpen || !!drawerSection;
+  const isOverlayOpen = drawerOpen || !!drawerSection || tab==="photo";
   useEffect(()=>{
     if(state.isPremium||state.noAds) return;
     if(isOverlayOpen){
-      AdMobHelper.hideBanner();
+      AdMobHelper.removeBanner();
     } else {
       AdMobHelper.showBanner();
     }
@@ -547,7 +547,7 @@ function App(){
           {tab==="timer"   &&<TimerPage T={T} state={state} update={update} handleRemoveButton={handleRemoveButton} todayStr={todayStr} todayDayStartMs={todayDayStartMs} snoozedUntil={snoozedUntil} setSnoozedUntil={setSnoozedUntil} alarmStopped={alarmStopped} setAlarmStopped={setAlarmStopped}/>}
           {tab==="stats"   &&<StatsPage T={T} state={state} update={update} todayStr={todayStr} todayDayStartMs={todayDayStartMs}/>}
         </div>
-        <div className="nav">
+        <div className="nav" style={(!state.isPremium&&!state.noAds)?{paddingBottom:`calc(env(safe-area-inset-bottom, 0px) + 35px)`}:{}}>
           {tabs.map(t=>{const active=tab===t.id;return(<button key={t.id} className={`nb${active?" on":""}`} onClick={()=>{
   setTab(t.id);
   if(!state.isPremium&&!state.noAds&&["calendar","stats","photo"].includes(t.id)&&t.id!==tab){
