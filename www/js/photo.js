@@ -53,6 +53,10 @@ function PhotoPage({T,state,update,todayStr}){
   const [editDate,setEditDate]=useState("");
   const [editPiece,setEditPiece]=useState(1);
   const [viewPhoto,setViewPhoto]=useState(null);
+  useEffect(()=>{
+    if(state.isPremium||state.noAds) return;
+    if(viewPhoto||albumCropPhoto||cameraOpen){ AdMobHelper.removeBanner(); } else { AdMobHelper.showBanner(); }
+  },[viewPhoto,albumCropPhoto,cameraOpen]);
   const [deleteConfirmId,setDeleteConfirmId]=useState(null);
   const [overlayOpacity,setOverlayOpacity]=useState(0.35);
   const [showOverlay,setShowOverlay]=useState(true);

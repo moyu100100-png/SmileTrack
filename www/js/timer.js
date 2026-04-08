@@ -9,6 +9,10 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
   const timerRunning=state.timerRunning;
 
   const [pendingReason,setPendingReason]=useState(null);
+  useEffect(()=>{
+    if(state.isPremium||state.noAds) return;
+    if(pendingReason!==null){ AdMobHelper.removeBanner(); } else { AdMobHelper.showBanner(); }
+  },[pendingReason]);
   // インライン編集 state（カレンダーと同じ構造）
   const [timerEditSessId,setTimerEditSessId]=useState(null);
   const [timerEditSessReason,setTimerEditSessReason]=useState("");
