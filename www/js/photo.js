@@ -107,10 +107,10 @@ function PhotoPage({T,state,update,todayStr}){
     setLiveZoom(1);
     setCameraOpen(true);
     try{
-      const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:{ideal:1920},height:{ideal:1080}},audio:false});
+      const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:{ideal:1280},height:{ideal:720}},audio:false});
       setStream(s);
       setTimeout(()=>{if(videoRef.current)videoRef.current.srcObject=s;},100);
-    }catch{alert("カメラへのアクセスが許可されていません");setCameraOpen(false);}
+    }catch(e){alert("カメラエラー: "+e.name+" / "+e.message);setCameraOpen(false);}
   };
 
   const closeCam=()=>{
