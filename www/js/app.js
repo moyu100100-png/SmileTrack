@@ -272,7 +272,7 @@ function App(){
   useEffect(()=>{
     if(state.isPremium||state.noAds) return;
     if(isOverlayOpen){
-      AdMobHelper.hideBanner();
+      AdMobHelper.removeBanner();
     } else {
       AdMobHelper.showBanner();
     }
