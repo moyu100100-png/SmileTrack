@@ -6,13 +6,13 @@
     "contentInset": "never",
     "allowsLinkPreview": false,
     "allowInlineMediaPlayback": true,
-    "mediaTypesRequiringUserActionForPlayback": "none"
+    "mediaTypesRequiringUserActionForPlayback": "none",
+    "scheme": "localhost"
   },
   "plugins": {
     "LocalNotifications": {
       "smallIcon": "ic_stat_icon_config_sample",
-      "iconColor": "#98C8CC",
-      "sound": "default"
+      "iconColor": "#98C8CC"
     },
     "Permissions": {
       "camera": "矯正の経過写真を撮影するためにカメラを使用します",
