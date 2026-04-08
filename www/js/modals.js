@@ -175,8 +175,8 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
         <div style={{borderTop:`1px solid ${T.soft}`,paddingTop:12,marginBottom:12}}>
           <div style={{fontSize:11,fontWeight:700,color:T.text+"66",marginBottom:8}}>単品購入</div>
           {extras.map(p=>(
-            <div key={p.id} style={{border:`1.5px solid ${T.soft}`,borderRadius:12,padding:"10px 14px",cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center"}}
-              onClick={()=>!loading&&handlePurchase(p.id)}>
+            <div key={p.id} style={{border:`2px solid ${selectedPlan===p.id?T.primary:T.soft}`,borderRadius:12,padding:"10px 14px",cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center",background:selectedPlan===p.id?T.soft:"transparent"}}
+              onClick={()=>{setSelectedPlan(p.id);!loading&&handlePurchase(p.id);}}>
               <div>
                 <div style={{fontSize:14,fontWeight:600,color:T.text}}>{p.label}</div>
                 <div style={{fontSize:11,color:T.text+"66",marginTop:2}}>{p.desc}</div>
@@ -754,10 +754,19 @@ function BackupModal({T,state,onImport,onClose}){
       const fullPhotos=(state.photos||[]).map(p=>({...p,data:dataMap[p.id]||p.data||null}));
       const fullState={...state,photos:fullPhotos};
       const blob=new Blob([JSON.stringify(fullState,null,2)],{type:"application/json"});
-      const a=document.createElement("a");
-      a.href=URL.createObjectURL(blob);
-      a.download="smiletrack_backup.json";
-      a.click();
+      const url=URL.createObjectURL(blob);
+      if(navigator.share){
+        const file=new File([blob],"smiletrack_backup.json",{type:"application/json"});
+        await navigator.share({files:[file],title:"SmileTrack バックアップ"});
+      } else {
+        const a=document.createElement("a");
+        a.href=url;
+        a.download="smiletrack_backup.json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+      URL.revokeObjectURL(url);
     }catch(e){alert("エクスポートに失敗しました");}
     setExporting(false);
   };
