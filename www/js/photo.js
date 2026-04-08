@@ -451,8 +451,8 @@ function PhotoPage({T,state,update,todayStr}){
       {/* 写真ビューアー（スワイプ・スライドショー・動画保存） */}
       {viewPhoto&&<PhotoViewer T={T} photos={filtered} initialId={viewPhoto.id} onClose={()=>setViewPhoto(null)}/>}
       {editId&&(
-        <div className="mo" onClick={()=>setEditId(null)}>
-          <div className="md" onClick={e=>e.stopPropagation()}>
+        <div className="mo" style={{alignItems:"center"}} onClick={()=>setEditId(null)}>
+          <div className="md" style={{borderRadius:20,maxHeight:"80dvh",overflowY:"auto"}} onClick={e=>e.stopPropagation()}>
             <div className="mdtitle">写真を編集</div>
             <label>コメント</label>
             <input value={editComment} onChange={e=>setEditComment(e.target.value)} style={{marginBottom:10}}/>
@@ -1166,7 +1166,7 @@ function PhotoViewer({T,photos,initialId,onClose,onEdit,state}){
       onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
 
       {/* ヘッダー */}
-      <div style={{padding:"10px 14px",paddingTop:"70px",display:"flex",alignItems:"center",justifyContent:"space-between",background:"rgba(0,0,0,0.7)",flexShrink:0,zIndex:10}}>
+      <div style={{padding:"10px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",background:"rgba(0,0,0,0.7)",flexShrink:0,zIndex:10}}>
         {/* × 閉じる */}
         <button onTouchEnd={e=>{e.stopPropagation();e.preventDefault();onClose();}} onClick={e=>{e.stopPropagation();onClose();}} style={btnStyle(false)}>
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
