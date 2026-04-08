@@ -3,7 +3,10 @@
   "appName": "SmileTrack",
   "webDir": "www",
   "ios": {
-    "contentInset": "never"
+    "contentInset": "never",
+    "allowsLinkPreview": false,
+    "allowInlineMediaPlayback": true,
+    "mediaTypesRequiringUserActionForPlayback": "none"
   },
   "plugins": {
     "LocalNotifications": {
