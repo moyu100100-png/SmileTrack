@@ -73,7 +73,6 @@
       if (!forceShow && this._interCount % 6 !== 0) return;
       try {
         await Capacitor.Plugins.AdMob.showInterstitial();
-        // 次回のために再プリロード
         setTimeout(() => this.prepareInterstitial(), 1000);
       } catch(e) {
         console.warn("[AdMob] showInterstitial error", e);
@@ -142,15 +141,15 @@
         return perm.display==="granted";
       }catch(e){return false;}
     },
-    async schedule(id,title,body,atMs,sound="default"){
+    async schedule(id,title,body,atMs,sound=null){
       try{
         const {LocalNotifications}=Capacitor.Plugins;
-        await LocalNotifications.schedule({notifications:[{
+        const notif={
           id,title,body,
           schedule:{at:new Date(atMs)},
-          smallIcon:"ic_stat_icon_config_sample",
-          sound:sound,
-        }]});
+        };
+        if(sound) notif.sound=sound;
+        await LocalNotifications.schedule({notifications:[notif]});
       }catch(e){console.warn("通知エラー:",e);}
     },
     async cancel(ids){

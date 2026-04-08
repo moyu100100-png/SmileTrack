@@ -272,7 +272,7 @@ function App(){
   useEffect(()=>{
     if(state.isPremium||state.noAds) return;
     if(isOverlayOpen){
-      AdMobHelper.removeBanner();
+      AdMobHelper.hideBanner();
     } else {
       AdMobHelper.showBanner();
     }
@@ -483,9 +483,8 @@ function App(){
       if(Notif.isCapacitor()&&state.alarmEnabled){
         const mins=state.alarmMinutes||30;
         Notif.cancel([1001]);
-        delete _scheduledTimes[1001];
-        const alarmMs=_getUniqueNotifTime(1001,startMs+mins*60000);
-        const alarmSound=(state.alarmSound||"tone1")+".caf";
+        const alarmMs=startMs+mins*60000;
+        const alarmSound=state.alarmSound||"tone1";
         Notif.schedule(1001,"アラーム",`取り外しから${mins}分が経過しました`,alarmMs,alarmSound);
       }
       // 放置防止アラート通知予約（設定した時間から1時間おき・最大12本）
@@ -496,7 +495,7 @@ function App(){
         for(let i=0;i<12;i++){
           const h=hrs+i;
           const ms=startMs+h*3600000;
-          if(ms>Date.now()) Notif.schedule(1002+i,"タイマー放置防止",`取り外し中のタイマーが${h}時間を超えています`,ms);
+          if(ms>Date.now()) Notif.schedule(1002+i,"取り外しタイマー",`取り外し中のタイマーが${h}時間を超えています`,ms);
         }
       }
     } else {
@@ -548,7 +547,7 @@ function App(){
           {tab==="timer"   &&<TimerPage T={T} state={state} update={update} handleRemoveButton={handleRemoveButton} todayStr={todayStr} todayDayStartMs={todayDayStartMs} snoozedUntil={snoozedUntil} setSnoozedUntil={setSnoozedUntil} alarmStopped={alarmStopped} setAlarmStopped={setAlarmStopped}/>}
           {tab==="stats"   &&<StatsPage T={T} state={state} update={update} todayStr={todayStr} todayDayStartMs={todayDayStartMs}/>}
         </div>
-        <div className="nav" style={(!state.isPremium&&!state.noAds)?{paddingBottom:`calc(env(safe-area-inset-bottom, 0px) + 35px)`}:{}}>
+        <div className="nav">
           {tabs.map(t=>{const active=tab===t.id;return(<button key={t.id} className={`nb${active?" on":""}`} onClick={()=>{
   setTab(t.id);
   if(!state.isPremium&&!state.noAds&&["calendar","stats","photo"].includes(t.id)&&t.id!==tab){
