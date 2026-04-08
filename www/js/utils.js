@@ -80,7 +80,7 @@ function Drawer({T,open,onClose,onSection,onReset}){
     <>
       {open&&<div className="overlay" onClick={onClose}/>}
       <div className={`drawer${open?" open":""}`}>
-        <div style={{padding:"18px 14px 10px",borderBottom:`1px solid ${T.soft}`}}>
+        <div style={{padding:"18px 14px 10px",paddingTop:"60px",borderBottom:`1px solid ${T.soft}`}}>
           <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:20,fontWeight:700,color:T.primary}}>SmileTrack</div>
         </div>
         <div style={{padding:"8px 0"}}>
