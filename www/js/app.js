@@ -480,12 +480,12 @@ function App(){
       const startMs=Date.now();
       update({timerRunning:true,timerStart:startMs,timerElapsed:0});
       // アラーム通知予約（Capacitor）
+      alert(`デバッグ: isCapacitor=${Notif.isCapacitor()}, alarmEnabled=${state.alarmEnabled}, alarmMinutes=${state.alarmMinutes}, forgetTimerAlert=${state.forgetTimerAlert}, forgetTimerHours=${state.forgetTimerHours}`);
       if(Notif.isCapacitor()&&state.alarmEnabled){
         const mins=state.alarmMinutes||30;
         Notif.cancel([1001]);
         const alarmMs=startMs+mins*60000;
-        const alarmSound=state.alarmSound||"tone1";
-        Notif.schedule(1001,"アラーム",`取り外しから${mins}分が経過しました`,alarmMs,alarmSound);
+        Notif.schedule(1001,"アラーム",`取り外しから${mins}分が経過しました`,alarmMs);
       }
       // 放置防止アラート通知予約（設定した時間から1時間おき・最大12本）
       if(Notif.isCapacitor()&&state.forgetTimerAlert){
