@@ -115,7 +115,7 @@ function PhotoPage({T,state,update,todayStr}){
     setLiveZoom(1);
     setCameraOpen(true);
     try{
-      const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:{ideal:1280},height:{ideal:720}},audio:false});
+      const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:{ideal:1920},height:{ideal:1080}},audio:false});
       setStream(s);
       setTimeout(()=>{if(videoRef.current)videoRef.current.srcObject=s;},100);
     }catch(e){alert("カメラエラー: "+e.name+" / "+e.message);setCameraOpen(false);}
@@ -447,6 +447,7 @@ function PhotoPage({T,state,update,todayStr}){
                   <span style={{color:"#aaa",fontSize:13,flexShrink:0}}># マウスピース番号</span>
                   <input type="number" min={1} max={100} value={capPiece||""} placeholder="ー"
                     onChange={e=>setCapPiece(e.target.value?parseInt(e.target.value):null)}
+                    onFocus={e=>e.target.select()}
                     style={{background:"#222",color:"#fff",border:"1px solid #444",borderRadius:10,width:80,textAlign:"center"}}/>
                 </div>
                 <div style={{display:"flex",gap:8}}>
@@ -474,7 +475,7 @@ function PhotoPage({T,state,update,todayStr}){
                 borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,
                 padding:"0 12px",WebkitAppearance:"none",appearance:"none"}}/>
             <label>マウスピース番号</label>
-            <input type="number" min={1} max={100} value={editPiece} onChange={e=>setEditPiece(parseInt(e.target.value)||1)} style={{marginBottom:6,textAlign:"center"}}/>
+            <input type="number" min={1} max={100} value={editPiece} onChange={e=>setEditPiece(parseInt(e.target.value)||1)} onFocus={e=>e.target.select()} style={{marginBottom:6,textAlign:"center"}}/>
             <div style={{fontSize:11,color:T.text+"55",marginBottom:14}}>部位は変更できません</div>
             <button className="btn bs" style={{width:"100%",marginBottom:10}} onClick={()=>{
               const photo=state.photos.find(p=>p.id===editId);
@@ -577,6 +578,7 @@ function PhotoPage({T,state,update,todayStr}){
             <label>マウスピース番号</label>
             <input type="number" min={1} max={100} value={albumMeta.piece}
               onChange={e=>setAlbumMeta(v=>({...v,piece:parseInt(e.target.value)||1}))}
+              onFocus={e=>e.target.select()}
               style={{marginBottom:16}}/>
 
             <div style={{display:"flex",gap:8}}>
