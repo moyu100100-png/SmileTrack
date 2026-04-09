@@ -73,11 +73,6 @@ function PhotoPage({T,state,update,todayStr}){
   const [liveZoom,setLiveZoom]=useState(1);
   const videoRef=useRef(null),canvasRef=useRef(null);
 
-  useEffect(()=>{
-    if(state.isPremium||state.noAds) return;
-    if(viewPhoto||albumCropPhoto||cameraOpen){ AdMobHelper.hideBanner(); } else { AdMobHelper.showBanner(); }
-  },[viewPhoto,albumCropPhoto,cameraOpen]);
-
   const isLocked=state.photoLockEnabled&&state.photoLock&&!unlocked;
 
   const getOverlayPhoto = mode => {
@@ -102,13 +97,6 @@ function PhotoPage({T,state,update,todayStr}){
   const satCSS = saturation * 2;
 
   const openCam=async shotModeId=>{
-    // ネイティブ側でカメラ権限を確定させる
-    try{
-      if(Notif.isCapacitor()){
-        const {Camera}=Capacitor.Plugins;
-        await Camera.requestPermissions({permissions:["camera"]});
-      }
-    }catch(e){console.warn("Camera permission request:",e);}
     setCameraMode(shotModeId);
     setCaptured(null);setCapComment("");setCapPiece(null);
     setShowColorPanel(false);setBrightness(50);setSaturation(50);
@@ -118,7 +106,7 @@ function PhotoPage({T,state,update,todayStr}){
       const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:{ideal:1920},height:{ideal:1080}},audio:false});
       setStream(s);
       setTimeout(()=>{if(videoRef.current)videoRef.current.srcObject=s;},100);
-    }catch(e){alert("カメラエラー: "+e.name+" / "+e.message);setCameraOpen(false);}
+    }catch{alert("カメラへのアクセスが許可されていません");setCameraOpen(false);}
   };
 
   const closeCam=()=>{
@@ -252,7 +240,7 @@ function PhotoPage({T,state,update,todayStr}){
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
           <div style={{display:"flex",alignItems:"center",gap:8}}>
             <div className="ct" style={{margin:0,fontSize:14}}>フォトアルバム</div>
-            {!isLocked&&(isPremium?(
+            {!isLocked&&filter!=="all"&&(isPremium?(
               <button className={`btn bsm ${compareMode?"bp":"bs"}`} onClick={()=>{setCompareMode(v=>!v);setComparePick([]);}} style={{fontSize:11}}>
                 {compareMode?"キャンセル":"比較"}
               </button>
@@ -447,7 +435,6 @@ function PhotoPage({T,state,update,todayStr}){
                   <span style={{color:"#aaa",fontSize:13,flexShrink:0}}># マウスピース番号</span>
                   <input type="number" min={1} max={100} value={capPiece||""} placeholder="ー"
                     onChange={e=>setCapPiece(e.target.value?parseInt(e.target.value):null)}
-                    onFocus={e=>e.target.select()}
                     style={{background:"#222",color:"#fff",border:"1px solid #444",borderRadius:10,width:80,textAlign:"center"}}/>
                 </div>
                 <div style={{display:"flex",gap:8}}>
@@ -464,8 +451,8 @@ function PhotoPage({T,state,update,todayStr}){
       {/* 写真ビューアー（スワイプ・スライドショー・動画保存） */}
       {viewPhoto&&<PhotoViewer T={T} photos={filtered} initialId={viewPhoto.id} onClose={()=>setViewPhoto(null)}/>}
       {editId&&(
-        <div className="mo" style={{alignItems:"center"}} onClick={()=>setEditId(null)}>
-          <div className="md" style={{borderRadius:20,maxHeight:"80dvh",overflowY:"auto"}} onClick={e=>e.stopPropagation()}>
+        <div className="mo" onClick={()=>setEditId(null)}>
+          <div className="md" onClick={e=>e.stopPropagation()}>
             <div className="mdtitle">写真を編集</div>
             <label>コメント</label>
             <input value={editComment} onChange={e=>setEditComment(e.target.value)} style={{marginBottom:10}}/>
@@ -475,7 +462,7 @@ function PhotoPage({T,state,update,todayStr}){
                 borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,
                 padding:"0 12px",WebkitAppearance:"none",appearance:"none"}}/>
             <label>マウスピース番号</label>
-            <input type="number" min={1} max={100} value={editPiece} onChange={e=>setEditPiece(parseInt(e.target.value)||1)} onFocus={e=>e.target.select()} style={{marginBottom:6,textAlign:"center"}}/>
+            <input type="number" min={1} max={100} value={editPiece} onChange={e=>setEditPiece(parseInt(e.target.value)||1)} style={{marginBottom:6,textAlign:"center"}}/>
             <div style={{fontSize:11,color:T.text+"55",marginBottom:14}}>部位は変更できません</div>
             <button className="btn bs" style={{width:"100%",marginBottom:10}} onClick={()=>{
               const photo=state.photos.find(p=>p.id===editId);
@@ -578,7 +565,6 @@ function PhotoPage({T,state,update,todayStr}){
             <label>マウスピース番号</label>
             <input type="number" min={1} max={100} value={albumMeta.piece}
               onChange={e=>setAlbumMeta(v=>({...v,piece:parseInt(e.target.value)||1}))}
-              onFocus={e=>e.target.select()}
               style={{marginBottom:16}}/>
 
             <div style={{display:"flex",gap:8}}>
@@ -1180,7 +1166,7 @@ function PhotoViewer({T,photos,initialId,onClose,onEdit,state}){
       onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
 
       {/* ヘッダー */}
-      <div style={{padding:"10px 14px",paddingTop:"70px",display:"flex",alignItems:"center",justifyContent:"space-between",background:"rgba(0,0,0,0.7)",flexShrink:0,zIndex:10}}>
+      <div style={{padding:"10px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",background:"rgba(0,0,0,0.7)",flexShrink:0,zIndex:10}}>
         {/* × 閉じる */}
         <button onTouchEnd={e=>{e.stopPropagation();e.preventDefault();onClose();}} onClick={e=>{e.stopPropagation();onClose();}} style={btnStyle(false)}>
           <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
