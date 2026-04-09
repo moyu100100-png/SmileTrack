@@ -282,25 +282,22 @@ function App(){
   const [snoozedUntil,setSnoozedUntil]=useState(null);
   const [alarmStopped,setAlarmStopped]=useState(false);
 
-  // RevenueCat初期化 & プレミアム状態取得
+  // RevenueCat初期化 & プレミアム状態取得 → 確定後にAdMob初期化
   useEffect(()=>{
     (async()=>{
+      let premium=false, noAds=false;
       try{
         await Purchases.configure({apiKey:"appl_HrDpuICDgfGShogHiNmlmBubJSJ"});
-        const premium=await Purchases.isPremiumUser();
-        const noAds=await Purchases.hasNoAds();
+        premium=await Purchases.isPremiumUser();
+        noAds=await Purchases.hasNoAds();
         setState(s=>({...s,isPremium:premium,noAds:noAds}));
       }catch(e){ console.warn("[RC] init error",e); }
-    })();
-  },[]);
-
-  // AdMob初期化
-  useEffect(()=>{
-    (async()=>{
-      if(state.isPremium||state.noAds) return;
-      await AdMobHelper.initialize();
-      await AdMobHelper.prepareInterstitial();
-      await AdMobHelper.showBanner();
+      // RevenueCat確定後にAdMob初期化
+      if(!premium&&!noAds){
+        await AdMobHelper.initialize();
+        await AdMobHelper.prepareInterstitial();
+        await AdMobHelper.showBanner();
+      }
     })();
   },[]);
 
@@ -475,10 +472,15 @@ function App(){
   },[todayStr]);
 
   // handleRemoveButton — runningMsをここで計算しない（コンポーネント側で持つ）
-  const handleRemoveButton=useCallback((runningMs)=>{
+  const handleRemoveButton=useCallback(async(runningMs)=>{
     if(!state.timerRunning){
       const startMs=Date.now();
       update({timerRunning:true,timerStart:startMs,timerElapsed:0});
+      // 通知許可を確認・リクエスト
+      if(Notif.isCapacitor()){
+        const granted=await Notif.checkPermission();
+        if(!granted) await Notif.requestPermission();
+      }
       // アラーム通知予約（Capacitor）
       if(Notif.isCapacitor()&&state.alarmEnabled){
         const mins=state.alarmMinutes||30;
