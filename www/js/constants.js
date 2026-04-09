@@ -1,4 +1,4 @@
-const IS_PREMIUM = true; // スクショ用・リリース前にfalseに戻す
+const IS_PREMIUM = false;
 
 const THEMES = {
   // ── S1〜S6 単色テーマ ────────────────────────────────────────────────────
@@ -163,7 +163,7 @@ function getCurrentPieceInfo(state, todayStr) {
 
 function getDaysToNextExchange(state, todayStr) {
   const {pieceIdx, dayNum, interval} = getCurrentPieceInfo(state, todayStr);
-  return interval - dayNum; // 0=今日が最終日(交換日)
+  return interval - dayNum + 1; // 1=今日が最終日、0=交換日
 }
 
 function getTotalEndDate(state) {
@@ -195,6 +195,7 @@ function playAlarmSound(soundId){
     const id = ALARM_SOUNDS.find(s=>s.id===soundId) ? soundId : "tone1";
     const audio = new Audio("sounds/" + id + ".mp3");
     audio.volume = 1.0;
+    audio.loop = true;
     _currentAudio = audio;
     audio.play().catch(e=>console.warn("Audio play error:", e));
   } catch(e){ console.warn("Audio error:", e); }
@@ -218,19 +219,39 @@ async function ensureNotifPermission(){
 }
 
 // ── NOTIFICATION SCHEDULER ───────────────────────────────────────────────────
+// スケジュール済み通知時刻を管理（重複回避用）
+const _scheduledTimes = {};
+
+function _getUniqueNotifTime(id, requestedMs){
+  // 他の通知と60秒以内に被っていたら1分ずつずらす
+  let ms = requestedMs;
+  let attempts = 0;
+  while(attempts < 60){
+    const conflict = Object.entries(_scheduledTimes).some(([otherId, otherMs])=>
+      Number(otherId) !== id && Math.abs(otherMs - ms) < 60000
+    );
+    if(!conflict) break;
+    ms += 60000;
+    attempts++;
+  }
+  _scheduledTimes[id] = ms;
+  return ms;
+}
+
 function scheduleExchangeNotif(state){
   if(!Notif.isCapacitor()) return;
   if(!state.settings?.reminderExchange) return;
   if(!state.nextExchangeDate) return;
   Notif.cancel([2001]);
   const hour = state.exchangeNotifyHour??9;
-  const before = state.notifyBefore??1440; // 分（0=当日、1440=前日、2880=2日前）
+  const before = state.notifyBefore??1440;
   const exchDate = new Date(state.nextExchangeDate+"T"+String(hour).padStart(2,"0")+":00:00");
-  // 通知日時 = 交換日のhour時 - before分（beforeが0なら当日、1440なら前日）
   const notifMs = exchDate.getTime() - before*60000;
-  if(notifMs > Date.now()){
-    const msg = before===0 ? "今日は交換日です！" : before===1440 ? "明日は交換日です！" : `${before/1440}日後に交換日があります`;
-    Notif.schedule(2001,"💎 マウスピース交換",msg,notifMs);
+  const fallbackMs = exchDate.getTime();
+  const rawMs = notifMs > Date.now() ? notifMs : (fallbackMs > Date.now() ? fallbackMs : null);
+  if(rawMs){
+    const msg = before===0 ? "今日は交換日です！" : before===1440 ? "明日は交換日です！" : `${before/1440}日後は交換日です！`;
+    Notif.schedule(2001,"マウスピース交換",msg,rawMs);
   }
 }
 
@@ -240,18 +261,30 @@ function schedulePhotoNotif(state){
   Notif.cancel([3001]);
   const hour = state.photoNotifyHour??9;
   const now = new Date();
-  // 翌週の指定曜日 or 交換日
   let target;
   if(state.photoReminderMode==="exchange"&&state.nextExchangeDate){
     target = new Date(state.nextExchangeDate+"T"+String(hour).padStart(2,"0")+":00:00");
+    // 交換日が過去の場合は7日後にフォールバック
+    if(target<=now){
+      target = new Date();
+      target.setDate(target.getDate()+7);
+      target.setHours(hour,0,0,0);
+    }
   } else {
     const day = state.photoReminderDay??0;
     target = new Date();
     target.setHours(hour,0,0,0);
-    const diff=(day-now.getDay()+7)%7||7;
-    target.setDate(target.getDate()+diff);
+    const diff=(day-now.getDay()+7)%7;
+    if(diff===0){
+      // 今日が指定曜日：時間が未来なら今日、過去なら来週
+      if(target<=now) target.setDate(target.getDate()+7);
+    } else {
+      target.setDate(target.getDate()+diff);
+    }
   }
-  if(target>now) Notif.schedule(3001,"📸 写真リマインダー","矯正の経過写真を撮りましょう！",target.getTime());
+  if(target>now){
+    Notif.schedule(3001,"写真リマインダー","矯正の経過写真を撮りましょう！",target.getTime());
+  }
 }
 
 // ── ICONS ────────────────────────────────────────────────────────────────────
