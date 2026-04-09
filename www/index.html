@@ -147,11 +147,7 @@
         };
         if(sound) notif.sound=sound;
         await LocalNotifications.schedule({notifications:[notif]});
-        alert("通知OK: "+title+" → "+new Date(atMs).toLocaleTimeString());
-      }catch(e){
-        console.warn("通知エラー:",e);
-        alert("通知エラー: "+JSON.stringify(e));
-      }
+      }catch(e){console.warn("通知エラー:",e);}
     },
     async cancel(ids){
       try{
