@@ -53,10 +53,6 @@ function PhotoPage({T,state,update,todayStr}){
   const [editDate,setEditDate]=useState("");
   const [editPiece,setEditPiece]=useState(1);
   const [viewPhoto,setViewPhoto]=useState(null);
-  useEffect(()=>{
-    if(state.isPremium||state.noAds) return;
-    if(viewPhoto||albumCropPhoto||cameraOpen){ AdMobHelper.removeBanner(); } else { AdMobHelper.showBanner(); }
-  },[viewPhoto,albumCropPhoto,cameraOpen]);
   const [deleteConfirmId,setDeleteConfirmId]=useState(null);
   const [overlayOpacity,setOverlayOpacity]=useState(0.35);
   const [showOverlay,setShowOverlay]=useState(true);
@@ -76,6 +72,11 @@ function PhotoPage({T,state,update,todayStr}){
   // ズーム（撮影時のみ）
   const [liveZoom,setLiveZoom]=useState(1);
   const videoRef=useRef(null),canvasRef=useRef(null);
+
+  useEffect(()=>{
+    if(state.isPremium||state.noAds) return;
+    if(viewPhoto||albumCropPhoto||cameraOpen){ AdMobHelper.hideBanner(); } else { AdMobHelper.showBanner(); }
+  },[viewPhoto,albumCropPhoto,cameraOpen]);
 
   const isLocked=state.photoLockEnabled&&state.photoLock&&!unlocked;
 
@@ -101,6 +102,13 @@ function PhotoPage({T,state,update,todayStr}){
   const satCSS = saturation * 2;
 
   const openCam=async shotModeId=>{
+    // ネイティブ側でカメラ権限を確定させる
+    try{
+      if(Notif.isCapacitor()){
+        const {Camera}=Capacitor.Plugins;
+        await Camera.requestPermissions({permissions:["camera"]});
+      }
+    }catch(e){console.warn("Camera permission request:",e);}
     setCameraMode(shotModeId);
     setCaptured(null);setCapComment("");setCapPiece(null);
     setShowColorPanel(false);setBrightness(50);setSaturation(50);
