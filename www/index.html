@@ -17,9 +17,6 @@
   <script>
   // ── AdMob 設定 ────────────────────────────────────────────────────────────
   const ADMOB_APP_ID       = "ca-app-pub-5456814091467820~1944092541";
-  // const ADMOB_BANNER_ID    = "ca-app-pub-5456814091467820/6020940488";
-  // const ADMOB_INTER_ID     = "ca-app-pub-5456814091467820/6669903678";
-  // テスト用ID
   const ADMOB_BANNER_ID = "ca-app-pub-3940256099942544/2934735716";
   const ADMOB_INTER_ID  = "ca-app-pub-3940256099942544/4411468910";
 
@@ -150,7 +147,11 @@
         };
         if(sound) notif.sound=sound;
         await LocalNotifications.schedule({notifications:[notif]});
-      }catch(e){console.warn("通知エラー:",e);}
+        alert("通知OK: "+title+" → "+new Date(atMs).toLocaleTimeString());
+      }catch(e){
+        console.warn("通知エラー:",e);
+        alert("通知エラー: "+JSON.stringify(e));
+      }
     },
     async cancel(ids){
       try{

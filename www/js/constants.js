@@ -243,7 +243,6 @@ function scheduleExchangeNotif(state){
   if(!state.settings?.reminderExchange) return;
   if(!state.nextExchangeDate) return;
   Notif.cancel([2001]);
-  delete _scheduledTimes[2001];
   const hour = state.exchangeNotifyHour??9;
   const before = state.notifyBefore??1440;
   const exchDate = new Date(state.nextExchangeDate+"T"+String(hour).padStart(2,"0")+":00:00");
@@ -260,7 +259,6 @@ function schedulePhotoNotif(state){
   if(!Notif.isCapacitor()) return;
   if(!state.settings?.reminderPhoto) return;
   Notif.cancel([3001]);
-  delete _scheduledTimes[3001];
   const hour = state.photoNotifyHour??9;
   const now = new Date();
   let target;
