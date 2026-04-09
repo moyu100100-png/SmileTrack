@@ -264,12 +264,23 @@ function schedulePhotoNotif(state){
   let target;
   if(state.photoReminderMode==="exchange"&&state.nextExchangeDate){
     target = new Date(state.nextExchangeDate+"T"+String(hour).padStart(2,"0")+":00:00");
+    // 交換日が過去の場合は7日後にフォールバック
+    if(target<=now){
+      target = new Date();
+      target.setDate(target.getDate()+7);
+      target.setHours(hour,0,0,0);
+    }
   } else {
     const day = state.photoReminderDay??0;
     target = new Date();
     target.setHours(hour,0,0,0);
-    const diff=(day-now.getDay()+7)%7||7;
-    target.setDate(target.getDate()+diff);
+    const diff=(day-now.getDay()+7)%7;
+    if(diff===0){
+      // 今日が指定曜日：時間が未来なら今日、過去なら来週
+      if(target<=now) target.setDate(target.getDate()+7);
+    } else {
+      target.setDate(target.getDate()+diff);
+    }
   }
   if(target>now){
     Notif.schedule(3001,"写真リマインダー","矯正の経過写真を撮りましょう！",target.getTime());
