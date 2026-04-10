@@ -14,6 +14,12 @@
       "smallIcon": "ic_stat_icon_config_sample",
       "iconColor": "#98C8CC"
     },
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "launchAutoHide": true,
+      "backgroundColor": "#1C1F2E",
+      "showSpinner": false
+    },
     "Permissions": {
       "camera": "矯正の経過写真を撮影するためにカメラを使用します",
       "notifications": "マウスピースの交換日やタイマーのアラームをお知らせします"
