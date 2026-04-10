@@ -1,4 +1,4 @@
-function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs}){
+function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,snoozedUntil,setSnoozedUntil,alarmStopped,setAlarmStopped}){
   // タイマーページは常に毎秒更新（メインのタイマー表示）
   useTick(1000);
 
@@ -9,8 +9,6 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
   const timerRunning=state.timerRunning;
 
   const [pendingReason,setPendingReason]=useState(null);
-  const [alarmStopped,setAlarmStopped]=useState(false);
-  const [snoozedUntil,setSnoozedUntil]=useState(null);
   // インライン編集 state（カレンダーと同じ構造）
   const [timerEditSessId,setTimerEditSessId]=useState(null);
   const [timerEditSessReason,setTimerEditSessReason]=useState("");
@@ -33,8 +31,6 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
       if(snoozeJustEnded) setSnoozedUntil(null);
     }
   },[isAlarmNow,snoozeJustEnded]);
-  // タイマー停止（装着ボタン）時にリセット
-  useEffect(()=>{ if(!timerRunning){setAlarmStopped(false);setSnoozedUntil(null);} },[timerRunning]);
   const cycleCount=Math.floor(currentSec/CYCLE);
   const cycleProgress=(currentSec%CYCLE)/CYCLE;
   const cycleColor=cycleCount%2===0?T.primary:T.accent;
@@ -50,17 +46,17 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
   const targetSecs=(state.targetWearHours||22)*3600;
   const expectedWear=Math.max(0,86400-totalRemovedSec);
 
-  const onStartPress=()=>{
-    if(!timerRunning){if(showBreakdown)setPendingReason("");else handleRemoveButton(runningMs);}
+  const onStartPress=async()=>{
+    if(!timerRunning){if(showBreakdown)setPendingReason("");else await handleRemoveButton(runningMs);}
     else {
-      handleRemoveButton(runningMs);
+      await handleRemoveButton(runningMs);
       // 装着ボタン後（取り外し終了→装着）に広告表示
       if(!state.isPremium&&!state.noAds){
         AdMobHelper.showInterstitialIfReady();
       }
     }
   };
-  const confirmReason=reason=>{setPendingReason(null);update({timerRunning:true,timerStart:Date.now(),timerElapsed:0,_pendingReason:reason});};
+  const confirmReason=async reason=>{setPendingReason(null);update({timerRunning:true,timerStart:Date.now(),timerElapsed:0,_pendingReason:reason});await handleRemoveButton(runningMs);};
   const secToHHMM=sec=>`${String(Math.floor(sec/3600)).padStart(2,"0")}:${String(Math.floor((sec%3600)/60)).padStart(2,"0")}`;
   const secToHHMMSS=sec=>`${String(Math.floor(sec/3600)).padStart(2,"0")}:${String(Math.floor((sec%3600)/60)).padStart(2,"0")}:${String(sec%60).padStart(2,"0")}`;
 
@@ -141,7 +137,26 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
             <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,fontSize:17,color:state.themeName==="ashviolet"?"#ffffff":T.accent,minWidth:28,textAlign:"center"}}>{state.alarmMinutes||30}</span>
             <span style={{fontSize:13,color:T.text+"77"}}>分</span>
             <button className="btn bs bsm" style={{padding:"3px 10px",fontSize:16}} onClick={()=>update({alarmMinutes:Math.min(180,(state.alarmMinutes||30)+5)})}>＋</button>
-            <button className="tg" style={{background:state.alarmEnabled?T.accent:T.soft+"aa"}} onClick={async()=>{if(!state.alarmEnabled){const ok=await ensureNotifPermission();if(!ok)return;}update({alarmEnabled:!state.alarmEnabled});}}>
+            <button className="tg" style={{background:state.alarmEnabled?T.accent:T.soft+"aa"}} onClick={async()=>{
+              if(!state.alarmEnabled){
+                const ok=await ensureNotifPermission();
+                if(!ok)return;
+                // ONにした時、タイマー動作中なら残り時間で再スケジュール
+                if(timerRunning&&Notif.isCapacitor()){
+                  const mins=state.alarmMinutes||30;
+                  const elapsed=Math.floor(runningMs/1000);
+                  const remaining=mins*60-elapsed;
+                  if(remaining>0){
+                    Notif.cancel([1001]);
+                    Notif.schedule(1001,"アラーム",`取り外しから${mins}分が経過しました`,Date.now()+remaining*1000,(state.alarmSound||"tone1")+".caf");
+                  }
+                }
+              } else {
+                Notif.cancel([1001]);
+              }
+              update({alarmEnabled:!state.alarmEnabled});
+            }}>
+
               <div className="tg-k" style={{left:state.alarmEnabled?22:2}}/>
             </button>
           </div>
@@ -200,9 +215,9 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
                     setTimerEditSessDur(secToHHMM(Math.floor(s.ms/1000)));
                   }}>
                   <div style={{display:'flex',alignItems:'center',minHeight:38,padding:'0 8px',gap:4,cursor:'pointer'}}>
-                    {showBreakdown&&<span style={{fontSize:13,fontWeight:700,flexShrink:0,minWidth:44,color:displayReason?T.primary:T.text+'44'}}>
-                      {displayReason||'ー'}
-                    </span>}
+                    <span style={{fontSize:13,fontWeight:700,flexShrink:0,minWidth:44,color:displayReason?T.primary:T.text+'44'}}>
+                      {displayReason||''}
+                    </span>
                     <span style={{flex:1,fontSize:11,color:T.text+'55',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',padding:'0 3px'}}>{s.comment||''}</span>
                     {rangeStr&&<span style={{fontSize:11,color:T.text+'44',flexShrink:0,whiteSpace:'nowrap'}}>{rangeStr}</span>}
                     <span style={{fontWeight:700,color:T.accent,fontSize:13,whiteSpace:"nowrap",textAlign:"right",minWidth:36,marginLeft:4,flexShrink:0}}>{durStr}</span>
@@ -213,7 +228,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
             {timerRunning&&(
               <div className="sess" style={{display:"flex",alignItems:"center",gap:0,borderLeft:`3px solid ${T.accent}`,cursor:"default",padding:"5px 8px"}}>
                 <div style={{display:"flex",flexDirection:"column",minWidth:0,width:"28%"}}>
-                  {showBreakdown&&state._pendingReason&&<span style={{color:T.accent,fontSize:12,fontWeight:700,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{state._pendingReason}</span>}
+                  {state._pendingReason&&<span style={{color:T.accent,fontSize:12,fontWeight:700,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{state._pendingReason}</span>}
                 </div>
                 <span style={{color:T.text+"88",fontSize:12,whiteSpace:"nowrap",textAlign:"center",flex:"0 0 auto",width:"44%"}}>
                   {fmtTime(state.timerStart)}〜計測中
@@ -317,13 +332,15 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
       {isAlarm&&(
         <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,zIndex:500,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.55)",backdropFilter:"blur(4px)"}}>
           <div style={{background:T.card,borderRadius:28,padding:"36px 28px 28px",width:"82%",maxWidth:340,textAlign:"center",boxShadow:"0 8px 40px rgba(0,0,0,0.25)"}}>
-            <div style={{fontSize:48,marginBottom:8}}>🔔</div>
+            <div style={{fontSize:32,marginBottom:8}}>
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3 2 6"/><path d="m22 6-3-3"/><path d="M6.38 18.7 4 21"/><path d="M17.64 18.67 20 21"/></svg>
+            </div>
             <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:20,fontWeight:700,color:T.primary,marginBottom:6}}>アラーム</div>
             <div style={{fontSize:14,color:T.text+"88",marginBottom:28}}>取り外しから{state.alarmMinutes||30}分が経過しました</div>
             <button
               onClick={()=>{stopAlarmSound();Notif.cancel([1001]);setAlarmStopped(true);}}
               style={{width:"100%",padding:"16px",border:"none",borderRadius:16,fontSize:17,fontWeight:700,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",background:T.primary,color:"#fff",marginBottom:12}}>
-              停止
+              アラーム停止
             </button>
             <button
               onClick={()=>{
@@ -331,10 +348,10 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
                 const snoozeMs=Date.now()+5*60*1000;
                 setSnoozedUntil(snoozeMs);
                 Notif.cancel([1001]);
-                Notif.schedule(1001,"アラーム",`取り外しから${state.alarmMinutes||30}分が経過しました`,snoozeMs);
+                Notif.schedule(1001,"アラーム",`取り外しから${state.alarmMinutes||30}分が経過しました`,snoozeMs,(state.alarmSound||"tone1")+".caf");
               }}
               style={{width:"100%",padding:"14px",border:`1.5px solid ${T.soft}`,borderRadius:16,fontSize:15,fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",background:"transparent",color:T.text}}>
-              5分後にまた知らせる
+              スヌーズ
             </button>
           </div>
         </div>
@@ -344,4 +361,4 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs})
   );
 }
 
-// ── STATS PAGE ───────────────────────────────────────────────────────────────
+
