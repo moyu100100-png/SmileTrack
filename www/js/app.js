@@ -266,6 +266,7 @@ function App(){
   const [tab,setTab]=useState("home");
   const [drawerOpen,setDrawerOpen]=useState(false);
   const [drawerSection,setDrawerSection]=useState(null);
+  const admobReady = React.useRef(false);
 
   // ドロワー・モーダル表示中は広告を非表示
   const isOverlayOpen = drawerOpen || !!drawerSection;
@@ -284,7 +285,6 @@ function App(){
   const [alarmStopped,setAlarmStopped]=useState(false);
 
   // RevenueCat初期化 & プレミアム状態取得 → 確定後にAdMob初期化
-  const admobReady = React.useRef(false);
   useEffect(()=>{
     (async()=>{
       let premium=false, noAds=false;

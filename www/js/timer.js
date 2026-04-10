@@ -56,7 +56,34 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
       }
     }
   };
-  const confirmReason=async reason=>{setPendingReason(null);update({timerRunning:true,timerStart:Date.now(),timerElapsed:0,_pendingReason:reason});await handleRemoveButton(runningMs);};
+  const confirmReason=async reason=>{
+    const startMs=Date.now();
+    setPendingReason(null);
+    update({timerRunning:true,timerStart:startMs,timerElapsed:0,_pendingReason:reason});
+    // 通知許可確認
+    if(Notif.isCapacitor()){
+      const granted=await Notif.checkPermission();
+      if(!granted) await Notif.requestPermission();
+    }
+    // アラーム通知
+    if(Notif.isCapacitor()&&state.alarmEnabled){
+      const mins=state.alarmMinutes||30;
+      Notif.cancel([1001]);
+      const alarmSound=state.alarmSound||"tone1";
+      Notif.schedule(1001,"アラーム",`取り外しから${mins}分が経過しました`,startMs+mins*60000,alarmSound);
+    }
+    // 放置防止通知
+    if(Notif.isCapacitor()&&state.forgetTimerAlert){
+      const hrs=state.forgetTimerHours||4;
+      const ids=Array.from({length:12},(_,i)=>1002+i);
+      Notif.cancel(ids);
+      for(let i=0;i<12;i++){
+        const h=hrs+i;
+        const ms=startMs+h*3600000;
+        if(ms>Date.now()) Notif.schedule(1002+i,"取り外しタイマー",`取り外し中のタイマーが${h}時間を超えています`,ms);
+      }
+    }
+  };
   const secToHHMM=sec=>`${String(Math.floor(sec/3600)).padStart(2,"0")}:${String(Math.floor((sec%3600)/60)).padStart(2,"0")}`;
   const secToHHMMSS=sec=>`${String(Math.floor(sec/3600)).padStart(2,"0")}:${String(Math.floor((sec%3600)/60)).padStart(2,"0")}:${String(sec%60).padStart(2,"0")}`;
 
