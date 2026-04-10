@@ -1,3 +1,22 @@
+// ── TOAST ────────────────────────────────────────────────────────────────────
+function showToast(msg, duration=2000){
+  const existing=document.getElementById("st-toast");
+  if(existing) existing.remove();
+  const el=document.createElement("div");
+  el.id="st-toast";
+  el.textContent=msg;
+  Object.assign(el.style,{
+    position:"fixed",bottom:"120px",left:"50%",transform:"translateX(-50%)",
+    background:"rgba(0,0,0,0.75)",color:"#fff",padding:"10px 20px",
+    borderRadius:"20px",fontSize:"14px",fontWeight:"600",zIndex:"99999",
+    fontFamily:"'M PLUS Rounded 1c',sans-serif",
+    pointerEvents:"none",whiteSpace:"nowrap",
+    transition:"opacity 0.3s",
+  });
+  document.body.appendChild(el);
+  setTimeout(()=>{ el.style.opacity="0"; setTimeout(()=>el.remove(),300); },duration);
+}
+
 function HomePreviewModal({T,themeName,themeObj,onClose}){
   const svg=makeHomeSVG(themeObj);
   return(
@@ -27,7 +46,7 @@ function AboutModal({T,onClose}){
       navigator.share({title:"SmileTrack",text:"マウスピース矯正の管理アプリ「SmileTrack」を使ってみてください！",url:"https://smiletrack.app"});
     } else {
       navigator.clipboard?.writeText("https://smiletrack.app");
-      console.log("URLをコピーしました！");
+      showToast("URLをコピーしました！");
     }
   };
   const docIcon=<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>;
@@ -767,7 +786,7 @@ function BackupModal({T,state,onImport,onClose}){
         document.body.removeChild(a);
       }
       URL.revokeObjectURL(url);
-    }catch(e){console.warn("エクスポートに失敗しました",e);}
+    }catch(e){console.warn("エクスポートに失敗しました",e);showToast("エクスポートに失敗しました");}
     setExporting(false);
   };
 
@@ -795,7 +814,7 @@ function BackupModal({T,state,onImport,onClose}){
           const r=new FileReader();
           r.onload=ev=>{
             try{doImport(JSON.parse(ev.target.result));}
-            catch{console.warn("ファイルが無効です");}
+            catch{console.warn("ファイルが無効です");showToast("ファイルが無効です");}
           };
           r.readAsText(f);
         }}/>
