@@ -268,8 +268,13 @@ function App(){
   const [drawerSection,setDrawerSection]=useState(null);
   const admobReady = React.useRef(false);
 
-  // ドロワー・モーダル表示中は広告を非表示
-  const isOverlayOpen = drawerOpen || !!drawerSection;
+  // 止め忘れダイアログ（isOverlayOpenより前に宣言）
+  const [showForgetAlert,setShowForgetAlert]=useState(false);
+
+  // ドロワー・モーダル・止め忘れダイアログ表示中は広告を非表示
+  // 【修正1】showForgetAlert を isOverlayOpen に含める
+  const isOverlayOpen = drawerOpen || !!drawerSection || showForgetAlert;
+  // 【修正2】依存配列に state.isPremium, state.noAds を追加
   useEffect(()=>{
     if(state.isPremium||state.noAds) return;
     if(!admobReady.current) return;
@@ -278,7 +283,8 @@ function App(){
     } else {
       AdMobHelper.showBanner();
     }
-  },[isOverlayOpen]);
+  },[isOverlayOpen, state.isPremium, state.noAds]);
+
   const [showResetConfirm,setShowResetConfirm]=useState(false);
   const [showAffiliatePopup,setShowAffiliatePopup]=useState(false);
   const [snoozedUntil,setSnoozedUntil]=useState(null);
@@ -378,16 +384,19 @@ function App(){
   },[T.bg]);
 
   // オンボーディング完了処理
+  // 【修正3】通知許可ダイアログ後にバナーを再表示
   const handleOnboardingComplete=useCallback(async(settings)=>{
     update({...settings,onboardingDone:true});
     // オンボーディング完了時に通知許可を一度だけ求める
     if(Notif.isCapacitor()){
       await Notif.requestPermission();
+      // 通知許可ダイアログでバナーが消えるため、閉じた後に再表示
+      setTimeout(()=>{
+        if(!state.isPremium&&!state.noAds) AdMobHelper.showBanner();
+      },500);
     }
-  },[update]);
+  },[update, state.isPremium, state.noAds]);
 
-  // 止め忘れダイアログ
-  const [showForgetAlert,setShowForgetAlert]=useState(false);
   useEffect(()=>{
     const check=()=>{
       if(!state.timerRunning||!state.forgetTimerAlert) return;
@@ -478,7 +487,13 @@ function App(){
       // 通知許可を確認・リクエスト
       if(Notif.isCapacitor()){
         const granted=await Notif.checkPermission();
-        if(!granted) await Notif.requestPermission();
+        // 【修正4】通知許可ダイアログ後にバナーが消えるため、閉じた後に再表示
+        if(!granted){
+          await Notif.requestPermission();
+          setTimeout(()=>{
+            if(!state.isPremium&&!state.noAds) AdMobHelper.showBanner();
+          },500);
+        }
       }
       // アラーム通知予約（Capacitor）
       if(Notif.isCapacitor()&&state.alarmEnabled){
