@@ -284,23 +284,28 @@ function App(){
   const [snoozedUntil,setSnoozedUntil]=useState(null);
   const [alarmStopped,setAlarmStopped]=useState(false);
 
-  // RevenueCat初期化 & プレミアム状態取得 → 確定後にAdMob初期化
+  // AdMob先に初期化（RevenueCatより前）
   useEffect(()=>{
     (async()=>{
-      let premium=false, noAds=false;
+      await AdMobHelper.initialize();
+      await AdMobHelper.prepareInterstitial();
+      await AdMobHelper.showBanner();
+      admobReady.current = true;
+    })();
+  },[]);
+
+  // RevenueCat初期化 → プレミアムなら広告削除
+  useEffect(()=>{
+    (async()=>{
       try{
         await Purchases.configure({apiKey:"appl_HrDpuICDgfGShogHiNmlmBubJSJ"});
-        premium=await Purchases.isPremiumUser();
-        noAds=await Purchases.hasNoAds();
+        const premium=await Purchases.isPremiumUser();
+        const noAds=await Purchases.hasNoAds();
         setState(s=>({...s,isPremium:premium,noAds:noAds}));
+        if(premium||noAds){
+          AdMobHelper.removeBanner();
+        }
       }catch(e){ console.warn("[RC] init error",e); }
-      // RevenueCat確定後にAdMob初期化
-      if(!premium&&!noAds){
-        await AdMobHelper.initialize();
-        await AdMobHelper.prepareInterstitial();
-        await AdMobHelper.showBanner();
-        admobReady.current = true;
-      }
     })();
   },[]);
 
