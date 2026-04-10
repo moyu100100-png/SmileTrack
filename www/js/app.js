@@ -271,18 +271,20 @@ function App(){
   const isOverlayOpen = drawerOpen || !!drawerSection;
   useEffect(()=>{
     if(state.isPremium||state.noAds) return;
+    if(!admobReady.current) return;
     if(isOverlayOpen){
       AdMobHelper.hideBanner();
     } else {
       AdMobHelper.showBanner();
     }
-  },[isOverlayOpen, state.isPremium, state.noAds]);
+  },[isOverlayOpen]);
   const [showResetConfirm,setShowResetConfirm]=useState(false);
   const [showAffiliatePopup,setShowAffiliatePopup]=useState(false);
   const [snoozedUntil,setSnoozedUntil]=useState(null);
   const [alarmStopped,setAlarmStopped]=useState(false);
 
   // RevenueCat初期化 & プレミアム状態取得 → 確定後にAdMob初期化
+  const admobReady = React.useRef(false);
   useEffect(()=>{
     (async()=>{
       let premium=false, noAds=false;
@@ -297,6 +299,7 @@ function App(){
         await AdMobHelper.initialize();
         await AdMobHelper.prepareInterstitial();
         await AdMobHelper.showBanner();
+        admobReady.current = true;
       }
     })();
   },[]);
