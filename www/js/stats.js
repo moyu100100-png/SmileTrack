@@ -254,7 +254,10 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
               : labelStr ? `取り外し内訳 (${labelStr})` : "取り外し内訳";
             return Object.keys(bd).length>0 ? (
               <div className="card">
-                <div className="ct">{titleStr}</div>
+                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
+                  <div className="ct" style={{marginBottom:0}}>{titleStr}</div>
+                  {activeBar&&period==="daily"&&<div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:15,fontWeight:700,color:(effectiveLog[activeBar.key]||0)>=target?T.primary:failCol}}>{effectiveLog[activeBar.key]?fmt(effectiveLog[activeBar.key]):"記録なし"}</div>}
+                </div>
                 {Object.entries(bd).sort((a,b)=>b[1]-a[1]).map(([r,s])=>(
                   <div key={r} style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
                     <span style={{fontSize:13,minWidth:52,color:T.text}}>{r}</span>
@@ -286,29 +289,6 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
           </div>
       }
 
-      {selectedDay&&period==="daily"&&(
-        <div className="mo" onClick={()=>setSelectedBar(null)}>
-          <div className="md" onClick={e=>e.stopPropagation()}>
-            <div className="mdtitle">{selectedDay}</div>
-            <div style={{marginBottom:10,textAlign:"center"}}>
-              <div style={{fontSize:13,color:T.text+"66",marginBottom:2}}>装着時間</div>
-              <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:24,fontWeight:700,color:(effectiveLog[selectedDay]||0)>=target?T.primary:failCol}}>{effectiveLog[selectedDay]?fmt(effectiveLog[selectedDay]):"記録なし"}</div>
-            </div>
-            {Object.keys(dayReasons).length>0&&<>
-              <div className="ct">取り外し内訳</div>
-              {Object.entries(dayReasons).sort((a,b)=>b[1]-a[1]).map(([r,s])=>{
-                const tot=Object.values(dayReasons).reduce((a,v)=>a+v,0)||1;
-                return(<div key={r} style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
-                  <span style={{fontSize:13,minWidth:52,color:T.text}}>{r}</span>
-                  <div style={{flex:1,height:8,background:T.soft,borderRadius:99,overflow:"hidden"}}><div style={{height:"100%",width:`${(s/tot)*100}%`,background:T.primary,borderRadius:99}}/></div>
-                  <span style={{fontSize:13,fontWeight:700,color:T.primary,minWidth:58,textAlign:"right"}}>{fmt(s)}</span>
-                </div>);
-              })}
-            </>}
-            <button className="btn bs" style={{width:"100%",marginTop:8}} onClick={()=>setSelectedBar(null)}>閉じる</button>
-          </div>
-        </div>
-      )}
       {showReportModal&&<ReportModal T={T} state={state} onClose={()=>setShowReportModal(false)}/>}
       {showReportPreview&&(
         <div className="mo" onClick={()=>setShowReportPreview(false)}>

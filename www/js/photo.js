@@ -433,22 +433,22 @@ function PhotoPage({T,state,update,todayStr}){
           ):(
             /* ── 撮影後プレビュー ── */
             <div style={{flex:1,display:"flex",flexDirection:"column",minHeight:0}}>
-              <div style={{flex:1,overflow:"hidden",position:"relative",minHeight:0,background:"#000",display:"flex",alignItems:"center",justifyContent:"center"}}>
-                <img src={captured} alt="" style={{width:"100%",height:"100%",objectFit:"contain",position:"absolute",inset:0}}/>
-              </div>
-              <div style={{padding:14,background:"#111",flexShrink:0}}>
-                <input value={capComment} onChange={e=>setCapComment(e.target.value)} placeholder="コメントを入力…" style={{background:"#222",color:"#fff",border:"1px solid #444",borderRadius:10,marginBottom:6}}/>
-                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
-                  <span style={{color:"#aaa",fontSize:13,flexShrink:0}}># マウスピース番号</span>
-                  <select value={capPiece||""} onChange={e=>setCapPiece(e.target.value?parseInt(e.target.value):null)}
-                    style={{background:"#222",color:"#fff",border:"1px solid #444",borderRadius:10,width:80,textAlign:"center"}}>
-                    <option value="">ー</option>
-                    {buildPieceList(state).map(p=><option key={p.n} value={p.n}>{p.label}</option>)}
-                  </select>
-                </div>
-                <div style={{display:"flex",gap:8}}>
-                  <button className="btn bs" style={{flex:1}} onClick={()=>{setCaptured(null);openCam(cameraMode);}}>撮り直し</button>
-                  <button className="btn bp" style={{flex:1}} onClick={savePhoto}>保存</button>
+              <div style={{flex:1,overflow:"hidden",position:"relative",minHeight:0,background:"#000",display:"flex",alignItems:"flex-start",justifyContent:"center"}}>
+                <img src={captured} alt="" style={{width:"100%",objectFit:"contain"}}/>
+                <div style={{position:"absolute",bottom:0,left:0,right:0,padding:14,background:"rgba(0,0,0,0.85)"}}>
+                  <input value={capComment} onChange={e=>setCapComment(e.target.value)} placeholder="コメントを入力…" style={{background:"#222",color:"#fff",border:"1px solid #444",borderRadius:10,marginBottom:6}}/>
+                  <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
+                    <span style={{color:"#aaa",fontSize:13,flexShrink:0}}># マウスピース番号</span>
+                    <select value={capPiece||""} onChange={e=>setCapPiece(e.target.value?parseInt(e.target.value):null)}
+                      style={{background:"#222",color:"#fff",border:"1px solid #444",borderRadius:10,width:80,textAlign:"center",maxHeight:160}}>
+                      <option value="">ー</option>
+                      {buildPieceList(state).map(p=><option key={p.n} value={p.n}>{p.label}</option>)}
+                    </select>
+                  </div>
+                  <div style={{display:"flex",gap:8}}>
+                    <button className="btn bs" style={{flex:1}} onClick={()=>{setCaptured(null);openCam(cameraMode);}}>撮り直し</button>
+                    <button className="btn bp" style={{flex:1}} onClick={savePhoto}>保存</button>
+                  </div>
                 </div>
               </div>
             </div>
