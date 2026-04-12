@@ -266,41 +266,22 @@ function App(){
   const [tab,setTab]=useState("home");
   const [drawerOpen,setDrawerOpen]=useState(false);
   const [drawerSection,setDrawerSection]=useState(null);
-  const admobReady = React.useRef(false);
-
-  // 止め忘れダイアログ（isOverlayOpenより前に宣言）
-  const [showForgetAlert,setShowForgetAlert]=useState(false);
-
-  // ドロワー・モーダル・止め忘れダイアログ表示中は広告を非表示
-  // 【修正1】showForgetAlert を isOverlayOpen に含める
-  const isOverlayOpen = drawerOpen || !!drawerSection || showForgetAlert;
-  // 【修正2】依存配列に state.isPremium, state.noAds を追加
-  useEffect(()=>{
-    if(state.isPremium||state.noAds) return;
-    if(!admobReady.current) return;
-    if(isOverlayOpen){
-      AdMobHelper.hideBanner();
-    } else {
-      AdMobHelper.showBanner();
-    }
-  },[isOverlayOpen, state.isPremium, state.noAds]);
-
   const [showResetConfirm,setShowResetConfirm]=useState(false);
   const [showAffiliatePopup,setShowAffiliatePopup]=useState(false);
   const [snoozedUntil,setSnoozedUntil]=useState(null);
   const [alarmStopped,setAlarmStopped]=useState(false);
 
-  // AdMob先に初期化（RevenueCatより前）
+  // AdMob初期化
   useEffect(()=>{
     (async()=>{
+      if(state.isPremium||state.noAds) return;
       await AdMobHelper.initialize();
       await AdMobHelper.prepareInterstitial();
       await AdMobHelper.showBanner();
-      admobReady.current = true;
     })();
   },[]);
 
-  // RevenueCat初期化 → プレミアムなら広告削除
+  // RevenueCat初期化
   useEffect(()=>{
     (async()=>{
       try{
@@ -308,12 +289,21 @@ function App(){
         const premium=await Purchases.isPremiumUser();
         const noAds=await Purchases.hasNoAds();
         setState(s=>({...s,isPremium:premium,noAds:noAds}));
-        if(premium||noAds){
-          AdMobHelper.removeBanner();
-        }
+        if(premium||noAds) AdMobHelper.removeBanner();
       }catch(e){ console.warn("[RC] init error",e); }
     })();
   },[]);
+
+  // ドロワー・モーダル表示中は広告を非表示
+  const isOverlayOpen = drawerOpen || !!drawerSection;
+  useEffect(()=>{
+    if(state.isPremium||state.noAds) return;
+    if(isOverlayOpen){
+      AdMobHelper.hideBanner();
+    } else {
+      AdMobHelper.showBanner();
+    }
+  },[isOverlayOpen]);
 
   // アフィリエイトポップアップ: 7日後に1回、30日後から30日ごと
   useEffect(()=>{
@@ -384,19 +374,16 @@ function App(){
   },[T.bg]);
 
   // オンボーディング完了処理
-  // 【修正3】通知許可ダイアログ後にバナーを再表示
   const handleOnboardingComplete=useCallback(async(settings)=>{
     update({...settings,onboardingDone:true});
     // オンボーディング完了時に通知許可を一度だけ求める
     if(Notif.isCapacitor()){
       await Notif.requestPermission();
-      // 通知許可ダイアログでバナーが消えるため、閉じた後に再表示
-      setTimeout(()=>{
-        if(!state.isPremium&&!state.noAds) AdMobHelper.showBanner();
-      },500);
     }
-  },[update, state.isPremium, state.noAds]);
+  },[update]);
 
+  // 止め忘れダイアログ
+  const [showForgetAlert,setShowForgetAlert]=useState(false);
   useEffect(()=>{
     const check=()=>{
       if(!state.timerRunning||!state.forgetTimerAlert) return;
@@ -487,13 +474,7 @@ function App(){
       // 通知許可を確認・リクエスト
       if(Notif.isCapacitor()){
         const granted=await Notif.checkPermission();
-        // 【修正4】通知許可ダイアログ後にバナーが消えるため、閉じた後に再表示
-        if(!granted){
-          await Notif.requestPermission();
-          setTimeout(()=>{
-            if(!state.isPremium&&!state.noAds) AdMobHelper.showBanner();
-          },500);
-        }
+        if(!granted) await Notif.requestPermission();
       }
       // アラーム通知予約（Capacitor）
       if(Notif.isCapacitor()&&state.alarmEnabled){
