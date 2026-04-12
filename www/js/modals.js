@@ -406,7 +406,27 @@ function TimerSettingsModal({T,state,onSave,onClose}){
         {/* アラームサウンド選択 */}
         {(()=>{
           const [soundOpen,setSoundOpen]=React.useState(false);
+          const [playingId,setPlayingId]=React.useState(null);
           const cur=ALARM_SOUNDS.find(s=>s.id===alarmSound)||ALARM_SOUNDS[0];
+          const handlePlay=(id)=>{
+            if(playingId===id){
+              stopAlarmSound();
+              setPlayingId(null);
+            } else {
+              stopAlarmSound();
+              // 1回のみ再生
+              try{
+                if(_currentAudio){_currentAudio.pause();_currentAudio.currentTime=0;}
+                const audio=new Audio("sounds/"+id+".mp3");
+                audio.volume=1.0;
+                audio.loop=false;
+                _currentAudio=audio;
+                audio.play().catch(e=>console.warn("Audio play error:",e));
+                audio.onended=()=>{setPlayingId(null);_currentAudio=null;};
+                setPlayingId(id);
+              }catch(e){console.warn("Audio error:",e);}
+            }
+          };
           return(
             <div style={{marginTop:16}}>
               <div style={{fontSize:13,fontWeight:700,color:T.accent,marginBottom:6,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>アラームサウンド</div>
@@ -428,9 +448,12 @@ function TimerSettingsModal({T,state,onSave,onClose}){
                         <div style={{fontSize:11,color:T.text+"66"}}>{s.desc}</div>
                       </div>
                       <button
-                        onClick={e=>{e.stopPropagation();playAlarmSound(s.id);}}
-                        style={{background:T.primary,border:"none",borderRadius:20,width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,marginLeft:8}}>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><polygon points="5,3 19,12 5,21"/></svg>
+                        onClick={e=>{e.stopPropagation();handlePlay(s.id);}}
+                        style={{background:playingId===s.id?T.accent:T.primary,border:"none",borderRadius:20,width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,marginLeft:8}}>
+                        {playingId===s.id
+                          ? <svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                          : <svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><polygon points="5,3 19,12 5,21"/></svg>
+                        }
                       </button>
                     </div>
                   ))}

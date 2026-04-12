@@ -204,19 +204,17 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
                   {/* ラベル: 棒グラフの下 */}
                   <div style={{marginTop:3,textAlign:"center",lineHeight:1.4,maxWidth:barW}}>
                     {period==="monthly" ? (
-                      // 毎月: 年と月を同サイズ
                       <>
-                        <div style={{fontSize:11,color:isSelected?T.accent:T.text+"55",fontWeight:isSelected?700:400}}>{b.year}年</div>
-                        <div style={{fontSize:11,color:labelColor,fontWeight:labelWeight}}>{b.month+1}月</div>
+                        <div style={{fontSize:12,color:isSelected?T.accent:T.text+"55",fontWeight:isSelected?700:400}}>{b.year}年</div>
+                        <div style={{fontSize:13,color:labelColor,fontWeight:labelWeight}}>{b.month+1}月</div>
                       </>
                     ) : period==="weekly" ? (
-                      // 毎週: 年 → 日付範囲（同サイズ）
                       <>
-                        <div style={{fontSize:12,color:isSelected?T.accent:T.text+"55",fontWeight:isSelected?700:400}}>{b.yearLabel}</div>
-                        <div style={{fontSize:12,color:labelColor,fontWeight:labelWeight,whiteSpace:"pre-line",textAlign:"center",lineHeight:1.3}}>{b.label}</div>
+                        <div style={{fontSize:11,color:isSelected?T.accent:T.text+"55",fontWeight:isSelected?700:400}}>{b.yearLabel}</div>
+                        <div style={{fontSize:13,color:labelColor,fontWeight:labelWeight,whiteSpace:"pre-line",textAlign:"center",lineHeight:1.3}}>{b.label}</div>
                       </>
                     ) : (
-                      <div style={{fontSize:11,color:labelColor,fontWeight:labelWeight}}>{b.label}</div>
+                      <div style={{fontSize:13,color:labelColor,fontWeight:labelWeight}}>{b.label}</div>
                     )}
                   </div>
                 </div>
@@ -253,41 +251,70 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
               ? "取り外し内訳 (今日)"
               : labelStr ? `取り外し内訳 (${labelStr})` : "取り外し内訳";
             return Object.keys(bd).length>0 ? (
-              <div className="card">
-                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
-                  <div className="ct" style={{marginBottom:0}}>{titleStr}</div>
-                  {activeBar&&period==="daily"&&<div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:15,fontWeight:700,color:(effectiveLog[activeBar.key]||0)>=target?T.primary:failCol}}>{effectiveLog[activeBar.key]?fmt(effectiveLog[activeBar.key]):"記録なし"}</div>}
-                </div>
-                {Object.entries(bd).sort((a,b)=>b[1]-a[1]).map(([r,s])=>(
-                  <div key={r} style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
-                    <span style={{fontSize:13,minWidth:52,color:T.text}}>{r}</span>
-                    <div style={{flex:1,height:8,background:T.soft,borderRadius:99,overflow:"hidden"}}><div style={{height:"100%",width:`${(s/rt)*100}%`,background:T.primary,borderRadius:99}}/></div>
-                    <span style={{fontSize:13,fontWeight:700,color:T.primary,minWidth:58,textAlign:"right"}}>{fmt(s)}</span>
+              <>
+                {period==="daily"&&selectedBar&&(
+                  <div className="card" style={{marginBottom:10,textAlign:"center"}}>
+                    <div style={{fontSize:12,color:T.text+"66",marginBottom:4}}>{selectedBar.key} 装着時間</div>
+                    <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:24,fontWeight:700,color:(effectiveLog[selectedBar.key]||0)>=target?T.primary:failCol}}>
+                      {effectiveLog[selectedBar.key]?fmt(effectiveLog[selectedBar.key]):"記録なし"}
+                    </div>
                   </div>
-                ))}
-              </div>
+                )}
+                <div className="card">
+                  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
+                    <div className="ct" style={{marginBottom:0}}>{titleStr}</div>
+                  </div>
+                  {Object.entries(bd).sort((a,b)=>b[1]-a[1]).map(([r,s])=>(
+                    <div key={r} style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+                      <span style={{fontSize:13,minWidth:52,color:T.text}}>{r}</span>
+                      <div style={{flex:1,height:8,background:T.soft,borderRadius:99,overflow:"hidden"}}><div style={{height:"100%",width:`${(s/rt)*100}%`,background:T.primary,borderRadius:99}}/></div>
+                      <span style={{fontSize:13,fontWeight:700,color:T.primary,minWidth:58,textAlign:"right"}}>{fmt(s)}</span>
+                    </div>
+                  ))}
+                </div>
+              </>)
             ) : (
               <div className="card" style={{textAlign:"center",color:T.text+"55",padding:"18px 0",fontSize:14}}>この期間の取り外し記録がありません</div>
             );
           })()
-        : <div className="card">
-            <div className="ct">ピース別 合計装着時間</div>
-            <div style={{maxHeight:260,overflowY:"auto"}}>
-              {pieceWearList.map(({n,label,rangeLabel,total})=>{
-                const isAct=n===state.currentPiece;
-                return(
-                  <div key={n} className="wr" style={{opacity:(total===0&&!isAct)?0.45:1}}>
-                    <div style={{display:"flex",alignItems:"center",gap:8,flex:1,minWidth:0}}>
-                      <div style={{width:22,height:22,borderRadius:"50%",background:isAct?T.primary:T.soft,color:isAct?"#fff":T.text,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,flexShrink:0}}>{ label }</div>
-                      <span style={{fontSize:12,color:T.text+"99",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:160}}>{rangeLabel}</span>
+        : period==="daily" ? (
+            <div className="card">
+              <div className="ct">ピース別 合計装着時間</div>
+              <div style={{maxHeight:260,overflowY:"auto"}}>
+                {pieceWearList.map(({n,label,rangeLabel,total})=>{
+                  const isAct=n===state.currentPiece;
+                  return(
+                    <div key={n} className="wr" style={{opacity:(total===0&&!isAct)?0.45:1}}>
+                      <div style={{display:"flex",alignItems:"center",gap:8,flex:1,minWidth:0}}>
+                        <div style={{width:22,height:22,borderRadius:"50%",background:isAct?T.primary:T.soft,color:isAct?"#fff":T.text,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,flexShrink:0}}>{label}</div>
+                        <span style={{fontSize:12,color:T.text+"99",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:160}}>{rangeLabel}</span>
+                      </div>
+                      <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,color:isAct?T.primary:T.text+"88",fontSize:14,flexShrink:0}}>{fmt(total)}</span>
                     </div>
-                    <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,color:isAct?T.primary:T.text+"88",fontSize:14,flexShrink:0}}>{fmt(total)}</span>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
-      }
+          ) : (
+            <div className="card">
+              <div className="ct">{period==="weekly"?"合計装着時間 1週間":"合計装着時間 1か月"}</div>
+              <div style={{maxHeight:260,overflowY:"auto"}}>
+                {[...bars].reverse().map(b=>{
+                  const isSelected=selectedBar?.key===b.key;
+                  const total=period==="weekly"
+                    ? (()=>{let t=0;const s=new Date(b.key+"T00:00:00");const e=new Date(b.endKey+"T00:00:00");for(let d=new Date(s);d<=e;d.setDate(d.getDate()+1))t+=effectiveLog[dsFromDate(new Date(d))]||0;return t;})()
+                    : (()=>{const parts=b.key.split("-");const y=parseInt(parts[0]),m=parseInt(parts[1]);let t=0;const days=new Date(y,m+1,0).getDate();for(let day=1;day<=days;day++)t+=effectiveLog[dsFromDate(new Date(y,m,day))]||0;return t;})();
+                  const achieved=total>=target*(period==="weekly"?7:new Date(parseInt(b.key.split("-")[0]),parseInt(b.key.split("-")[1])+1,0).getDate());
+                  return(
+                    <div key={b.key} className="wr" style={{background:isSelected?T.soft:"transparent",borderRadius:8,cursor:"pointer"}} onClick={()=>setSelectedBar(isSelected?null:b)}>
+                      <span style={{fontSize:13,fontWeight:isSelected?700:400,color:isSelected?T.primary:T.text,whiteSpace:"pre-line",lineHeight:1.4,flex:1}}>{period==="weekly"?b.label:`${parseInt(b.key.split("-")[1])+1}月`}</span>
+                      <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,color:achieved?T.primary:failCol,fontSize:14,flexShrink:0}}>{fmt(total)}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )
 
       {showReportModal&&<ReportModal T={T} state={state} onClose={()=>setShowReportModal(false)}/>}
       {showReportPreview&&(
