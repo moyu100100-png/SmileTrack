@@ -315,6 +315,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
               </div>
             </div>
           )
+      }
 
       {showReportModal&&<ReportModal T={T} state={state} onClose={()=>setShowReportModal(false)}/>}
       {showReportPreview&&(
