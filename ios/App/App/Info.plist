@@ -49,6 +49,10 @@
 	<true/>
 	<key>GADApplicationIdentifier</key>
 	<string>ca-app-pub-5456814091467820~1944092541</string>
+	<key>WKAppBoundDomains</key>
+	<array>
+		<string>localhost</string>
+	</array>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>より関連性の高い広告を表示するために使用します。</string>
 	<key>SKAdNetworkItems</key>
@@ -60,10 +64,6 @@
 	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>矯正の経過写真を撮影するためにカメラを使用します</string>
-	<key>WKAppBoundDomains</key>
-	<array>
-		<string>localhost</string>
-	</array>
 	<key>NSUserNotificationsUsageDescription</key>
 	<string>マウスピースの交換日やタイマーのアラームをお知らせします</string>
 	<key>UIBackgroundModes</key>
