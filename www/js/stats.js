@@ -251,7 +251,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
               ? "取り外し内訳 (今日)"
               : labelStr ? `取り外し内訳 (${labelStr})` : "取り外し内訳";
             return Object.keys(bd).length>0 ? (
-              <>
+              <div>
                 {period==="daily"&&selectedBar&&(
                   <div className="card" style={{marginBottom:10,textAlign:"center"}}>
                     <div style={{fontSize:12,color:T.text+"66",marginBottom:4}}>{selectedBar.key} 装着時間</div>
@@ -272,7 +272,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
                     </div>
                   ))}
                 </div>
-              </>)
+              </div>
             ) : (
               <div className="card" style={{textAlign:"center",color:T.text+"55",padding:"18px 0",fontSize:14}}>この期間の取り外し記録がありません</div>
             );
@@ -304,11 +304,11 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
                   const total=period==="weekly"
                     ? (()=>{let t=0;const s=new Date(b.key+"T00:00:00");const e=new Date(b.endKey+"T00:00:00");for(let d=new Date(s);d<=e;d.setDate(d.getDate()+1))t+=effectiveLog[dsFromDate(new Date(d))]||0;return t;})()
                     : (()=>{const parts=b.key.split("-");const y=parseInt(parts[0]),m=parseInt(parts[1]);let t=0;const days=new Date(y,m+1,0).getDate();for(let day=1;day<=days;day++)t+=effectiveLog[dsFromDate(new Date(y,m,day))]||0;return t;})();
-                  const achieved=total>=target*(period==="weekly"?7:new Date(parseInt(b.key.split("-")[0]),parseInt(b.key.split("-")[1])+1,0).getDate());
+                  const achieved=total>0&&total>=target*(period==="weekly"?7:new Date(parseInt(b.key.split("-")[0]),parseInt(b.key.split("-")[1])+1,0).getDate());
                   return(
                     <div key={b.key} className="wr" style={{background:isSelected?T.soft:"transparent",borderRadius:8,cursor:"pointer"}} onClick={()=>setSelectedBar(isSelected?null:b)}>
                       <span style={{fontSize:13,fontWeight:isSelected?700:400,color:isSelected?T.primary:T.text,whiteSpace:"pre-line",lineHeight:1.4,flex:1}}>{period==="weekly"?b.label:`${parseInt(b.key.split("-")[1])+1}月`}</span>
-                      <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,color:achieved?T.primary:failCol,fontSize:14,flexShrink:0}}>{fmt(total)}</span>
+                      <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,color:total===0?T.text+"44":achieved?T.primary:failCol,fontSize:14,flexShrink:0}}>{total===0?"記録なし":fmt(total)}</span>
                     </div>
                   );
                 })}
