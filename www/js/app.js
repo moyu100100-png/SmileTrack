@@ -367,6 +367,27 @@ function App(){
 
   const update=useCallback(patch=>setState(s=>({...s,...patch})),[]);
   const T=THEMES[state.themeName]||THEMES.blush||Object.values(THEMES)[0];
+  // 通知バナーのアラーム停止・スヌーズアクション受信
+  useEffect(()=>{
+    if(!Notif.isCapacitor()) return;
+    const handler=(event)=>{
+      const action=event.detail?.action;
+      if(action==="stop"){
+        stopAlarmSound();
+        Notif.cancel([1001]);
+        setAlarmStopped(true);
+      } else if(action==="snooze"){
+        stopAlarmSound();
+        Notif.cancel([1001]);
+        const snoozeMs=Date.now()+5*60000;
+        setSnoozedUntil(snoozeMs);
+        Notif.schedule(1001,"アラーム",`取り外しから${state.alarmMinutes||30}分が経過しました`,snoozeMs,(state.alarmSound||"tone1")+".caf",true);
+      }
+    };
+    window.addEventListener("AlarmAction",handler);
+    return()=>window.removeEventListener("AlarmAction",handler);
+  },[state.alarmMinutes,state.alarmSound,setAlarmStopped,setSnoozedUntil]);
+
   // bodyの背景色をテーマに合わせて更新（セーフエリアの白帯を防ぐ）
   useEffect(()=>{
     document.body.style.background=T.bg;
@@ -481,8 +502,8 @@ function App(){
         const mins=state.alarmMinutes||30;
         Notif.cancel([1001]);
         const alarmMs=startMs+mins*60000;
-        const alarmSound=state.alarmSound||"tone1";
-        Notif.schedule(1001,"アラーム",`取り外しから${mins}分が経過しました`,alarmMs,alarmSound);
+        const alarmSound=(state.alarmSound||"tone1")+".caf";
+        Notif.schedule(1001,"アラーム",`取り外しから${mins}分が経過しました`,alarmMs,alarmSound,true);
       }
       // 放置防止アラート通知予約（設定した時間から1時間おき・最大12本）
       if(Notif.isCapacitor()&&state.forgetTimerAlert){

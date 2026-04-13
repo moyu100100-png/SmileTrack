@@ -139,7 +139,7 @@
         return perm.display==="granted";
       }catch(e){return false;}
     },
-    async schedule(id,title,body,atMs,sound=null){
+    async schedule(id,title,body,atMs,sound=null,isAlarm=false){
       try{
         const {LocalNotifications}=Capacitor.Plugins;
         const notif={
@@ -147,6 +147,7 @@
           schedule:{at:new Date(atMs)},
         };
         if(sound) notif.sound=sound;
+        if(isAlarm) notif.categoryIdentifier="ALARM_CATEGORY";
         await LocalNotifications.schedule({notifications:[notif]});
       }catch(e){console.warn("通知エラー:",e);}
     },

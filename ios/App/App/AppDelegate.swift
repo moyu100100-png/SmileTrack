@@ -8,6 +8,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         UNUserNotificationCenter.current().delegate = self
+
+        // アラーム通知カテゴリ（停止・スヌーズボタン）を登録
+        let stopAction = UNNotificationAction(
+            identifier: "ALARM_STOP",
+            title: "アラーム停止",
+            options: [.foreground]
+        )
+        let snoozeAction = UNNotificationAction(
+            identifier: "ALARM_SNOOZE",
+            title: "スヌーズ",
+            options: []
+        )
+        let alarmCategory = UNNotificationCategory(
+            identifier: "ALARM_CATEGORY",
+            actions: [stopAction, snoozeAction],
+            intentIdentifiers: [],
+            options: []
+        )
+        UNUserNotificationCenter.current().setNotificationCategories([alarmCategory])
+
         return true
     }
 
@@ -27,17 +47,34 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
-    // バックグラウンド・フォアグラウンド両方で通知を表示
     func userNotificationCenter(_ center: UNUserNotificationCenter,
         willPresent notification: UNNotification,
         withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler([.banner, .sound, .badge])
     }
 
-    // 通知タップ時の処理
     func userNotificationCenter(_ center: UNUserNotificationCenter,
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void) {
+        let actionId = response.actionIdentifier
+        
+        if actionId == "ALARM_STOP" {
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(
+                    name: NSNotification.Name("AlarmAction"),
+                    object: nil,
+                    userInfo: ["action": "stop"]
+                )
+            }
+        } else if actionId == "ALARM_SNOOZE" {
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(
+                    name: NSNotification.Name("AlarmAction"),
+                    object: nil,
+                    userInfo: ["action": "snooze"]
+                )
+            }
+        }
         completionHandler()
     }
 }

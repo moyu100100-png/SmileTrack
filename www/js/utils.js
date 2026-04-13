@@ -41,16 +41,24 @@ function Toggle({T,on,label,onToggle}){
 
 function PinPad({T,title,onDone}){
   const [val,setVal]=useState("");
+  const [error,setError]=useState(false);
   const press=k=>{
+    if(error){setError(false);setVal("");}
     if(k==="del"){setVal(v=>v.slice(0,-1));return;}
     if(val.length>=4)return;
     const n=val+k;setVal(n);
-    if(n.length===4)setTimeout(()=>onDone(n),80);
+    if(n.length===4){
+      setTimeout(()=>{
+        const result=onDone(n);
+        if(result===false){setError(true);setTimeout(()=>{setError(false);setVal("");},600);}
+        else setVal("");
+      },80);
+    }
   };
   return(
     <div>
-      <div style={{textAlign:"center",fontWeight:600,fontSize:16,marginBottom:4,color:T.text}}>{title}</div>
-      <div className="pin-dots">{[0,1,2,3].map(i=><div key={i} className={`pin-dot${val.length>i?" on":""}`}/>)}</div>
+      <div style={{textAlign:"center",fontWeight:600,fontSize:16,marginBottom:4,color:error?T.accent:T.text}}>{error?"PINが違います":title}</div>
+      <div className="pin-dots">{[0,1,2,3].map(i=><div key={i} className={`pin-dot${val.length>i?" on":""}`} style={error?{borderColor:T.accent,background:T.accent}:{}}/>)}</div>
       <div className="pin-grid">
         {["1","2","3","4","5","6","7","8","9","","0","del"].map((k,i)=>
           k===""?<div key={i}/>:<button key={i} className="pin-btn" style={k==="del"?{fontSize:32,color:T.accent}:{color:T.accent}} onClick={()=>press(k)}>{k==="del"?"⌫":k}</button>
@@ -80,7 +88,7 @@ function Drawer({T,open,onClose,onSection,onReset}){
     <>
       {open&&<div className="overlay" onClick={onClose}/>}
       <div className={`drawer${open?" open":""}`}>
-        <div style={{padding:"18px 14px 10px",paddingTop:"60px",borderBottom:`1px solid ${T.soft}`}}>
+        <div style={{padding:"18px 14px 10px",borderBottom:`1px solid ${T.soft}`}}>
           <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:20,fontWeight:700,color:T.primary}}>SmileTrack</div>
         </div>
         <div style={{padding:"8px 0"}}>

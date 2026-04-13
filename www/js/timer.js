@@ -50,10 +50,6 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
     if(!timerRunning){if(showBreakdown)setPendingReason("");else await handleRemoveButton(runningMs);}
     else {
       await handleRemoveButton(runningMs);
-      // 装着ボタン後（取り外し終了→装着）に広告表示
-      if(!state.isPremium&&!state.noAds){
-        AdMobHelper.showInterstitialIfReady();
-      }
     }
   };
   const confirmReason=async reason=>{
@@ -69,8 +65,8 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
     if(Notif.isCapacitor()&&state.alarmEnabled){
       const mins=state.alarmMinutes||30;
       Notif.cancel([1001]);
-      const alarmSound=state.alarmSound||"tone1";
-      Notif.schedule(1001,"アラーム",`取り外しから${mins}分が経過しました`,startMs+mins*60000,alarmSound);
+      const alarmSound=(state.alarmSound||"tone1")+".caf";
+      Notif.schedule(1001,"アラーム",`取り外しから${mins}分が経過しました`,startMs+mins*60000,alarmSound,true);
     }
     // 放置防止通知
     if(Notif.isCapacitor()&&state.forgetTimerAlert){
@@ -160,10 +156,28 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",background:T.soft,borderRadius:12,padding:"9px 14px"}}>
           <span style={{fontSize:15,fontWeight:700,color:T.accent}}>アラーム</span>
           <div style={{display:"flex",alignItems:"center",gap:8}}>
-            <button className="btn bs bsm" style={{padding:"3px 10px",fontSize:16}} onClick={()=>update({alarmMinutes:Math.max(5,(state.alarmMinutes||30)-5)})}>－</button>
+            <button className="btn bs bsm" style={{padding:"3px 10px",fontSize:16}} onClick={()=>{
+              const newMins=Math.max(5,(state.alarmMinutes||30)-5);
+              update({alarmMinutes:newMins});
+              if(timerRunning&&state.alarmEnabled&&Notif.isCapacitor()){
+                const elapsed=Math.floor(runningMs/1000);
+                const remaining=newMins*60-elapsed;
+                Notif.cancel([1001]);
+                if(remaining>0) Notif.schedule(1001,"アラーム",`取り外しから${newMins}分が経過しました`,Date.now()+remaining*1000,(state.alarmSound||"tone1")+".caf",true);
+              }
+            }}>－</button>
             <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,fontSize:17,color:state.themeName==="ashviolet"?"#ffffff":T.accent,minWidth:28,textAlign:"center"}}>{state.alarmMinutes||30}</span>
             <span style={{fontSize:13,color:T.text+"77"}}>分</span>
-            <button className="btn bs bsm" style={{padding:"3px 10px",fontSize:16}} onClick={()=>update({alarmMinutes:Math.min(180,(state.alarmMinutes||30)+5)})}>＋</button>
+            <button className="btn bs bsm" style={{padding:"3px 10px",fontSize:16}} onClick={()=>{
+              const newMins=Math.min(180,(state.alarmMinutes||30)+5);
+              update({alarmMinutes:newMins});
+              if(timerRunning&&state.alarmEnabled&&Notif.isCapacitor()){
+                const elapsed=Math.floor(runningMs/1000);
+                const remaining=newMins*60-elapsed;
+                Notif.cancel([1001]);
+                if(remaining>0) Notif.schedule(1001,"アラーム",`取り外しから${newMins}分が経過しました`,Date.now()+remaining*1000,(state.alarmSound||"tone1")+".caf",true);
+              }
+            }}>＋</button>
             <button className="tg" style={{background:state.alarmEnabled?T.accent:T.soft+"aa"}} onClick={async()=>{
               if(!state.alarmEnabled){
                 const ok=await ensureNotifPermission();
@@ -175,7 +189,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
                   const remaining=mins*60-elapsed;
                   if(remaining>0){
                     Notif.cancel([1001]);
-                    Notif.schedule(1001,"アラーム",`取り外しから${mins}分が経過しました`,Date.now()+remaining*1000,(state.alarmSound||"tone1")+".caf");
+                    Notif.schedule(1001,"アラーム",`取り外しから${mins}分が経過しました`,Date.now()+remaining*1000,(state.alarmSound||"tone1")+".caf",true);
                   }
                 }
               } else {
@@ -375,7 +389,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
                 const snoozeMs=Date.now()+5*60*1000;
                 setSnoozedUntil(snoozeMs);
                 Notif.cancel([1001]);
-                Notif.schedule(1001,"アラーム",`取り外しから${state.alarmMinutes||30}分が経過しました`,snoozeMs,(state.alarmSound||"tone1")+".caf");
+                Notif.schedule(1001,"アラーム",`取り外しから${state.alarmMinutes||30}分が経過しました`,snoozeMs,(state.alarmSound||"tone1")+".caf",true);
               }}
               style={{width:"100%",padding:"14px",border:`1.5px solid ${T.soft}`,borderRadius:16,fontSize:15,fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",background:"transparent",color:T.text}}>
               スヌーズ
