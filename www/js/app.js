@@ -549,11 +549,11 @@ function App(){
   },[state,todayStr,todayDayStartMs,todayDayEndMs,update,setAlarmStopped,setSnoozedUntil]);
 
   const tabs=[
-    {id:"home",   icon:c=>Icons.home(c),    label:"ホーム"},
-    {id:"calendar",icon:c=>Icons.calendar(c),label:"カレンダー"},
-    {id:"photo",  icon:c=>Icons.camera(c),  label:"写真"},
-    {id:"timer",  icon:c=>Icons.timer(c),   label:"タイマー"},
-    {id:"stats",  icon:c=>Icons.chart(c),   label:"統計"},
+    {id:"home",   icon:c=>Icons.home(c),    label:t("tabHome")},
+    {id:"calendar",icon:c=>Icons.calendar(c),label:t("tabCalendar")},
+    {id:"photo",  icon:c=>Icons.camera(c),  label:t("tabPhoto")},
+    {id:"timer",  icon:c=>Icons.timer(c),   label:t("tabTimer")},
+    {id:"stats",  icon:c=>Icons.chart(c),   label:t("tabStats")},
   ];
 
   // オンボーディング未完了なら表示（全フックの後）
@@ -632,24 +632,24 @@ function App(){
             <div style={{display:"flex",justifyContent:"center",marginBottom:8}}>
               <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/></svg>
             </div>
-            <div className="mdtitle" style={{marginBottom:8}}>タイマー止め忘れでは？</div>
+            <div className="mdtitle" style={{marginBottom:8}}>{t("forgetAlert")}</div>
             <div style={{fontSize:15,color:T.text+"88",marginBottom:20,lineHeight:1.7}}>
-              取り外し中のタイマーが<br/>
+              {t("forgetMsg")}<br/>
               <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,color:T.primary,fontSize:16}}>
-                {Math.floor((Date.now()-(state.timerStart||Date.now()))/3600000)}時間以上
+                {Math.floor((Date.now()-(state.timerStart||Date.now()))/3600000)}{t("forgetHour").replace("時間以上動いています。","時間以上")}
               </span><br/>
-              動いています。
+              {LANG==="ja"?"動いています。":t("forgetHour")}
             </div>
             <div style={{display:"flex",flexDirection:"column",gap:8}}>
               <button className="btn bp" style={{width:"100%",padding:"12px"}}
                 onClick={()=>setShowForgetAlert(false)}>
-                このまま続ける
+                {t("keepGoing")}
               </button>
               <button style={{width:"100%",padding:"12px",border:"none",borderRadius:12,
                 background:T.soft,color:T.text,fontWeight:600,cursor:"pointer",
                 fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16}}
                 onClick={()=>{setShowForgetAlert(false);setTab("timer");}}>
-                タイマーページへ
+                {t("goTimer")}
               </button>
             </div>
           </div>
@@ -663,21 +663,21 @@ function App(){
             <div style={{marginBottom:8}}>
               <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3 2 6"/><path d="m22 6-3-3"/><path d="M6.38 18.7 4 21"/><path d="M17.64 18.67 20 21"/></svg>
             </div>
-            <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:20,fontWeight:700,color:T.primary,marginBottom:6}}>アラーム</div>
-            <div style={{fontSize:14,color:T.text+"88",marginBottom:28}}>取り外しから{state.alarmMinutes||30}分が経過しました</div>
+            <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:20,fontWeight:700,color:T.primary,marginBottom:6}}>{t("alarm")}</div>
+            <div style={{fontSize:14,color:T.text+"88",marginBottom:28}}>{t("tabTimer")}から{state.alarmMinutes||30}{t("alarmMsg")}</div>
             <button onClick={()=>{stopAlarmSound();Notif.cancel([1001]);setAlarmStopped(true);}}
               style={{width:"100%",padding:"16px",border:"none",borderRadius:16,fontSize:17,fontWeight:700,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",background:T.primary,color:"#fff",marginBottom:12}}>
-              アラーム停止
+              {t("alarmStop")}
             </button>
             <button onClick={()=>{
                 stopAlarmSound();
                 const snoozeMs=Date.now()+5*60*1000;
                 setSnoozedUntil(snoozeMs);
                 Notif.cancel([1001]);
-                Notif.schedule(1001,"アラーム",`取り外しから${state.alarmMinutes||30}分が経過しました`,snoozeMs,(state.alarmSound||"tone1")+".caf",true);
+                Notif.schedule(1001,t("alarm"),`取り外しから${state.alarmMinutes||30}分が経過しました`,snoozeMs,(state.alarmSound||"tone1")+".caf",true);
               }}
               style={{width:"100%",padding:"14px",border:`1.5px solid ${T.soft}`,borderRadius:16,fontSize:15,fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",background:"transparent",color:T.text}}>
-              スヌーズ
+              {t("snooze")}
             </button>
           </div>
         </div>

@@ -68,7 +68,15 @@ const defaultState = () => {
 
 // ── HELPERS ──────────────────────────────────────────────────────────────────
 const fmt = s => { if(s<0)s=0; return `${String(Math.floor(s/3600)).padStart(2,"0")}:${String(Math.floor((s%3600)/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`; };
-const fmtHM = s => { if(s<0)s=0; const h=Math.floor(s/3600),m=Math.floor((s%3600)/60); return h>0?`${h}時間${String(m).padStart(2,"0")}分`:`${m}分`; };
+const fmtHM = s => {
+  if(s<0)s=0;
+  const h=Math.floor(s/3600),m=Math.floor((s%3600)/60);
+  const lang=typeof LANG!=="undefined"?LANG:"ja";
+  if(lang==="ja") return h>0?`${h}時間${String(m).padStart(2,"0")}分`:`${m}分`;
+  if(lang==="ko") return h>0?`${h}시간 ${String(m).padStart(2,"0")}분`:`${m}분`;
+  if(lang==="zh") return h>0?`${h}小时${String(m).padStart(2,"0")}分`:`${m}分`;
+  return h>0?`${h}h ${String(m).padStart(2,"0")}m`:`${m}m`;
+};
 // DateオブジェクトをYYYY-MM-DDに変換（タイムゾーン問題回避）
 const dsFromDate = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 
