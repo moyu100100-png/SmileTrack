@@ -147,7 +147,7 @@
           schedule:{at:new Date(atMs)},
         };
         if(sound) notif.sound=sound;
-        if(isAlarm) notif.categoryIdentifier="ALARM_CATEGORY";
+        if(isAlarm) notif.actionTypeId="ALARM_CATEGORY";
         await LocalNotifications.schedule({notifications:[notif]});
       }catch(e){console.warn("通知エラー:",e);}
     },

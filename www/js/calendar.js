@@ -313,7 +313,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
               {isExpanded&&(
                 <div style={{background:T.accent+'0d',borderRadius:'0 0 10px 10px',paddingBottom:4}}>
 
-                  {selSessions.map(s=>{
+                  {[...selSessions].sort((a,b)=>(a.start||0)-(b.start||0)).map(s=>{
                     const hasRange=s.start&&s.end&&s.end>s.start
                       &&!(fmtTs(s.start)==='00:00'&&fmtTs(s.end)==='00:00');
                     const rangeStr=hasRange?fmtTs(s.start)+'〜'+fmtTs(s.end):'';

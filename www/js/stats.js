@@ -192,29 +192,29 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
               const h=maxSecs>0?(b.secs/maxSecs)*160:0;
               const achieved=b.secs>=target&&b.secs>0;
               const isSelected=selectedBar?.key===b.key;
-              const barW=period==="daily"?26:period==="weekly"?58:52;
+              const barW=period==="daily"?24:period==="weekly"?58:52;
               const labelColor = isSelected?T.primary:b.isToday?T.primary:T.text+"44";
               const labelWeight = (isSelected||b.isToday)?700:400;
               return(
-                <div key={i} style={{display:"flex",flexDirection:"column",alignItems:"center",width:barW,cursor:"pointer",flexShrink:0}}
+                <div key={i} style={{display:"flex",flexDirection:"column",alignItems:"center",width:barW,cursor:"pointer",flexShrink:0,margin:period==="daily"?"0 1px":"0"}}
                   onClick={()=>setSelectedBar(isSelected?null:b)}>
                   <div style={{height:160,display:"flex",alignItems:"flex-end",width:"100%",justifyContent:"center"}}>
                     <div style={{width:"72%",height:`${Math.max(2,h)}px`,background:b.secs===0?T.soft:achieved?T.primary:failCol,borderRadius:"3px 3px 0 0",opacity:(selectedBar&&!isSelected)?0.35:b.isToday?1:0.8,transition:"opacity .2s"}}/>
                   </div>
                   {/* ラベル: 棒グラフの下 */}
-                  <div style={{marginTop:3,textAlign:"center",lineHeight:1.4,maxWidth:barW}}>
+                  <div style={{marginTop:3,textAlign:"center",lineHeight:1.3,maxWidth:barW}}>
                     {period==="monthly" ? (
                       <>
-                        <div style={{fontSize:12,color:isSelected?T.accent:T.text+"55",fontWeight:isSelected?700:400}}>{b.year}年</div>
-                        <div style={{fontSize:13,color:labelColor,fontWeight:labelWeight}}>{b.month+1}月</div>
+                        <div style={{fontSize:11,color:isSelected?T.accent:T.text+"55",fontWeight:isSelected?700:400}}>{b.year}年</div>
+                        <div style={{fontSize:12,color:labelColor,fontWeight:labelWeight}}>{b.month+1}月</div>
                       </>
                     ) : period==="weekly" ? (
                       <>
-                        <div style={{fontSize:11,color:isSelected?T.accent:T.text+"55",fontWeight:isSelected?700:400}}>{b.yearLabel}</div>
-                        <div style={{fontSize:13,color:labelColor,fontWeight:labelWeight,whiteSpace:"pre-line",textAlign:"center",lineHeight:1.3}}>{b.label}</div>
+                        <div style={{fontSize:10,color:isSelected?T.accent:T.text+"55",fontWeight:isSelected?700:400}}>{b.yearLabel}</div>
+                        <div style={{fontSize:11,color:labelColor,fontWeight:labelWeight,whiteSpace:"nowrap",textAlign:"center"}}>{b.label.replace("\n","〜")}</div>
                       </>
                     ) : (
-                      <div style={{fontSize:13,color:labelColor,fontWeight:labelWeight}}>{b.label}</div>
+                      <div style={{fontSize:11,color:labelColor,fontWeight:labelWeight}}>{b.label}</div>
                     )}
                   </div>
                 </div>
@@ -297,9 +297,9 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
             </div>
           ) : (
             <div className="card">
-              <div className="ct">{period==="weekly"?"合計装着時間 1週間":"合計装着時間 1か月"}</div>
+              <div className="ct">{period==="weekly"?"週別 装着時間":"月別 装着時間"}</div>
               <div style={{maxHeight:260,overflowY:"auto"}}>
-                {[...bars].reverse().map(b=>{
+                {bars.map(b=>{
                   const isSelected=selectedBar?.key===b.key;
                   const total=period==="weekly"
                     ? (()=>{let t=0;const s=new Date(b.key+"T00:00:00");const e=new Date(b.endKey+"T00:00:00");for(let d=new Date(s);d<=e;d.setDate(d.getDate()+1))t+=effectiveLog[dsFromDate(new Date(d))]||0;return t;})()
