@@ -66,7 +66,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
       const mins=state.alarmMinutes||30;
       Notif.cancel([1001]);
       const alarmSound=(state.alarmSound||"tone1")+".caf";
-      Notif.schedule(1001,"アラーム",`取り外しから${mins}分が経過しました`,startMs+mins*60000,alarmSound,true);
+      Notif.schedule(1001,t("alarm"),`取り外しから${mins}分が経過しました`,startMs+mins*60000,alarmSound,true);
     }
     // 放置防止通知
     if(Notif.isCapacitor()&&state.forgetTimerAlert){
@@ -149,7 +149,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
 
         </div>
         <button onClick={onStartPress} style={{width:"100%",padding:"16px",border:"none",borderRadius:16,fontSize:17,fontWeight:700,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",background:timerRunning?T.accent:T.primary,color:"#fff",marginBottom:10}}>
-          {timerRunning?"装着":"▶ 取り外し開始"}
+          {timerRunning?t("attach"):t("startRemove")}
         </button>
 
         {/* アラーム行 - コンパクト */}
@@ -163,7 +163,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
                 const elapsed=Math.floor(runningMs/1000);
                 const remaining=newMins*60-elapsed;
                 Notif.cancel([1001]);
-                if(remaining>0) Notif.schedule(1001,"アラーム",`取り外しから${newMins}分が経過しました`,Date.now()+remaining*1000,(state.alarmSound||"tone1")+".caf",true);
+                if(remaining>0) Notif.schedule(1001,t("alarm"),`取り外しから${newMins}分が経過しました`,Date.now()+remaining*1000,(state.alarmSound||"tone1")+".caf",true);
               }
             }}>－</button>
             <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,fontSize:17,color:state.themeName==="ashviolet"?"#ffffff":T.accent,minWidth:28,textAlign:"center"}}>{state.alarmMinutes||30}</span>
@@ -175,7 +175,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
                 const elapsed=Math.floor(runningMs/1000);
                 const remaining=newMins*60-elapsed;
                 Notif.cancel([1001]);
-                if(remaining>0) Notif.schedule(1001,"アラーム",`取り外しから${newMins}分が経過しました`,Date.now()+remaining*1000,(state.alarmSound||"tone1")+".caf",true);
+                if(remaining>0) Notif.schedule(1001,t("alarm"),`取り外しから${newMins}分が経過しました`,Date.now()+remaining*1000,(state.alarmSound||"tone1")+".caf",true);
               }
             }}>＋</button>
             <button className="tg" style={{background:state.alarmEnabled?T.accent:T.soft+"aa"}} onClick={async()=>{
@@ -189,7 +189,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
                   const remaining=mins*60-elapsed;
                   if(remaining>0){
                     Notif.cancel([1001]);
-                    Notif.schedule(1001,"アラーム",`取り外しから${mins}分が経過しました`,Date.now()+remaining*1000,(state.alarmSound||"tone1")+".caf",true);
+                    Notif.schedule(1001,t("alarm"),`取り外しから${mins}分が経過しました`,Date.now()+remaining*1000,(state.alarmSound||"tone1")+".caf",true);
                   }
                 }
               } else {
@@ -296,12 +296,12 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
               </div>
               <label>理由</label>
               <div style={{display:'flex',flexWrap:'wrap',gap:8,marginBottom:14}}>
-                {[...getReasonList(state),"ー"].map(r=>(
-                  <button key={r} onClick={()=>setTimerEditSessReason(r==="ー"?"":r)}
+                {[...getReasonList(state),t("reasonNone")].map(r=>(
+                  <button key={r} onClick={()=>setTimerEditSessReason(r===t("reasonNone")?"":r)}
                     style={{padding:'10px 16px',borderRadius:20,
-                      border:`1.5px solid ${(timerEditSessReason===r||(r==="ー"&&!timerEditSessReason))?T.primary:T.soft}`,
-                      background:(timerEditSessReason===r||(r==="ー"&&!timerEditSessReason))?T.primary:'transparent',
-                      color:(timerEditSessReason===r||(r==="ー"&&!timerEditSessReason))?'#fff':T.text,
+                      border:`1.5px solid ${(timerEditSessReason===r||(r===t("reasonNone")&&!timerEditSessReason))?T.primary:T.soft}`,
+                      background:(timerEditSessReason===r||(r===t("reasonNone")&&!timerEditSessReason))?T.primary:'transparent',
+                      color:(timerEditSessReason===r||(r===t("reasonNone")&&!timerEditSessReason))?'#fff':T.text,
                       fontSize:15,fontWeight:600,cursor:'pointer',fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>
                     {r}
                   </button>

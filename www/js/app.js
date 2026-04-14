@@ -64,10 +64,10 @@ function OnboardingScreen({T,onComplete}){
   const TimerIcon=()=><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/></svg>;
 
   const steps=[
-    {icon:<CalIcon/>,   title:"矯正開始日"},
-    {icon:<ListIcon/>,  title:"マウスピース合計枚数"},
-    {icon:<RepeatIcon/>,title:"交換スケジュール"},
-    {icon:<TimerIcon/>, title:"装着目標時間"},
+    {icon:<CalIcon/>,   title:t("obStartDate")},
+    {icon:<ListIcon/>,  title:t("obTotalPieces")},
+    {icon:<RepeatIcon/>,title:t("obSchedule")},
+    {icon:<TimerIcon/>, title:t("obTarget")},
   ];
 
   const cardContent=()=>{
@@ -222,7 +222,7 @@ function OnboardingScreen({T,onComplete}){
             fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16,fontWeight:800,
             cursor:canNext()?"pointer":"default",letterSpacing:0.3,
             boxShadow:canNext()?`0 6px 20px ${T.primary}44`:"none",transition:"all 0.2s",marginBottom:4}}>
-          {step===3?"はじめる →":"次へ →"}
+          {step===3?t("start"):t("next")}
         </button>
         {step>0?(
           <button onClick={()=>setStep(s=>s-1)}

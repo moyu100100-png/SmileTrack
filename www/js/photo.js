@@ -57,7 +57,7 @@ function PinPad({T,title,onDone}){
   };
   return(
     <div>
-      <div style={{textAlign:"center",fontWeight:600,fontSize:16,marginBottom:4,color:error?T.accent:T.text}}>{error?"PINが違います":title}</div>
+      <div style={{textAlign:"center",fontWeight:600,fontSize:16,marginBottom:4,color:error?T.accent:T.text}}>{error?t("pinWrong"):title}</div>
       <div className="pin-dots">{[0,1,2,3].map(i=><div key={i} className={`pin-dot${val.length>i?" on":""}`} style={error?{borderColor:T.accent,background:T.accent}:{}}/>)}</div>
       <div className="pin-grid">
         {["1","2","3","4","5","6","7","8","9","","0","del"].map((k,i)=>

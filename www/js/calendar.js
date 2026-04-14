@@ -47,7 +47,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
   },[editSessFrom,editSessTo]);
 
   const ws = state.settings?.calendarWeekStart ?? 0;
-  const DOW = ws===0 ? ["日","月","火","水","木","金","土"] : ["月","火","水","木","金","土","日"];
+  const DOW = ws===0 ? [[t("sun"),t("mon"),t("tue"),t("wed"),t("thu"),t("fri"),t("sat")]] : ["月","火","水","木","金","土","日"];
 
   const firstDow = ((new Date(vy,vm,1).getDay() - ws + 7) % 7);
   const lastDate = new Date(vy,vm+1,0).getDate();

@@ -177,7 +177,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
   return(
     <div style={{padding:12}}>
       <div style={{display:"flex",gap:2,background:T.card,borderRadius:12,padding:4,marginBottom:10}}>
-        {[["daily","毎日"],["weekly","毎週"],["monthly","毎月"]].map(([v,l])=>(
+        {[["daily",t("daily")],["weekly",t("weekly")],["monthly",t("monthly")]].map(([v,l])=>(
           <button key={v} className={`stats-tab${period===v?" on":""}`} onClick={()=>setPeriod(v)}>{l}</button>
         ))}
       </div>
@@ -248,15 +248,15 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
               ? (period==="daily" ? activeBar.key : period==="weekly" ? activeBar.label : `${activeBar.year}年${activeBar.month+1}月`)
               : null;
             const titleStr = isDefault && period==="daily"
-              ? "取り外し内訳 (今日)"
-              : labelStr ? `取り外し内訳 (${labelStr})` : "取り外し内訳";
+              ? t("todayBreakdown")
+              : labelStr ? `取り外し内訳 (${labelStr})` : t("breakdownTab");
             return Object.keys(bd).length>0 ? (
               <div>
                 {period==="daily"&&selectedBar&&(
                   <div className="card" style={{marginBottom:10,textAlign:"center"}}>
                     <div style={{fontSize:12,color:T.text+"66",marginBottom:4}}>{selectedBar.key} 装着時間</div>
                     <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:24,fontWeight:700,color:(effectiveLog[selectedBar.key]||0)>=target?T.primary:failCol}}>
-                      {effectiveLog[selectedBar.key]?fmt(effectiveLog[selectedBar.key]):"記録なし"}
+                      {effectiveLog[selectedBar.key]?fmt(effectiveLog[selectedBar.key]):t("noRecord")}
                     </div>
                   </div>
                 )}
@@ -297,7 +297,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
             </div>
           ) : (
             <div className="card">
-              <div className="ct">{period==="weekly"?"週別 装着時間":"月別 装着時間"}</div>
+              <div className="ct">{period==="weekly"?t("weeklyWear"):t("monthlyWear")}</div>
               <div style={{maxHeight:260,overflowY:"auto"}}>
                 {bars.map(b=>{
                   const isSelected=selectedBar?.key===b.key;
@@ -308,7 +308,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
                   return(
                     <div key={b.key} className="wr" style={{background:isSelected?T.soft:"transparent",borderRadius:8,cursor:"pointer"}} onClick={()=>setSelectedBar(isSelected?null:b)}>
                       <span style={{fontSize:13,fontWeight:isSelected?700:400,color:isSelected?T.primary:T.text,whiteSpace:"pre-line",lineHeight:1.4,flex:1}}>{period==="weekly"?b.label:`${parseInt(b.key.split("-")[1])+1}月`}</span>
-                      <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,color:total===0?T.text+"44":achieved?T.primary:failCol,fontSize:14,flexShrink:0}}>{total===0?"記録なし":fmt(total)}</span>
+                      <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,color:total===0?T.text+"44":achieved?T.primary:failCol,fontSize:14,flexShrink:0}}>{total===0?t("noRecord"):fmt(total)}</span>
                     </div>
                   );
                 })}

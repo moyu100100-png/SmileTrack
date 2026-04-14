@@ -135,18 +135,18 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
             </div>
           ))}
         </div>
-        <button className="btn bp" style={{width:"100%",marginBottom:10,padding:"14px",fontSize:15}} onClick={()=>handlePurchase("coffee")} disabled={loading}>{loading?"処理中…":"差し入れる ☕ ¥120"}</button>
+        <button className="btn bp" style={{width:"100%",marginBottom:10,padding:"14px",fontSize:15}} onClick={()=>handlePurchase("coffee")} disabled={loading}>{loading?t("loading"):t("coffeeBuy")}</button>
         <button className="btn bs" style={{width:"100%"}} onClick={onClose}>閉じる</button>
       </div>
     </div>
   );
   const plans=[
-    {id:"monthly", label:"月額プラン", price:"¥450", sub:"月額", badge:null, desc:"いつでもキャンセル可能"},
-    {id:"yearly",  label:"年額プラン", price:"¥4,800", sub:"年額", badge:"おすすめ", desc:"月換算 ¥400 お得！"},
-    {id:"lifetime",label:"買い切りプラン", price:"¥10,000", sub:"一括", badge:null, desc:"永久に全機能使い放題"},
+    {id:"monthly", label:t("monthly"), price:"¥450", sub:"月額", badge:null, desc:"いつでもキャンセル可能"},
+    {id:"yearly",  label:t("yearly"), price:"¥4,800", sub:"年額", badge:t("recommended"), desc:"月換算 ¥400 お得！"},
+    {id:"lifetime",label:t("lifetime"), price:"¥10,000", sub:"一括", badge:null, desc:"永久に全機能使い放題"},
   ];
   const extras=[
-    {id:"no_ads", label:"広告削除", price:"¥200", desc:"一度購入したら広告が永久に非表示"},
+    {id:"no_ads", label:t("noAds"), price:"¥200", desc:"一度購入したら広告が永久に非表示"},
   ];
 
   if(thankYou) return(
@@ -830,7 +830,7 @@ function BackupModal({T,state,onImport,onClose}){
         <div style={{borderTop:`1px solid ${T.soft}`,marginTop:16,paddingTop:16}}>
           <div style={{fontSize:13,fontWeight:700,color:T.accent,marginBottom:8}}>購入の復元</div>
           <div style={{fontSize:12,color:T.text+"77",marginBottom:10}}>機種変更後などに購入済みのプランを復元できます</div>
-          <button className="btn bs blg" style={{width:"100%"}} onClick={handleRestore} disabled={loading}>{loading?"処理中…":"購入を復元する"}</button>
+          <button className="btn bs blg" style={{width:"100%"}} onClick={handleRestore} disabled={loading}>{loading?t("loading"):"購入を復元する"}</button>
         </div>
         {errorMsg&&<div style={{fontSize:12,color:"#D4445A",textAlign:"center",margin:"8px 0",lineHeight:1.6}}>{errorMsg}</div>}
         <button className="btn bs" style={{width:"100%",marginTop:12}} onClick={onClose}>閉じる</button>
