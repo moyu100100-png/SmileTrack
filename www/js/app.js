@@ -144,7 +144,7 @@ function OnboardingScreen({T,onComplete}){
 
   // 完了画面
   if(step===4) return(
-    <div style={{position:"fixed",inset:0,background:T.bg,display:"flex",flexDirection:"column",padding:"52px 26px 36px",zIndex:9999}}>
+    <div style={{position:"fixed",inset:0,background:T.bg,display:"flex",flexDirection:"column",padding:"77px 26px 36px",zIndex:9999}}>
       <Header allDone={true}/>
       {/* Step行（fontSize:12 + marginTop:8 ≒ 28px）分の空白 */}
       <div style={{height:28,flexShrink:0}}/>
@@ -193,7 +193,7 @@ function OnboardingScreen({T,onComplete}){
 
   // 入力画面（step 0-3）
   return(
-    <div style={{position:"fixed",inset:0,background:T.bg,display:"flex",flexDirection:"column",padding:"52px 26px 36px",zIndex:9999}}>
+    <div style={{position:"fixed",inset:0,background:T.bg,display:"flex",flexDirection:"column",padding:"77px 26px 36px",zIndex:9999}}>
       <Header/>
 
       {/* カード（height:320固定） */}
@@ -269,17 +269,19 @@ function App(){
   const [showResetConfirm,setShowResetConfirm]=useState(false);
   const [showAffiliatePopup,setShowAffiliatePopup]=useState(false);
   const [snoozedUntil,setSnoozedUntil]=useState(null);
-  const [alarmStopped,setAlarmStopped]=useState(false);
+  const alarmStopped=state.alarmStopped||false;
+  const setAlarmStopped=(v)=>update({alarmStopped:v});
 
-  // AdMob初期化
+  // AdMob初期化（オンボーディング完了後のみ）
   useEffect(()=>{
     (async()=>{
       if(state.isPremium||state.noAds) return;
+      if(!state.onboardingDone) return;
       await AdMobHelper.initialize();
       await AdMobHelper.prepareInterstitial();
       await AdMobHelper.showBanner();
     })();
-  },[]);
+  },[state.onboardingDone]);
 
   // RevenueCat初期化
   useEffect(()=>{
@@ -508,7 +510,7 @@ function App(){
   const handleRemoveButton=useCallback(async(runningMs)=>{
     if(!state.timerRunning){
       const startMs=Date.now();
-      update({timerRunning:true,timerStart:startMs,timerElapsed:0});
+      update({timerRunning:true,timerStart:startMs,timerElapsed:0,alarmStopped:false});
       // 通知許可を確認・リクエスト
       if(Notif.isCapacitor()){
         const granted=await Notif.checkPermission();
