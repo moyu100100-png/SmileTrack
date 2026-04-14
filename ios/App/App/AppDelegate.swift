@@ -9,7 +9,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         UNUserNotificationCenter.current().delegate = self
 
-        // アラーム通知カテゴリ（停止・スヌーズボタン）を登録
         let stopAction = UNNotificationAction(
             identifier: "ALARM_STOP",
             title: "アラーム停止",
@@ -57,22 +56,14 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void) {
         let actionId = response.actionIdentifier
-        
-        if actionId == "ALARM_STOP" {
+
+        if actionId == "ALARM_STOP" || actionId == "ALARM_SNOOZE" {
+            let action = actionId == "ALARM_STOP" ? "stop" : "snooze"
             DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: NSNotification.Name("AlarmAction"),
-                    object: nil,
-                    userInfo: ["action": "stop"]
-                )
-            }
-        } else if actionId == "ALARM_SNOOZE" {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(
-                    name: NSNotification.Name("AlarmAction"),
-                    object: nil,
-                    userInfo: ["action": "snooze"]
-                )
+                if let webView = (self.window?.rootViewController as? CAPBridgeViewController)?.webView {
+                    let js = "window.dispatchEvent(new CustomEvent('AlarmAction', {detail: {action: '\(action)'}}))"
+                    webView.evaluateJavaScript(js, completionHandler: nil)
+                }
             }
         }
         completionHandler()
