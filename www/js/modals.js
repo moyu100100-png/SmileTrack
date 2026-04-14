@@ -121,12 +121,21 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
     finally{ setLoading(false); }
   };
   if(showCoffee&&!thankYou) return(
-    <div className="mo" onClick={onClose}>
-      <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center"}}>
-        <div style={{fontSize:40,marginBottom:8}}>☕</div>
-        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16,fontWeight:700,color:T.primary,marginBottom:6}}>開発者にコーヒーを差し入れ</div>
-        <div style={{fontSize:13,color:T.text+"88",marginBottom:20}}>開発継続の大きな励みになります</div>
-        <button className="btn bp" style={{width:"100%",marginBottom:8}} onClick={()=>handlePurchase("coffee")} disabled={loading}>{loading?"処理中…":"差し入れる ☕"}</button>
+    <div className="mo" onClick={onClose} style={{alignItems:"center",justifyContent:"center"}}>
+      <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,width:"90%",maxWidth:400,textAlign:"center"}}>
+        <div style={{fontSize:48,marginBottom:12}}>☕</div>
+        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:700,color:T.primary,marginBottom:6}}>開発者にコーヒーを差し入れ</div>
+        <div style={{fontSize:13,color:T.text+"88",marginBottom:20,lineHeight:1.7}}>
+          このアプリが役に立っていたら、<br/>コーヒー1杯分のサポートをいただけると<br/>開発の大きな励みになります 🙏
+        </div>
+        <div style={{background:T.soft,borderRadius:12,padding:"10px 14px",marginBottom:20,textAlign:"left"}}>
+          {["広告なしで使い続けられます","新機能の開発が続きます","開発者がコーヒーを飲めます☕"].map((f,i)=>(
+            <div key={i} style={{display:"flex",alignItems:"center",gap:8,padding:"4px 0",fontSize:13,color:T.text}}>
+              <span style={{color:T.primary,fontWeight:700,flexShrink:0}}>✓</span>{f}
+            </div>
+          ))}
+        </div>
+        <button className="btn bp" style={{width:"100%",marginBottom:10,padding:"14px",fontSize:15}} onClick={()=>handlePurchase("coffee")} disabled={loading}>{loading?"処理中…":"差し入れる ☕ ¥120"}</button>
         <button className="btn bs" style={{width:"100%"}} onClick={onClose}>閉じる</button>
       </div>
     </div>
@@ -406,27 +415,7 @@ function TimerSettingsModal({T,state,onSave,onClose}){
         {/* アラームサウンド選択 */}
         {(()=>{
           const [soundOpen,setSoundOpen]=React.useState(false);
-          const [playingId,setPlayingId]=React.useState(null);
           const cur=ALARM_SOUNDS.find(s=>s.id===alarmSound)||ALARM_SOUNDS[0];
-          const handlePlay=(id)=>{
-            if(playingId===id){
-              stopAlarmSound();
-              setPlayingId(null);
-            } else {
-              stopAlarmSound();
-              // 1回のみ再生
-              try{
-                if(_currentAudio){_currentAudio.pause();_currentAudio.currentTime=0;}
-                const audio=new Audio("sounds/"+id+".mp3");
-                audio.volume=1.0;
-                audio.loop=false;
-                _currentAudio=audio;
-                audio.play().catch(e=>console.warn("Audio play error:",e));
-                audio.onended=()=>{setPlayingId(null);_currentAudio=null;};
-                setPlayingId(id);
-              }catch(e){console.warn("Audio error:",e);}
-            }
-          };
           return(
             <div style={{marginTop:16}}>
               <div style={{fontSize:13,fontWeight:700,color:T.accent,marginBottom:6,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>アラームサウンド</div>
@@ -448,12 +437,9 @@ function TimerSettingsModal({T,state,onSave,onClose}){
                         <div style={{fontSize:11,color:T.text+"66"}}>{s.desc}</div>
                       </div>
                       <button
-                        onClick={e=>{e.stopPropagation();handlePlay(s.id);}}
-                        style={{background:playingId===s.id?T.accent:T.primary,border:"none",borderRadius:20,width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,marginLeft:8}}>
-                        {playingId===s.id
-                          ? <svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-                          : <svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><polygon points="5,3 19,12 5,21"/></svg>
-                        }
+                        onClick={e=>{e.stopPropagation();playAlarmSound(s.id);}}
+                        style={{background:T.primary,border:"none",borderRadius:20,width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,marginLeft:8}}>
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><polygon points="5,3 19,12 5,21"/></svg>
                       </button>
                     </div>
                   ))}

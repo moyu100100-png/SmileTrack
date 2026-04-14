@@ -571,7 +571,7 @@ function App(){
       <style>{makeCSS(T)}</style>
       <div className="app">
         <div className="hdr">
-          <button className="ham" onClick={()=>setDrawerOpen(true)}>{Icons.menu(T.primary,18)}</button>
+          <button className="ham" onClick={()=>{setDrawerOpen(true);if(!state.isPremium&&!state.noAds)AdMobHelper.hideBanner();}}>{Icons.menu(T.primary,18)}</button>
           <div style={{textAlign:"center"}}><div className="htitle" style={{fontSize:18}}>SmileTrack</div></div>
           <div style={{width:32}}/>
         </div>
