@@ -126,17 +126,10 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
         <div style={{fontSize:48,marginBottom:12}}>☕</div>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:700,color:T.primary,marginBottom:6}}>開発者にコーヒーを差し入れ</div>
         <div style={{fontSize:13,color:T.text+"88",marginBottom:20,lineHeight:1.7}}>
-          このアプリが役に立っていたら、<br/>コーヒー1杯分のサポートをいただけると<br/>開発の大きな励みになります 🙏
+          SmileTrackの運営は<br/>広告とプレミアム会員様によって支えられています。<br/>アプリの継続と新機能の開発のため<br/>コーヒー1杯分のサポートをいただけると<br/>大きな励みになります🙏
         </div>
-        <div style={{background:T.soft,borderRadius:12,padding:"10px 14px",marginBottom:20,textAlign:"left"}}>
-          {["広告なしで使い続けられます","新機能の開発が続きます","開発者がコーヒーを飲めます☕"].map((f,i)=>(
-            <div key={i} style={{display:"flex",alignItems:"center",gap:8,padding:"4px 0",fontSize:13,color:T.text}}>
-              <span style={{color:T.primary,fontWeight:700,flexShrink:0}}>✓</span>{f}
-            </div>
-          ))}
-        </div>
-        <button className="btn bp" style={{width:"100%",marginBottom:10,padding:"14px",fontSize:15}} onClick={()=>handlePurchase("coffee")} disabled={loading}>{loading?t("loading"):t("coffeeBuy")}</button>
-        <button className="btn bs" style={{width:"100%"}} onClick={onClose}>閉じる</button>
+        <button className="btn bp" style={{width:"100%",marginBottom:10,padding:"14px",fontSize:15}} onClick={()=>handlePurchase("coffee")} disabled={loading}>{loading?t("loading"):"差し入れる　¥120"}</button>
+        <button className="btn bs" style={{width:"100%",padding:"14px",fontSize:15}} onClick={onClose}>閉じる</button>
       </div>
     </div>
   );
@@ -172,7 +165,7 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
 
         {/* 機能一覧 */}
         <div style={{background:T.soft,borderRadius:12,padding:"10px 14px",marginBottom:16}}>
-          {["写真スロット2・比較機能","カラーテーマ全種類","PDF月次レポート出力","取り外し理由カスタマイズ","PINロック","広告永久削除","写真ウォーターマーク削除"].map((f,i)=>(
+          {["カラーテーマ全種類","PDF月次レポート出力","取り外し理由カスタマイズ","写真スロット2解放・比較機能","PINロック機能解放","写真ウォーターマーク削除","広告永久削除"].map((f,i)=>(
             <div key={i} style={{display:"flex",alignItems:"center",gap:8,padding:"4px 0",fontSize:13,color:T.text}}>
               <span style={{color:T.primary,fontWeight:700,flexShrink:0}}>✓</span>{f}
             </div>
