@@ -68,7 +68,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
         const endDs=dsFromDate(end);
         const year=start.getFullYear();
         const rangeLabel=`${start.getMonth()+1}/${start.getDate()}〜\n${end.getMonth()+1}/${end.getDate()}`;
-        bars.push({key:startDs,endKey:endDs,label:rangeLabel,yearLabel:`${year}`,secs:avgSecs,isPast:true,isToday:startDs===thisWeekDs});
+        bars.push({key:startDs,endKey:endDs,label:rangeLabel,yearLabel:`${year}`,secs:avgSecs,totalSecs:total,days:7,isPast:true,isToday:startDs===thisWeekDs});
       }
       return bars;
     } else {
@@ -83,7 +83,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
           if(effectiveLog[ds]){total+=effectiveLog[ds];cnt++;}
         }
         const avgSecs=cnt>0?Math.floor(total/cnt):0;
-        bars.push({key:`${y}-${m}`,endKey:`${y}-${m}`,label:`${y}年${m+1}月`,secs:avgSecs,isPast:true,isToday:(y===ty&&m===tm),year:y,month:m});
+        bars.push({key:`${y}-${m}`,endKey:`${y}-${m}`,label:`${y}年${m+1}月`,secs:avgSecs,totalSecs:total,days:daysInMonth,isPast:true,isToday:(y===ty&&m===tm),year:y,month:m});
         if(y===ty&&m===tm) break;
         m++;if(m>11){m=0;y++;}
       }
@@ -190,7 +190,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
           <div style={{display:"flex",alignItems:"flex-end",gap:period==="monthly"?10:period==="weekly"?6:4,padding:"8px 8px 0",minWidth:"max-content"}}>
             {bars.map((b,i)=>{
               const h=maxSecs>0?(b.secs/maxSecs)*160:0;
-              const achieved=b.secs>=target&&b.secs>0;
+              const achieved=period==="daily" ? (b.secs>=target&&b.secs>0) : (b.totalSecs!=null ? b.totalSecs>=(target*(b.days||1)) : b.secs>=target&&b.secs>0);
               const isSelected=selectedBar?.key===b.key;
               const barW=period==="daily"?24:period==="weekly"?58:52;
               const labelColor = isSelected?T.primary:b.isToday?T.primary:T.text+"44";
@@ -320,7 +320,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
 
       {showReportModal&&<ReportModal T={T} state={state} onClose={()=>setShowReportModal(false)}/>}
       {showReportPreview&&(
-        <div className="mo" onClick={()=>setShowReportPreview(false)}>
+        <div className="mo" onClick={()=>setShowReportPreview(false)} style={{alignItems:"center",justifyContent:"center"}}>
           <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center",position:"relative"}}>
             <button onClick={()=>setShowReportPreview(false)} style={{position:"absolute",top:8,right:8,background:"none",border:"none",cursor:"pointer",fontSize:20,color:T.text+"66",lineHeight:1,padding:4}}>✕</button>
             <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:15,fontWeight:700,color:T.primary,marginBottom:4}}>レポートプレビュー</div>
