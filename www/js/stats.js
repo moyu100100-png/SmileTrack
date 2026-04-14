@@ -298,16 +298,17 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
           ) : (
             <div className="card">
               <div className="ct">{period==="weekly"?t("weeklyWear"):t("monthlyWear")}</div>
-              <div style={{maxHeight:260,overflowY:"auto"}}>
+              <div>
                 {bars.map(b=>{
                   const isSelected=selectedBar?.key===b.key;
                   const total=period==="weekly"
                     ? (()=>{let t=0;const s=new Date(b.key+"T00:00:00");const e=new Date(b.endKey+"T00:00:00");for(let d=new Date(s);d<=e;d.setDate(d.getDate()+1))t+=effectiveLog[dsFromDate(new Date(d))]||0;return t;})()
                     : (()=>{const parts=b.key.split("-");const y=parseInt(parts[0]),m=parseInt(parts[1]);let t=0;const days=new Date(y,m+1,0).getDate();for(let day=1;day<=days;day++)t+=effectiveLog[dsFromDate(new Date(y,m,day))]||0;return t;})();
                   const achieved=total>0&&total>=target*(period==="weekly"?7:new Date(parseInt(b.key.split("-")[0]),parseInt(b.key.split("-")[1])+1,0).getDate());
+                  const weekLabel=period==="weekly"?b.label.replace(/〜?\n/,"〜"):"";
                   return(
                     <div key={b.key} className="wr" style={{background:isSelected?T.soft:"transparent",borderRadius:8,cursor:"pointer"}} onClick={()=>setSelectedBar(isSelected?null:b)}>
-                      <span style={{fontSize:13,fontWeight:isSelected?700:400,color:isSelected?T.primary:T.text,whiteSpace:"nowrap",lineHeight:1.4,flex:1}}>{period==="weekly"?b.label.replace("\n","〜"):`${parseInt(b.key.split("-")[1])+1}月`}</span>
+                      <span style={{fontSize:13,fontWeight:isSelected?700:400,color:isSelected?T.primary:T.text,whiteSpace:"nowrap",lineHeight:1.4,flex:1}}>{period==="weekly"?weekLabel:`${parseInt(b.key.split("-")[1])+1}月`}</span>
                       <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,color:total===0?T.text+"44":achieved?T.primary:failCol,fontSize:14,flexShrink:0}}>{total===0?t("noRecord"):fmt(total)}</span>
                     </div>
                   );
