@@ -211,7 +211,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
                     ) : period==="weekly" ? (
                       <>
                         <div style={{fontSize:10,color:isSelected?T.accent:T.text+"55",fontWeight:isSelected?700:400}}>{b.yearLabel}</div>
-                        <div style={{fontSize:11,color:labelColor,fontWeight:labelWeight,whiteSpace:"nowrap",textAlign:"center"}}>{b.label.replace("\n","〜")}</div>
+                        <div style={{fontSize:11,color:labelColor,fontWeight:labelWeight,whiteSpace:"pre-line",textAlign:"center",lineHeight:1.3}}>{b.label}</div>
                       </>
                     ) : (
                       <div style={{fontSize:11,color:labelColor,fontWeight:labelWeight}}>{b.label}</div>
@@ -307,7 +307,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
                   const achieved=total>0&&total>=target*(period==="weekly"?7:new Date(parseInt(b.key.split("-")[0]),parseInt(b.key.split("-")[1])+1,0).getDate());
                   return(
                     <div key={b.key} className="wr" style={{background:isSelected?T.soft:"transparent",borderRadius:8,cursor:"pointer"}} onClick={()=>setSelectedBar(isSelected?null:b)}>
-                      <span style={{fontSize:13,fontWeight:isSelected?700:400,color:isSelected?T.primary:T.text,whiteSpace:"pre-line",lineHeight:1.4,flex:1}}>{period==="weekly"?b.label:`${parseInt(b.key.split("-")[1])+1}月`}</span>
+                      <span style={{fontSize:13,fontWeight:isSelected?700:400,color:isSelected?T.primary:T.text,whiteSpace:"nowrap",lineHeight:1.4,flex:1}}>{period==="weekly"?b.label.replace("\n","〜"):`${parseInt(b.key.split("-")[1])+1}月`}</span>
                       <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,color:total===0?T.text+"44":achieved?T.primary:failCol,fontSize:14,flexShrink:0}}>{total===0?t("noRecord"):fmt(total)}</span>
                     </div>
                   );
