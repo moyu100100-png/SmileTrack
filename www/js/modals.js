@@ -86,6 +86,29 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
   const [loading,setLoading]=React.useState(false);
   const [errorMsg,setErrorMsg]=React.useState(null);
   const [selectedPlan,setSelectedPlan]=React.useState("yearly");
+  const [prices,setPrices]=React.useState({});
+
+  // RevenueCatから実際の価格を取得
+  React.useEffect(()=>{
+    (async()=>{
+      try{
+        if(!Purchases._isNative()) return;
+        const offerings=await Capacitor.Plugins.Purchases.getOfferings();
+        const pkgs=offerings?.current?.availablePackages||[];
+        const p={};
+        pkgs.forEach(pkg=>{
+          const id=pkg.product?.identifier;
+          const price=pkg.product?.priceString;
+          if(id&&price){
+            Object.entries(RC_PRODUCTS).forEach(([key,val])=>{
+              if(val===id) p[key]=price;
+            });
+          }
+        });
+        if(Object.keys(p).length>0) setPrices(p);
+      }catch(e){ console.warn("[RC] getOfferings error",e); }
+    })();
+  },[]);
 
   const handlePurchase=async(productKey)=>{
     setErrorMsg(null);
@@ -128,18 +151,18 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
         <div style={{fontSize:13,color:T.text+"88",marginBottom:20,lineHeight:1.7}}>
           SmileTrackの運営は<br/>広告とプレミアム会員様によって支えられています。<br/>アプリの継続と新機能の開発のため<br/>コーヒー1杯分のサポートをいただけると<br/>大きな励みになります🙏
         </div>
-        <button className="btn bp" style={{width:"100%",marginBottom:10,padding:"14px",fontSize:15}} onClick={()=>handlePurchase("coffee")} disabled={loading}>{loading?t("loading"):"差し入れる　¥120"}</button>
+        <button className="btn bp" style={{width:"100%",marginBottom:10,padding:"14px",fontSize:15}} onClick={()=>handlePurchase("coffee")} disabled={loading}>{loading?t("loading"):`差し入れる　${prices.coffee||"¥120"}`}</button>
         <button className="btn bs" style={{width:"100%",padding:"14px",fontSize:15}} onClick={onClose}>閉じる</button>
       </div>
     </div>
   );
   const plans=[
-    {id:"monthly", label:t("monthly"), price:"¥450", sub:"月額", badge:null, desc:"いつでもキャンセル可能"},
-    {id:"yearly",  label:t("yearly"), price:"¥4,800", sub:"年額", badge:t("recommended"), desc:"月換算 ¥400 お得！"},
-    {id:"lifetime",label:t("lifetime"), price:"¥10,000", sub:"一括", badge:null, desc:"永久に全機能使い放題"},
+    {id:"monthly", label:t("monthlyPlan"), price:prices.monthly||t("monthlyPrice"), sub:"月額", badge:null, desc:t("monthlyDesc")},
+    {id:"yearly",  label:t("yearly"), price:prices.yearly||t("yearlyPrice"), sub:"年額", badge:t("recommended"), desc:t("yearlyDesc")},
+    {id:"lifetime",label:t("lifetime"), price:prices.lifetime||t("lifetimePrice"), sub:"一括", badge:null, desc:t("lifetimeDesc")},
   ];
   const extras=[
-    {id:"no_ads", label:t("noAds"), price:"¥200", desc:"一度購入したら広告が永久に非表示"},
+    {id:"no_ads", label:t("noAds"), price:prices.no_ads||t("noAdsPrice"), desc:t("noAdsDesc")},
   ];
 
   if(thankYou) return(
