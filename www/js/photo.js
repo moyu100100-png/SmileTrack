@@ -252,7 +252,7 @@ function PhotoPage({T,state,update,todayStr}){
             <div className="ct" style={{margin:0,fontSize:14}}>フォトアルバム</div>
             {!isLocked&&(isPremium?(
               <button className={`btn bsm ${compareMode?"bp":"bs"}`} onClick={()=>{setCompareMode(v=>!v);setComparePick([]);}} style={{fontSize:11}}>
-                {compareMode?"キャンセル":"比較"}
+                {compareMode?t("cancel"):"比較"}
               </button>
             ):(
               <button className="btn bsm bs" style={{fontSize:11,opacity:0.6}} onClick={()=>setShowComparePreview(true)}>🔒比較</button>
@@ -276,7 +276,7 @@ function PhotoPage({T,state,update,todayStr}){
             ))}
           </div>
           {compareMode&&<div style={{fontSize:12,color:T.accent,marginBottom:8,fontWeight:600}}>
-            {comparePick.length===0?"1枚目を選択してください":comparePick.length===1?"2枚目を選択してください（同じスロットの写真）":""}
+            {comparePick.length===0?t("select1st"):comparePick.length===1?t("select2nd"):""}
           </div>}
           {filtered.length===0
             ?<div style={{textAlign:"center",color:T.text+"55",padding:"22px 0",fontSize:14}}>まだ写真がありません</div>
@@ -440,7 +440,7 @@ function PhotoPage({T,state,update,todayStr}){
                 <img src={captured} alt="" style={{width:"100%",objectFit:"contain",maxHeight:"55dvh"}}/>
               </div>
               <div style={{padding:14,background:"#111",flexShrink:0}}>
-                <input value={capComment} onChange={e=>setCapComment(e.target.value)} placeholder="コメントを入力…" style={{background:"#222",color:"#fff",border:"1px solid #444",borderRadius:10,marginBottom:6}}/>
+                <input value={capComment} onChange={e=>setCapComment(e.target.value)} placeholder=t("comment") style={{background:"#222",color:"#fff",border:"1px solid #444",borderRadius:10,marginBottom:6}}/>
                 <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
                   <span style={{color:"#aaa",fontSize:13,flexShrink:0}}># マウスピース番号</span>
                   <select value={capPiece||""} onChange={e=>setCapPiece(e.target.value?parseInt(e.target.value):null)}
@@ -573,7 +573,7 @@ function PhotoPage({T,state,update,todayStr}){
             {/* コメント */}
             <label>コメント</label>
             <input value={albumMeta.comment} onChange={e=>setAlbumMeta(v=>({...v,comment:e.target.value}))}
-              placeholder="コメントを入力…" style={{marginBottom:10}}/>
+              placeholder=t("comment") style={{marginBottom:10}}/>
 
             {/* マウスピース番号 */}
             <label>マウスピース番号</label>
@@ -645,7 +645,7 @@ function PhotoPage({T,state,update,todayStr}){
         </div>
       )}
       {showComparePreview&&<ComparePreviewModal T={T} onClose={()=>setShowComparePreview(false)}/>}
-      {showSetPin&&(<div className="mo" onClick={()=>setShowSetPin(false)}><div className="md" onClick={e=>e.stopPropagation()}><div className="mdtitle">アルバムをロック</div>{state.photoLockEnabled?<><div style={{fontSize:14,color:T.text+"88",marginBottom:12}}>解除するにはPINを入力してください</div><PinPad T={T} title="PINを入力" onDone={p=>{if(p===state.photoLock){update({photoLockEnabled:false,photoLock:null});setUnlocked(false);setShowSetPin(false);}else alert("PINが違います");}}/></>:<PinPad T={T} title="PINを設定（4桁）" onDone={p=>{update({photoLock:p,photoLockEnabled:true});alert("PINを設定しました");setShowSetPin(false);}}/>}<button className="btn bs" style={{width:"100%",marginTop:10}} onClick={()=>setShowSetPin(false)}>キャンセル</button></div></div>)}
+      {showSetPin&&(<div className="mo" onClick={()=>setShowSetPin(false)}><div className="md" onClick={e=>e.stopPropagation()}><div className="mdtitle">アルバムをロック</div>{state.photoLockEnabled?<><div style={{fontSize:14,color:T.text+"88",marginBottom:12}}>解除するにはPINを入力してください</div><PinPad T={T} title="PINを入力" onDone={p=>{if(p===state.photoLock){update({photoLockEnabled:false,photoLock:null});setUnlocked(false);setShowSetPin(false);}else alert("PINが違います");}}/></>:<PinPad T={T} title=t("pinSet") onDone={p=>{update({photoLock:p,photoLockEnabled:true});alert("PINを設定しました");setShowSetPin(false);}}/>}<button className="btn bs" style={{width:"100%",marginTop:10}} onClick={()=>setShowSetPin(false)}>キャンセル</button></div></div>)}
     </div>
   );
 }
