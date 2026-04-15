@@ -298,7 +298,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
           ) : (
             <div className="card">
               <div className="ct">{period==="weekly"?t("weeklyWear"):t("monthlyWear")}</div>
-              <div>
+              <div style={{maxHeight:260,overflowY:"auto"}}>
                 {bars.map(b=>{
                   const isSelected=selectedBar?.key===b.key;
                   const total=period==="weekly"

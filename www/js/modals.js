@@ -20,7 +20,7 @@ function showToast(msg, duration=2000){
 function HomePreviewModal({T,themeName,themeObj,onClose}){
   const svg=makeHomeSVG(themeObj);
   return(
-    <div className="mo" onClick={onClose} style={{alignItems:"center",justifyContent:"center"}}>
+    <div className="mo" onClick={onClose}>
       <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center"}}>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:15,fontWeight:700,color:T.primary,marginBottom:4}}>
           プレビュー
@@ -62,8 +62,8 @@ function AboutModal({T,onClose}){
     </div>
   );
   return(
-    <div className="mo" onClick={onClose} style={{alignItems:"center",justifyContent:"center"}}>
-      <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:480}}>
+    <div className="mo" onClick={onClose}>
+      <div className="md" onClick={e=>e.stopPropagation()}>
         <div className="mdtitle">アプリについて</div>
         <div style={{fontSize:11,color:T.text+"55",marginBottom:16,textAlign:"center"}}>SmileTrack ver 1.0.0</div>
 
@@ -144,12 +144,12 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
     finally{ setLoading(false); }
   };
   if(showCoffee&&!thankYou) return(
-    <div className="mo" onClick={onClose} style={{alignItems:"center",justifyContent:"center"}}>
+    <div className="mo" onClick={onClose}>
       <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,width:"90%",maxWidth:400,textAlign:"center"}}>
         <div style={{fontSize:48,marginBottom:12}}>☕</div>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:700,color:T.primary,marginBottom:6}}>開発者にコーヒーを差し入れ</div>
         <div style={{fontSize:13,color:T.text+"88",marginBottom:20,lineHeight:1.7}}>
-          SmileTrackの運営は<br/>広告とプレミアム会員様によって支えられています。<br/>アプリの継続と新機能の開発のため<br/>コーヒー1杯分のサポートをいただけると<br/>大きな励みになります🙏
+          SmileTrackの継続と新機能の開発のため<br/>コーヒー1杯分のサポートをいただけると<br/>大きな励みになります🙏
         </div>
         <button className="btn bp" style={{width:"100%",marginBottom:10,padding:"14px",fontSize:15}} onClick={()=>handlePurchase("coffee")} disabled={loading}>{loading?t("loading"):`差し入れる　${prices.coffee||"¥120"}`}</button>
         <button className="btn bs" style={{width:"100%",padding:"14px",fontSize:15}} onClick={onClose}>閉じる</button>
@@ -166,7 +166,7 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
   ];
 
   if(thankYou) return(
-    <div className="mo" onClick={onClose} style={{alignItems:"center",justifyContent:"center"}}>
+    <div className="mo" onClick={onClose}>
       <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center",padding:"32px 20px"}}>
         <div style={{fontSize:48,marginBottom:12}}>☕</div>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:20,fontWeight:700,color:T.primary,marginBottom:8}}>ありがとうございます！</div>
@@ -179,8 +179,8 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
   );
 
   return(
-    <div className="mo" onClick={onClose} style={{alignItems:"center",justifyContent:"center"}}>
-      <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:480}}>
+    <div className="mo" onClick={onClose}>
+      <div className="md" onClick={e=>e.stopPropagation()}>
         <div style={{textAlign:"center",marginBottom:16}}>
           <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:700,color:T.primary,marginBottom:4}}>SmileTrack プレミアム</div>
           <div style={{fontSize:12,color:T.text+"88"}}>矯正記録をもっと便利に、もっと楽しく</div>
@@ -269,8 +269,8 @@ function ColorModal({T,themeName,onPick,onClose}){
   };
 
   return(
-    <div className="mo" onClick={onClose} style={{alignItems:"center",justifyContent:"center"}}>
-      <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:480}}>
+    <div className="mo" onClick={onClose}>
+      <div className="md" onClick={e=>e.stopPropagation()}>
         <div className="mdtitle">カラーテーマ</div>
         <div style={{display:"flex",flexWrap:"wrap",gap:12,justifyContent:"center",padding:"8px 0 16px"}}>
           {orderedKeys.map(renderSwatch)}
@@ -291,8 +291,8 @@ function SettingsModal({T,state,onSave,onClose}){
   const [tp,setTp]=useState(state.totalPieces||20);
 
   return(
-    <div className="mo" onClick={onClose} style={{alignItems:"center",justifyContent:"center"}}>
-      <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:480}}>
+    <div className="mo" onClick={onClose}>
+      <div className="md" onClick={e=>e.stopPropagation()}>
         <div className="mdtitle">設定</div>
         <div style={{fontSize:13,fontWeight:700,color:T.accent,marginBottom:6}}>矯正開始日</div>
         <input type="date" value={sd} onChange={e=>setSd(e.target.value)}
@@ -364,8 +364,8 @@ function TimerSettingsModal({T,state,onSave,onClose}){
   };
 
   return(
-    <div className="mo" onClick={onClose} style={{alignItems:"center",justifyContent:"center"}}>
-      <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:480}}>
+    <div className="mo" onClick={onClose}>
+      <div className="md" onClick={e=>e.stopPropagation()}>
         <div className="mdtitle">タイマー設定</div>
 
         {/* ON/OFFトグル */}
@@ -501,8 +501,8 @@ function ScheduleModal({T,state,update,onClose}){
   };
 
   return(
-    <div className="mo" onClick={onClose} style={{alignItems:"center",justifyContent:"center"}}>
-      <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:480}}>
+    <div className="mo" onClick={onClose}>
+      <div className="md" onClick={e=>e.stopPropagation()}>
         <div className="mdtitle">交換スケジュール</div>
 
         {/* Piece list - 日付範囲をタップで個別設定 */}
@@ -626,7 +626,7 @@ function ScheduleModal({T,state,update,onClose}){
         };
         return(
           <div className="mo" style={{zIndex:400}} onClick={()=>setEditPiece(null)}>
-            <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:480}}>
+            <div className="md" onClick={e=>e.stopPropagation()}>
               <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
                 <div className="mdtitle" style={{margin:0}}>{editPiece}枚目の装着間隔</div>
                 {isExtra&&(
@@ -699,8 +699,8 @@ function NotifyModal({T,state,onSave,onClose}){
   );
 
   return(
-    <div className="mo" onClick={onClose} style={{alignItems:"center",justifyContent:"center"}}>
-      <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:480}}>
+    <div className="mo" onClick={onClose}>
+      <div className="md" onClick={e=>e.stopPropagation()}>
         <div className="mdtitle">通知設定</div>
 
 
@@ -825,8 +825,8 @@ function BackupModal({T,state,onImport,onClose}){
   };
 
   return(
-    <div className="mo" onClick={onClose} style={{alignItems:"center",justifyContent:"center"}}>
-      <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:480}}>
+    <div className="mo" onClick={onClose}>
+      <div className="md" onClick={e=>e.stopPropagation()}>
         <div className="mdtitle">バックアップ</div>
         <div style={{fontSize:12,color:T.text+"77",marginBottom:12}}>写真を含む全データをバックアップします</div>
         <button className="btn bp blg" style={{width:"100%",marginBottom:10,opacity:exporting?0.6:1}}
@@ -895,8 +895,8 @@ function CameraSettingsModal({T,state,onSave,onClose}){
   const [selectingSlot,setSelectingSlot]=useState(null);
 
   return(
-    <div className="mo" onClick={onClose} style={{alignItems:"center",justifyContent:"center"}}>
-      <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:480}}>
+    <div className="mo" onClick={onClose}>
+      <div className="md" onClick={e=>e.stopPropagation()}>
         <div className="mdtitle">カメラ設定</div>
 
         {/* ミラー設定 */}
@@ -944,8 +944,8 @@ function CameraSettingsModal({T,state,onSave,onClose}){
 
 function ResetConfirmModal({T,onConfirm,onCancel}){
   return(
-    <div className="mo" onClick={onCancel} style={{alignItems:"center",justifyContent:"center"}}>
-      <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center"}}>
+    <div className="mo" onClick={onCancel}>
+      <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center",borderRadius:20}}>
         <div style={{fontSize:36,marginBottom:8}}>⚠️</div>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:17,fontWeight:700,color:"#E74C3C",marginBottom:8}}>本当にリセットしますか？</div>
         <div style={{fontSize:15,color:T.text+"88",marginBottom:20,lineHeight:1.7}}>すべてのデータが完全に削除されます。<br/>この操作は元に戻せません。</div>
