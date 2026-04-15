@@ -46,7 +46,7 @@ function AboutModal({T,onClose}){
       navigator.share({title:"SmileTrack",text:"マウスピース矯正の管理アプリ「SmileTrack」を使ってみてください！",url:"https://smiletrack.app"});
     } else {
       navigator.clipboard?.writeText("https://smiletrack.app");
-      showToast(t("copiedUrl"));
+      showToast("URLをコピーしました！");
     }
   };
   const docIcon=<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>;
@@ -69,8 +69,8 @@ function AboutModal({T,onClose}){
 
         <Row icon={docIcon} label="利用規約" onClick={()=>window.open("https://pickled-runner-04f.notion.site/ebd//329470522fe180399354fbae6be51bfb","_blank")}/>
         <Row icon={lockIcon} label="プライバシーポリシー" onClick={()=>window.open("https://pickled-runner-04f.notion.site/ebd//329470522fe180d884bfc0afe2d3dd94","_blank")}/>
-        <Row icon={mailIcon} label=t("contact") onClick={()=>window.open("mailto:contact.appname@gmail.com")}/>
-        <Row icon={starIcon} label=t("review") onClick={()=>window.open("https://apps.apple.com/app/smiletrack","_blank")}/>
+        <Row icon={mailIcon} label="お問い合わせ" onClick={()=>window.open("mailto:contact.appname@gmail.com")}/>
+        <Row icon={starIcon} label="App Storeでレビューを書く" onClick={()=>window.open("https://apps.apple.com/app/smiletrack","_blank")}/>
         <Row icon={starIcon} label="Google Playでレビューを書く" onClick={()=>window.open("https://play.google.com/store/apps/details?id=app.smiletrack","_blank")}/>
         <Row icon={shareIcon} label="友人にアプリを教える" onClick={share}/>
 
@@ -188,7 +188,7 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
 
         {/* 機能一覧 */}
         <div style={{background:T.soft,borderRadius:12,padding:"10px 14px",marginBottom:16}}>
-          {["カラーテーマ全種類",t("pdfReport"),"取り外し理由カスタマイズ","写真スロット2解放・比較機能",t("pinLockFeature"),"写真ウォーターマーク削除","広告永久削除"].map((f,i)=>(
+          {["カラーテーマ全種類","PDF月次レポート出力","取り外し理由カスタマイズ","写真スロット2解放・比較機能","PINロック機能解放","写真ウォーターマーク削除","広告永久削除"].map((f,i)=>(
             <div key={i} style={{display:"flex",alignItems:"center",gap:8,padding:"4px 0",fontSize:13,color:T.text}}>
               <span style={{color:T.primary,fontWeight:700,flexShrink:0}}>✓</span>{f}
             </div>
@@ -441,7 +441,7 @@ function TimerSettingsModal({T,state,onSave,onClose}){
                   <div style={{fontSize:13,fontWeight:600,color:T.primary}}>{cur.label}</div>
                   <div style={{fontSize:11,color:T.text+"66"}}>{cur.desc}</div>
                 </div>
-                <span style={{fontSize:12,color:T.primary}}>{soundOpen?t("closePanel"):"▼"}</span>
+                <span style={{fontSize:12,color:T.primary}}>{soundOpen?"▲":"▼"}</span>
               </div>
               {soundOpen&&(
                 <div style={{display:"flex",flexDirection:"column",gap:4,marginTop:6}}>
@@ -547,7 +547,7 @@ function ScheduleModal({T,state,update,onClose}){
               {(state.extraPieces?.length>0)&&<span style={{marginLeft:6,color:T.primary,fontWeight:700}}>{state.extraPieces.length}枚登録済</span>}
             </div>
             <button className="btn bp bsm" style={{fontSize:12,padding:"4px 10px"}} onClick={()=>setShowAddExtra(v=>!v)}>
-              {showAddExtra?t("closePanel"):"＋ 追加"}
+              {showAddExtra?"▲ 閉じる":"＋ 追加"}
             </button>
           </div>
           {/* 番号方式トグル：追加ピースがある or 追加UI開いている時に表示 */}
@@ -679,7 +679,7 @@ function NotifyModal({T,state,onSave,onClose}){
   const [sf,setSf]=useState({...state.settings});
 
   // 縦スクロールピッカー
-    const timingOpts=[{v:0,l:"当日"},{v:1440,l:"前日"},{v:2880,l:t("twoDaysBefore")}];
+    const timingOpts=[{v:0,l:"当日"},{v:1440,l:"前日"},{v:2880,l:"2日前"}];
   const hours=Array.from({length:24},(_,i)=>({v:i,l:`${i}時`}));
   const DOW_OPTS=[
     {v:"exchange",l:"交換日連動"},
@@ -801,7 +801,7 @@ function BackupModal({T,state,onImport,onClose}){
       const url=URL.createObjectURL(blob);
       if(navigator.share){
         const file=new File([blob],"smiletrack_backup.json",{type:"application/json"});
-        await navigator.share({files:[file],title:t("backupTitle")});
+        await navigator.share({files:[file],title:"SmileTrack バックアップ"});
       } else {
         const a=document.createElement("a");
         a.href=url;
@@ -811,7 +811,7 @@ function BackupModal({T,state,onImport,onClose}){
         document.body.removeChild(a);
       }
       URL.revokeObjectURL(url);
-    }catch(e){console.warn(t("exportFail"),e);showToast(t("exportFail"));}
+    }catch(e){console.warn("エクスポートに失敗しました",e);showToast("エクスポートに失敗しました");}
     setExporting(false);
   };
 
@@ -831,7 +831,7 @@ function BackupModal({T,state,onImport,onClose}){
         <div style={{fontSize:12,color:T.text+"77",marginBottom:12}}>写真を含む全データをバックアップします</div>
         <button className="btn bp blg" style={{width:"100%",marginBottom:10,opacity:exporting?0.6:1}}
           onClick={doExport} disabled={exporting}>
-          {exporting?t("exporting"):t("export")}
+          {exporting?"エクスポート中...":"エクスポート"}
         </button>
         <button className="btn bs blg" style={{width:"100%"}} onClick={()=>fileRef.current?.click()}>インポート</button>
         <input ref={fileRef} type="file" accept=".json" style={{display:"none"}} onChange={e=>{
@@ -901,7 +901,7 @@ function CameraSettingsModal({T,state,onSave,onClose}){
 
         {/* ミラー設定 */}
         <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif",marginBottom:6}}>保存設定</div>
-        <Toggle T={T} on={mirror} label=t("mirrorSave") onToggle={()=>setMirror(v=>!v)}/>
+        <Toggle T={T} on={mirror} label="カメラ画像を左右反転して保存" onToggle={()=>setMirror(v=>!v)}/>
 
 
         {/* 撮影スロット */}
@@ -919,7 +919,7 @@ function CameraSettingsModal({T,state,onSave,onClose}){
                 background:T.soft,borderRadius:10,padding:"8px 12px",cursor:"pointer"}}
                 onClick={()=>setSelectingSlot(isOpen?null:slotN)}>
                 <span style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>{slotN}：{modeInfo.labelJP}</span>
-                <span style={{fontSize:13,fontWeight:600,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>{isOpen?t("closePanel"):t("changePanel")}</span>
+                <span style={{fontSize:13,fontWeight:600,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>{isOpen?"▲ 閉じる":"▼ 変更"}</span>
               </div>
               {isOpen&&(
                 <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6,marginTop:8,padding:"8px",background:T.bg,borderRadius:10}}>

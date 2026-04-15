@@ -100,7 +100,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
   if(sel){
     const exLabel = getExPieceLabel(state,sel);
     if(exLabel) selEvents.push({type:"ex",label: sel===state.startDate ? `マウスピース開始 1日目` : `マウスピース交換 (${exLabel}枚目)`,color:T.accent,id:null});
-    (apptMap[sel]||[]).forEach(a=>selEvents.push({type:"appt",label:`${a.title||t("appointmentTitle")}${a.time?" "+a.time:""}`,title:a.title||t("appointmentTitle"),time:a.time||"",color:T.primary,id:a.id}));
+    (apptMap[sel]||[]).forEach(a=>selEvents.push({type:"appt",label:`${a.title||"歯科受診"}${a.time?" "+a.time:""}`,title:a.title||"歯科受診",time:a.time||"",color:T.primary,id:a.id}));
   }
 
   const deleteEvent = ev => {
@@ -522,11 +522,11 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
               </div>
               <label>理由</label>
               <div style={{display:'flex',flexWrap:'wrap',gap:8,marginBottom:14}}>
-                {[...getReasonList(state),t("reasonNone")].map(r=>(
-                  <button key={r} onClick={()=>setEditSessReason(r===t("reasonNone")?"":r)}
-                    style={{padding:'10px 16px',borderRadius:20,border:`1.5px solid ${(editSessReason===r||(r===t("reasonNone")&&!editSessReason))?T.primary:T.soft}`,
-                      background:(editSessReason===r||(r===t("reasonNone")&&!editSessReason))?T.primary:'transparent',
-                      color:(editSessReason===r||(r===t("reasonNone")&&!editSessReason))?'#fff':T.text,
+                {[...getReasonList(state),"ー"].map(r=>(
+                  <button key={r} onClick={()=>setEditSessReason(r==="ー"?"":r)}
+                    style={{padding:'10px 16px',borderRadius:20,border:`1.5px solid ${(editSessReason===r||(r==="ー"&&!editSessReason))?T.primary:T.soft}`,
+                      background:(editSessReason===r||(r==="ー"&&!editSessReason))?T.primary:'transparent',
+                      color:(editSessReason===r||(r==="ー"&&!editSessReason))?'#fff':T.text,
                       fontSize:15,fontWeight:600,cursor:'pointer',fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>
                     {r}
                   </button>
@@ -582,7 +582,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
             {/* 理由選択 */}
             <label>理由</label>
             <div style={{display:'flex',flexWrap:'wrap',gap:8,marginBottom:14}}>
-              {[...getReasonList(state),t("reasonNone")].map(r=>(
+              {[...getReasonList(state),"ー"].map(r=>(
                 <button key={r}
                   onClick={()=>setAddBreakdownReason(r)}
                   style={{padding:'10px 16px',borderRadius:20,border:`1.5px solid ${addBreakdownReason===r?T.primary:T.soft}`,
@@ -675,7 +675,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
           <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:400}}>
             <div className="mdtitle">予定を追加</div>
             <label>タイトル</label>
-            <input value={apptForm.title} onChange={e=>setApptForm(f=>({...f,title:e.target.value}))} placeholder=t("labelTitle") style={{marginBottom:8}}/>
+            <input value={apptForm.title} onChange={e=>setApptForm(f=>({...f,title:e.target.value}))} placeholder="タイトル" style={{marginBottom:8}}/>
             <label>日付</label>
             <input type="date" value={apptForm.date} onChange={e=>setApptForm(f=>({...f,date:e.target.value}))}
               style={{marginBottom:8,width:"100%",boxSizing:"border-box",height:44,fontSize:16,

@@ -76,7 +76,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
       for(let i=0;i<12;i++){
         const h=hrs+i;
         const ms=startMs+h*3600000;
-        if(ms>Date.now()) Notif.schedule(1002+i,t("removeTimer"),`取り外し中のタイマーが${h}時間を超えています`,ms);
+        if(ms>Date.now()) Notif.schedule(1002+i,"取り外しタイマー",`取り外し中のタイマーが${h}時間を超えています`,ms);
       }
     }
   };

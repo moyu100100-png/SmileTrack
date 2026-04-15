@@ -383,7 +383,7 @@ function App(){
         Notif.cancel([1001]);
         const snoozeMs=Date.now()+5*60000;
         setSnoozedUntil(snoozeMs);
-        Notif.schedule(1001,t("alarmNotif"),`取り外しから${state.alarmMinutes||30}分が経過しました`,snoozeMs,(state.alarmSound||"tone1")+".caf",true);
+        Notif.schedule(1001,"アラーム",`取り外しから${state.alarmMinutes||30}分が経過しました`,snoozeMs,(state.alarmSound||"tone1")+".caf",true);
       }
     };
     window.addEventListener("AlarmAction",handler);
@@ -522,7 +522,7 @@ function App(){
         Notif.cancel([1001]);
         const alarmMs=startMs+mins*60000;
         const alarmSound=(state.alarmSound||"tone1")+".caf";
-        Notif.schedule(1001,t("alarmNotif"),`取り外しから${mins}分が経過しました`,alarmMs,alarmSound,true);
+        Notif.schedule(1001,"アラーム",`取り外しから${mins}分が経過しました`,alarmMs,alarmSound,true);
       }
       // 放置防止アラート通知予約（設定した時間から1時間おき・最大12本）
       if(Notif.isCapacitor()&&state.forgetTimerAlert){
@@ -532,7 +532,7 @@ function App(){
         for(let i=0;i<12;i++){
           const h=hrs+i;
           const ms=startMs+h*3600000;
-          if(ms>Date.now()) Notif.schedule(1002+i,t("removeTimer"),`取り外し中のタイマーが${h}時間を超えています`,ms);
+          if(ms>Date.now()) Notif.schedule(1002+i,"取り外しタイマー",`取り外し中のタイマーが${h}時間を超えています`,ms);
         }
       }
     } else {
@@ -638,9 +638,9 @@ function App(){
             <div style={{fontSize:15,color:T.text+"88",marginBottom:20,lineHeight:1.7}}>
               {t("forgetMsg")}<br/>
               <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,color:T.primary,fontSize:16}}>
-                {Math.floor((Date.now()-(state.timerStart||Date.now()))/3600000)}{t("forgetHour").replace("時間以上動いています。",t("hourOver"))}
+                {Math.floor((Date.now()-(state.timerStart||Date.now()))/3600000)}{t("forgetHour").replace("時間以上動いています。","時間以上")}
               </span><br/>
-              {LANG==="ja"?t("moving"):t("forgetHour")}
+              {LANG==="ja"?"動いています。":t("forgetHour")}
             </div>
             <div style={{display:"flex",flexDirection:"column",gap:8}}>
               <button className="btn bp" style={{width:"100%",padding:"12px"}}
