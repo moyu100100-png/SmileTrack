@@ -46,7 +46,7 @@ function AboutModal({T,onClose}){
       navigator.share({title:"SmileTrack",text:"マウスピース矯正の管理アプリ「SmileTrack」を使ってみてください！",url:"https://smiletrack.app"});
     } else {
       navigator.clipboard?.writeText("https://smiletrack.app");
-      showToast("URLをコピーしました！");
+      showToast(LANG==="ja"?"URLをコピーしました！":"URL copied!");
     }
   };
   const docIcon=<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>;
@@ -341,8 +341,8 @@ function TimerSettingsModal({T,state,onSave,onClose}){
 
   const addWord=()=>{
     const w=newWord.replace(/\s/g,"").slice(0,6);
-    if(!w){setErr("文字を入力してください");return;}
-    if(pool.includes(w)){setErr("同じ項目がすでにあります");return;}
+    if(!w){setErr(LANG==="ja"?"文字を入力してください":"Please enter text");return;}
+    if(pool.includes(w)){setErr(LANG==="ja"?"同じ項目がすでにあります":"Item already exists");return;}
     if(pool.length>=MAX_ALL-1){setErr(`項目は${MAX_ALL-1}個まで（ーを除く）`);return;}
     setPool(p=>[...p,w]);
     setNewWord("");setErr("");
@@ -415,7 +415,7 @@ function TimerSettingsModal({T,state,onSave,onClose}){
             <div style={{display:"flex",gap:8,marginBottom:4}}>
               <input value={newWord} onChange={e=>setNewWord(e.target.value.slice(0,6))}
                 onKeyDown={e=>{if(e.key==="Enter")addWord();}}
-                placeholder="例: カフェ"
+                placeholder={LANG==="ja"?"例: カフェ":"e.g. Cafe"}
                 style={{flex:1,marginBottom:0}}/>
               <button className="btn bp" style={{flexShrink:0,padding:"8px 14px"}} onClick={addWord}>＋追加</button>
             </div>
@@ -547,7 +547,7 @@ function ScheduleModal({T,state,update,onClose}){
               {(state.extraPieces?.length>0)&&<span style={{marginLeft:6,color:T.primary,fontWeight:700}}>{state.extraPieces.length}枚登録済</span>}
             </div>
             <button className="btn bp bsm" style={{fontSize:12,padding:"4px 10px"}} onClick={()=>setShowAddExtra(v=>!v)}>
-              {showAddExtra?"▲ 閉じる":"＋ 追加"}
+              {showAddExtra?(LANG==="ja"?"▲ 閉じる":"▲ Close"):(LANG==="ja"?"＋ 追加":"＋ Add")}
             </button>
           </div>
           {/* 番号方式トグル：追加ピースがある or 追加UI開いている時に表示 */}
@@ -555,7 +555,7 @@ function ScheduleModal({T,state,update,onClose}){
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8,marginTop:4}}>
               <span style={{fontSize:12,color:state.themeName==="night"?T.text+"88":"#555555"}}>番号方式</span>
               <div style={{display:"flex",gap:6}}>
-                {[{key:"relative",label:"+1〜"},{key:"absolute",label:"通し番号"}].map(opt=>(
+                {[{key:"relative",label:LANG==="ja"?"+1〜":"+1~"},{key:"absolute",label:LANG==="ja"?"通し番号":"Sequential"}].map(opt=>(
                   <button key={opt.key}
                     onClick={e=>{e.stopPropagation();update({extraLabelMode:opt.key});}}
                     style={{padding:"4px 12px",borderRadius:8,border:`1.5px solid ${(state.extraLabelMode||"relative")===opt.key?T.primary:T.soft}`,
@@ -679,12 +679,12 @@ function NotifyModal({T,state,onSave,onClose}){
   const [sf,setSf]=useState({...state.settings});
 
   // 縦スクロールピッカー
-    const timingOpts=[{v:0,l:"当日"},{v:1440,l:"前日"},{v:2880,l:"2日前"}];
+    const timingOpts=[{v:0,l:LANG==="ja"?"当日":"Same day"},{v:1440,l:LANG==="ja"?"前日":"Day before"},{v:2880,l:LANG==="ja"?"2日前":"2 days before"}];
   const hours=Array.from({length:24},(_,i)=>({v:i,l:`${i}時`}));
   const DOW_OPTS=[
-    {v:"exchange",l:"交換日連動"},
-    {v:"0",l:"日曜日"},{v:"1",l:"月曜日"},{v:"2",l:"火曜日"},
-    {v:"3",l:"水曜日"},{v:"4",l:"木曜日"},{v:"5",l:"金曜日"},{v:"6",l:"土曜日"},
+    {v:"exchange",l:LANG==="ja"?"交換日連動":"On change day"},
+    {v:"0",l:t("sunday")},{v:"1",l:t("monday")},{v:"2",l:LANG==="ja"?"火曜日":"Tuesday"},
+    {v:"3",l:LANG==="ja"?"水曜日":"Wednesday"},{v:"4",l:LANG==="ja"?"木曜日":"Thursday"},{v:"5",l:LANG==="ja"?"金曜日":"Friday"},{v:"6",l:LANG==="ja"?"土曜日":"Saturday"},
   ];
 
   const sec=(title)=>(
@@ -811,7 +811,7 @@ function BackupModal({T,state,onImport,onClose}){
         document.body.removeChild(a);
       }
       URL.revokeObjectURL(url);
-    }catch(e){console.warn("エクスポートに失敗しました",e);showToast("エクスポートに失敗しました");}
+    }catch(e){console.warn(LANG==="ja"?"エクスポートに失敗しました":"Export failed",e);showToast(LANG==="ja"?"エクスポートに失敗しました":"Export failed");}
     setExporting(false);
   };
 
@@ -831,7 +831,7 @@ function BackupModal({T,state,onImport,onClose}){
         <div style={{fontSize:12,color:T.text+"77",marginBottom:12}}>写真を含む全データをバックアップします</div>
         <button className="btn bp blg" style={{width:"100%",marginBottom:10,opacity:exporting?0.6:1}}
           onClick={doExport} disabled={exporting}>
-          {exporting?"エクスポート中...":"エクスポート"}
+          {exporting?LANG==="ja"?"エクスポート中...":"Exporting...":LANG==="ja"?"エクスポート":"Export"}
         </button>
         <button className="btn bs blg" style={{width:"100%"}} onClick={()=>fileRef.current?.click()}>インポート</button>
         <input ref={fileRef} type="file" accept=".json" style={{display:"none"}} onChange={e=>{
@@ -839,7 +839,7 @@ function BackupModal({T,state,onImport,onClose}){
           const r=new FileReader();
           r.onload=ev=>{
             try{doImport(JSON.parse(ev.target.result));}
-            catch{console.warn("ファイルが無効です");showToast("ファイルが無効です");}
+            catch{console.warn(LANG==="ja"?"ファイルが無効です":"Invalid file");showToast(LANG==="ja"?"ファイルが無効です":"Invalid file");}
           };
           r.readAsText(f);
         }}/>
@@ -901,7 +901,7 @@ function CameraSettingsModal({T,state,onSave,onClose}){
 
         {/* ミラー設定 */}
         <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif",marginBottom:6}}>保存設定</div>
-        <Toggle T={T} on={mirror} label="カメラ画像を左右反転して保存" onToggle={()=>setMirror(v=>!v)}/>
+        <Toggle T={T} on={mirror} label=LANG==="ja"?"カメラ画像を左右反転して保存":"Save mirrored" onToggle={()=>setMirror(v=>!v)}/>
 
 
         {/* 撮影スロット */}
