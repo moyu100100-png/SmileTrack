@@ -21,7 +21,7 @@ function HomePreviewModal({T,themeName,themeObj,onClose}){
   const svg=makeHomeSVG(themeObj);
   return(
     <div className="mo" onClick={onClose}>
-      <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center"}}>
+      <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center",borderRadius:24,width:"90%",maxWidth:400}}>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:15,fontWeight:700,color:T.primary,marginBottom:4}}>
           プレビュー
         </div>
@@ -46,7 +46,7 @@ function AboutModal({T,onClose}){
       navigator.share({title:"SmileTrack",text:"マウスピース矯正の管理アプリ「SmileTrack」を使ってみてください！",url:"https://smiletrack.app"});
     } else {
       navigator.clipboard?.writeText("https://smiletrack.app");
-      showToast(LANG==="ja"?"URLをコピーしました！":"URL copied!");
+      showToast(LANG==="ja"?LANG==="ja"?"URLをコピーしました！":"URL copied!":"URL copied!");
     }
   };
   const docIcon=<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>;
@@ -125,7 +125,7 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
       if(e?.code==="PURCHASE_CANCELLED"||e?.message?.includes("cancel")||e?.message?.includes("Cancel")){
         // キャンセルはno-op
       } else {
-        setErrorMsg(LANG==="ja"?"購入に失敗しました。時間をおいて再試行してください。":"Purchase failed. Please try again later.");
+        setErrorMsg(LANG==="ja"?LANG==="ja"?"購入に失敗しました。時間をおいて再試行してください。":"Purchase failed. Please try again.":"Purchase failed. Please try again later.");
       }
     }finally{ setLoading(false); }
   };
@@ -139,12 +139,12 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
       const noAds=await Purchases.hasNoAds();
       if(onPurchased) onPurchased({isPremium,noAds});
       if(isPremium){ onClose(); }
-      else{ setErrorMsg(LANG==="ja"?"復元できる購入履歴が見つかりませんでした。":"No purchases found to restore."); }
-    }catch(e){ setErrorMsg(LANG==="ja"?"復元に失敗しました。":"Restore failed."); }
+      else{ setErrorMsg(LANG==="ja"?LANG==="ja"?"復元できる購入履歴が見つかりませんでした。":"No purchases found to restore.":"No purchases found to restore."); }
+    }catch(e){ setErrorMsg(LANG==="ja"?LANG==="ja"?"復元に失敗しました。":"Restore failed.":"Restore failed."); }
     finally{ setLoading(false); }
   };
   if(showCoffee&&!thankYou) return(
-    <div className="mo" onClick={onClose}>
+    <div className="mo" onClick={onClose} style={{alignItems:"center",justifyContent:"center"}}>
       <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,width:"90%",maxWidth:400,textAlign:"center"}}>
         <div style={{fontSize:48,marginBottom:12}}>☕</div>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:700,color:T.primary,marginBottom:6}}>開発者にコーヒーを差し入れ</div>
@@ -166,7 +166,7 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
   ];
 
   if(thankYou) return(
-    <div className="mo" onClick={onClose}>
+    <div className="mo" onClick={onClose} style={{alignItems:"center",justifyContent:"center"}}>
       <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center",padding:"32px 20px"}}>
         <div style={{fontSize:48,marginBottom:12}}>☕</div>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:20,fontWeight:700,color:T.primary,marginBottom:8}}>ありがとうございます！</div>
@@ -341,8 +341,8 @@ function TimerSettingsModal({T,state,onSave,onClose}){
 
   const addWord=()=>{
     const w=newWord.replace(/\s/g,"").slice(0,6);
-    if(!w){setErr(LANG==="ja"?"文字を入力してください":"Please enter text");return;}
-    if(pool.includes(w)){setErr(LANG==="ja"?"同じ項目がすでにあります":"Item already exists");return;}
+    if(!w){setErr(LANG==="ja"?LANG==="ja"?"文字を入力してください":"Please enter text":"Please enter text");return;}
+    if(pool.includes(w)){setErr(LANG==="ja"?LANG==="ja"?"同じ項目がすでにあります":"Item already exists":"Item already exists");return;}
     if(pool.length>=MAX_ALL-1){setErr(`項目は${MAX_ALL-1}個まで（ーを除く）`);return;}
     setPool(p=>[...p,w]);
     setNewWord("");setErr("");
@@ -801,7 +801,7 @@ function BackupModal({T,state,onImport,onClose}){
       const url=URL.createObjectURL(blob);
       if(navigator.share){
         const file=new File([blob],"smiletrack_backup.json",{type:"application/json"});
-        await navigator.share({files:[file],title:LANG==="ja"?"SmileTrack バックアップ":"SmileTrack Backup"});
+        await navigator.share({files:[file],title:LANG==="ja"?LANG==="ja"?"SmileTrack バックアップ":"SmileTrack Backup":"SmileTrack Backup"});
       } else {
         const a=document.createElement("a");
         a.href=url;
@@ -811,7 +811,7 @@ function BackupModal({T,state,onImport,onClose}){
         document.body.removeChild(a);
       }
       URL.revokeObjectURL(url);
-    }catch(e){console.warn(LANG==="ja"?"エクスポートに失敗しました":"Export failed",e);showToast(LANG==="ja"?"エクスポートに失敗しました":"Export failed");}
+    }catch(e){console.warn(LANG==="ja"?LANG==="ja"?"エクスポートに失敗しました":"Export failed":"Export failed",e);showToast(LANG==="ja"?LANG==="ja"?"エクスポートに失敗しました":"Export failed":"Export failed");}
     setExporting(false);
   };
 
@@ -831,7 +831,7 @@ function BackupModal({T,state,onImport,onClose}){
         <div style={{fontSize:12,color:T.text+"77",marginBottom:12}}>写真を含む全データをバックアップします</div>
         <button className="btn bp blg" style={{width:"100%",marginBottom:10,opacity:exporting?0.6:1}}
           onClick={doExport} disabled={exporting}>
-          {exporting?LANG==="ja"?"エクスポート中...":"Exporting...":LANG==="ja"?"エクスポート":"Export"}
+          {exporting?LANG==="ja"?LANG==="ja"?"エクスポート中...":"Exporting...":"Exporting...":LANG==="ja"?LANG==="ja"?"エクスポート":"Export":"Export"}
         </button>
         <button className="btn bs blg" style={{width:"100%"}} onClick={()=>fileRef.current?.click()}>インポート</button>
         <input ref={fileRef} type="file" accept=".json" style={{display:"none"}} onChange={e=>{
@@ -839,7 +839,7 @@ function BackupModal({T,state,onImport,onClose}){
           const r=new FileReader();
           r.onload=ev=>{
             try{doImport(JSON.parse(ev.target.result));}
-            catch{console.warn(LANG==="ja"?"ファイルが無効です":"Invalid file");showToast(LANG==="ja"?"ファイルが無効です":"Invalid file");}
+            catch{console.warn(LANG==="ja"?LANG==="ja"?"ファイルが無効です":"Invalid file":"Invalid file");showToast(LANG==="ja"?LANG==="ja"?"ファイルが無効です":"Invalid file":"Invalid file");}
           };
           r.readAsText(f);
         }}/>
@@ -944,7 +944,7 @@ function CameraSettingsModal({T,state,onSave,onClose}){
 
 function ResetConfirmModal({T,onConfirm,onCancel}){
   return(
-    <div className="mo" onClick={onCancel}>
+    <div className="mo" onClick={onCancel} style={{alignItems:"center",justifyContent:"center"}}>
       <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center",borderRadius:20}}>
         <div style={{fontSize:36,marginBottom:8}}>⚠️</div>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:17,fontWeight:700,color:"#E74C3C",marginBottom:8}}>本当にリセットしますか？</div>

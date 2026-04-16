@@ -205,8 +205,8 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
                   <div style={{marginTop:3,textAlign:"center",lineHeight:1.3,maxWidth:barW}}>
                     {period==="monthly" ? (
                       <>
-                        <div style={{fontSize:11,color:isSelected?T.accent:T.text+"55",fontWeight:isSelected?700:400}}>{b.year}年</div>
-                        <div style={{fontSize:12,color:labelColor,fontWeight:labelWeight}}>{b.month+1}月</div>
+                        <div style={{fontSize:11,color:isSelected?T.accent:T.text+"55",fontWeight:isSelected?700:400}}>{LANG==="ja"?`${b.year}年`:`${b.year}`}</div>
+                        <div style={{fontSize:12,color:labelColor,fontWeight:labelWeight}}>{LANG==="ja"?`${b.month+1}月`:`${b.month+1}`}</div>
                       </>
                     ) : period==="weekly" ? (
                       <>
@@ -234,8 +234,8 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
       </div>
 
       <div style={{display:"flex",gap:6,marginBottom:10}}>
-        <button className={`btn bsm ${statsView==="breakdown"?"bp":"bs"}`} onClick={()=>setStatsView("breakdown")} style={{flex:1}}>取り外し内訳</button>
-        <button className={`btn bsm ${statsView==="pieces"?"bp":"bs"}`} onClick={()=>setStatsView("pieces")} style={{flex:1}}>装着時間</button>
+        <button className={`btn bsm ${statsView==="breakdown"?"bp":"bs"}`} onClick={()=>setStatsView("breakdown")} style={{flex:1}}>{t("breakdownTab")}</button>
+        <button className={`btn bsm ${statsView==="pieces"?"bp":"bs"}`} onClick={()=>setStatsView("pieces")} style={{flex:1}}>{t("wearTimeTab")}</button>
       </div>
 
       {statsView==="breakdown"
@@ -249,12 +249,12 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
               : null;
             const titleStr = isDefault && period==="daily"
               ? t("todayBreakdown")
-              : labelStr ? `取り外し内訳 (${labelStr})` : t("breakdownTab");
+              : labelStr ? (LANG==="ja"?`取り外し内訳 (${labelStr})`:`Breakdown (${labelStr})`) : t("breakdownTab");
             return Object.keys(bd).length>0 ? (
               <div>
                 {period==="daily"&&selectedBar&&(
                   <div className="card" style={{marginBottom:10,textAlign:"center"}}>
-                    <div style={{fontSize:12,color:T.text+"66",marginBottom:4}}>{selectedBar.key} 装着時間</div>
+                    <div style={{fontSize:12,color:T.text+"66",marginBottom:4}}>{selectedBar.key} {t("wearTimeTab")}</div>
                     <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:24,fontWeight:700,color:(effectiveLog[selectedBar.key]||0)>=target?T.primary:failCol}}>
                       {effectiveLog[selectedBar.key]?fmt(effectiveLog[selectedBar.key]):t("noRecord")}
                     </div>
@@ -274,12 +274,12 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
                 </div>
               </div>
             ) : (
-              <div className="card" style={{textAlign:"center",color:T.text+"55",padding:"18px 0",fontSize:14}}>この期間の取り外し記録がありません</div>
+              <div className="card" style={{textAlign:"center",color:T.text+"55",padding:"18px 0",fontSize:14}}>{t("noBreakdown")}</div>
             );
           })()
         : period==="daily" ? (
             <div className="card">
-              <div className="ct">ピース別 合計装着時間</div>
+              <div className="ct">{t("pieceWear")}</div>
               <div style={{maxHeight:260,overflowY:"auto"}}>
                 {pieceWearList.map(({n,label,rangeLabel,total})=>{
                   const isAct=n===state.currentPiece;
@@ -308,7 +308,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
                   const weekLabel=period==="weekly"?b.label.replace(/〜?\n/,"〜"):"";
                   return(
                     <div key={b.key} className="wr" style={{background:isSelected?T.soft:"transparent",borderRadius:8,cursor:"pointer"}} onClick={()=>setSelectedBar(isSelected?null:b)}>
-                      <span style={{fontSize:13,fontWeight:isSelected?700:400,color:isSelected?T.primary:T.text,whiteSpace:"nowrap",lineHeight:1.4,flex:1}}>{period==="weekly"?weekLabel:`${parseInt(b.key.split("-")[1])+1}月`}</span>
+                      <span style={{fontSize:13,fontWeight:isSelected?700:400,color:isSelected?T.primary:T.text,whiteSpace:"nowrap",lineHeight:1.4,flex:1}}>{period==="weekly"?weekLabel:LANG==="ja"?`${parseInt(b.key.split("-")[1])+1}月`:`${parseInt(b.key.split("-")[1])+1}`}</span>
                       <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,color:total===0?T.text+"44":achieved?T.primary:failCol,fontSize:14,flexShrink:0}}>{total===0?t("noRecord"):fmt(total)}</span>
                     </div>
                   );
@@ -324,8 +324,8 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
           <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center",position:"relative"}}>
             <button onClick={()=>setShowReportPreview(false)} style={{position:"absolute",top:8,right:8,background:"none",border:"none",cursor:"pointer",fontSize:20,color:T.text+"66",lineHeight:1,padding:4}}>✕</button>
             <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:15,fontWeight:700,color:T.primary,marginBottom:4}}>レポートプレビュー</div>
-            <div style={{fontSize:12,color:T.text+"88",marginBottom:4}}>サンプルデータによるイメージです</div>
-            <div style={{fontSize:12,color:T.accent,fontWeight:600,marginBottom:12}}>🔒 PDF出力はプレミアム機能でご利用いただけます</div>
+            <div style={{fontSize:12,color:T.text+"88",marginBottom:4}}>{LANG==="ja"?"サンプルデータによるイメージです":"Sample data preview"}</div>
+            <div style={{fontSize:12,color:T.accent,fontWeight:600,marginBottom:12}}>{LANG==="ja"?"🔒 PDF出力はプレミアム機能でご利用いただけます":"🔒 PDF export is a premium feature"}</div>
             <div style={{borderRadius:10,overflow:"hidden",marginBottom:14,border:`1px solid ${T.soft}`,maxHeight:"60dvh",overflowY:"auto"}}>
               <img src={PDF_PREVIEW_IMG} alt=t("pdfPreview") style={{width:"100%",display:"block"}}/>
             </div>
