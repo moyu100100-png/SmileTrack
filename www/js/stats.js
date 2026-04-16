@@ -135,10 +135,10 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
     }
     if(state.timerRunning&&state._pendingReason&&period==="daily"&&bar.key===todayStr){
       const rMs=state.timerElapsed+(Date.now()-(state.timerStart||Date.now()));
-      filtered=[...filtered,{ms:rMs,reason:state._pendingReason||"その他"}];
+      filtered=[...filtered,{ms:rMs,reason:state._pendingReason||t("others")}];
     }
     const totals={};
-    filtered.forEach(s=>{const r=(!s.noReason&&s.reason)?s.reason:"ー";totals[r]=(totals[r]||0)+Math.floor(s.ms/1000);});
+    filtered.forEach(s=>{const r=(!s.noReason&&s.reason)?s.reason:t("reasonNone");totals[r]=(totals[r]||0)+Math.floor(s.ms/1000);});
     return totals;
   };
 
@@ -225,7 +225,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
       </div>
 
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:10}}>
-        {[["7日平均",avg7],["30日平均",avg30]].map(([lbl,v])=>(
+        {[[t("avg7"),avg7],[t("avg30"),avg30]].map(([lbl,v])=>(
           <div key={lbl} style={{background:T.card,borderRadius:13,padding:"11px 14px",textAlign:"center"}}>
             <div style={{fontSize:12,color:T.text+"77",marginBottom:4}}>{lbl}</div>
             <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:700,color:v>=target?T.primary:failCol}}>{fmtHM(v)}</div>
@@ -327,7 +327,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
             <div style={{fontSize:12,color:T.text+"88",marginBottom:4}}>サンプルデータによるイメージです</div>
             <div style={{fontSize:12,color:T.accent,fontWeight:600,marginBottom:12}}>🔒 PDF出力はプレミアム機能でご利用いただけます</div>
             <div style={{borderRadius:10,overflow:"hidden",marginBottom:14,border:`1px solid ${T.soft}`,maxHeight:"60dvh",overflowY:"auto"}}>
-              <img src={PDF_PREVIEW_IMG} alt="PDFプレビュー" style={{width:"100%",display:"block"}}/>
+              <img src={PDF_PREVIEW_IMG} alt={t("pdfPreview")} style={{width:"100%",display:"block"}}/>
             </div>
             <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowReportPreview(false)}>閉じる</button>
           </div>

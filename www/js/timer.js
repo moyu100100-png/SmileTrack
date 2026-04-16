@@ -66,7 +66,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
       const mins=state.alarmMinutes||30;
       Notif.cancel([1001]);
       const alarmSound=(state.alarmSound||"tone1")+".caf";
-      Notif.schedule(1001,t("alarm"),`取り外しから${mins}分が経過しました`,startMs+mins*60000,alarmSound,true);
+      Notif.schedule(1001,t("alarm"),LANG==="ja"?`取り外しから${mins}分が経過しました`:`${mins} min have passed`,startMs+mins*60000,alarmSound,true);
     }
     // 放置防止通知
     if(Notif.isCapacitor()&&state.forgetTimerAlert){
@@ -76,7 +76,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
       for(let i=0;i<12;i++){
         const h=hrs+i;
         const ms=startMs+h*3600000;
-        if(ms>Date.now()) Notif.schedule(1002+i,"取り外しタイマー",`取り外し中のタイマーが${h}時間を超えています`,ms);
+        if(ms>Date.now()) Notif.schedule(1002+i,LANG==="ja"?"取り外しタイマー":"Removal Timer",LANG==="ja"?`取り外し中のタイマーが${h}時間を超えています`:`Removal timer has exceeded ${h} hours`,ms);
       }
     }
   };
@@ -163,7 +163,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
                 const elapsed=Math.floor(runningMs/1000);
                 const remaining=newMins*60-elapsed;
                 Notif.cancel([1001]);
-                if(remaining>0) Notif.schedule(1001,t("alarm"),`取り外しから${newMins}分が経過しました`,Date.now()+remaining*1000,(state.alarmSound||"tone1")+".caf",true);
+                if(remaining>0) Notif.schedule(1001,t("alarm"),LANG==="ja"?`取り外しから${newMins}分が経過しました`:`${newMins} min have passed`,Date.now()+remaining*1000,(state.alarmSound||"tone1")+".caf",true);
               }
             }}>－</button>
             <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,fontSize:17,color:state.themeName==="ashviolet"?"#ffffff":T.accent,minWidth:28,textAlign:"center"}}>{state.alarmMinutes||30}</span>
@@ -175,7 +175,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
                 const elapsed=Math.floor(runningMs/1000);
                 const remaining=newMins*60-elapsed;
                 Notif.cancel([1001]);
-                if(remaining>0) Notif.schedule(1001,t("alarm"),`取り外しから${newMins}分が経過しました`,Date.now()+remaining*1000,(state.alarmSound||"tone1")+".caf",true);
+                if(remaining>0) Notif.schedule(1001,t("alarm"),LANG==="ja"?`取り外しから${newMins}分が経過しました`:`${newMins} min have passed`,Date.now()+remaining*1000,(state.alarmSound||"tone1")+".caf",true);
               }
             }}>＋</button>
             <button className="tg" style={{background:state.alarmEnabled?T.accent:T.soft+"aa"}} onClick={async()=>{
@@ -189,7 +189,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
                   const remaining=mins*60-elapsed;
                   if(remaining>0){
                     Notif.cancel([1001]);
-                    Notif.schedule(1001,t("alarm"),`取り外しから${mins}分が経過しました`,Date.now()+remaining*1000,(state.alarmSound||"tone1")+".caf",true);
+                    Notif.schedule(1001,t("alarm"),LANG==="ja"?`取り外しから${mins}分が経過しました`:`${mins} min have passed`,Date.now()+remaining*1000,(state.alarmSound||"tone1")+".caf",true);
                   }
                 }
               } else {
