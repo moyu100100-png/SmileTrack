@@ -144,15 +144,15 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
     finally{ setLoading(false); }
   };
   if(showCoffee&&!thankYou) return(
-    <div className="mo" onClick={onClose}>
-      <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,width:"90%",maxWidth:400,textAlign:"center"}}>
+    <div className="mo" onClick={onClose} style={{alignItems:"center",justifyContent:"center"}}>
+      <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:24,width:"90%",maxWidth:400,textAlign:"center"}}>
         <div style={{fontSize:48,marginBottom:12}}>☕</div>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:700,color:T.primary,marginBottom:6}}>開発者にコーヒーを差し入れ</div>
         <div style={{fontSize:13,color:T.text+"88",marginBottom:20,lineHeight:1.7}}>
           SmileTrackの継続と新機能の開発のため<br/>コーヒー1杯分のサポートをいただけると<br/>大きな励みになります🙏
         </div>
-        <button className="btn bp" style={{width:"100%",marginBottom:10,padding:"14px",fontSize:15}} onClick={()=>handlePurchase("coffee")} disabled={loading}>{loading?t("loading"):`差し入れる　${prices.coffee||"¥120"}`}</button>
-        <button className="btn bs" style={{width:"100%",padding:"14px",fontSize:15}} onClick={onClose}>閉じる</button>
+        <button className="btn bp" style={{width:"100%",marginBottom:10,padding:"14px",fontSize:15,borderRadius:14}} onClick={()=>handlePurchase("coffee")} disabled={loading}>{loading?t("loading"):`差し入れる　${prices.coffee||"¥120"}`}</button>
+        <button className="btn bs" style={{width:"100%",padding:"14px",fontSize:15,borderRadius:14}} onClick={onClose}>閉じる</button>
       </div>
     </div>
   );
@@ -166,14 +166,14 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
   ];
 
   if(thankYou) return(
-    <div className="mo" onClick={onClose}>
-      <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center",padding:"32px 20px"}}>
+    <div className="mo" onClick={onClose} style={{alignItems:"center",justifyContent:"center"}}>
+      <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center",padding:"32px 20px",borderRadius:24,width:"90%",maxWidth:400}}>
         <div style={{fontSize:48,marginBottom:12}}>☕</div>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:20,fontWeight:700,color:T.primary,marginBottom:8}}>ありがとうございます！</div>
         <div style={{fontSize:14,color:T.text+"88",lineHeight:1.8,marginBottom:24}}>
           コーヒーの差し入れ、とても嬉しいです。<br/>開発の大きな励みになります✨
         </div>
-        <button className="btn bp" style={{width:"100%"}} onClick={onClose}>閉じる</button>
+        <button className="btn bp" style={{width:"100%",borderRadius:14}} onClick={onClose}>閉じる</button>
       </div>
     </div>
   );
@@ -944,14 +944,14 @@ function CameraSettingsModal({T,state,onSave,onClose}){
 
 function ResetConfirmModal({T,onConfirm,onCancel}){
   return(
-    <div className="mo" onClick={onCancel}>
-      <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center",borderRadius:20}}>
+    <div className="mo" onClick={onCancel} style={{alignItems:"center",justifyContent:"center"}}>
+      <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center",borderRadius:24,width:"90%",maxWidth:400}}>
         <div style={{fontSize:36,marginBottom:8}}>⚠️</div>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:17,fontWeight:700,color:"#E74C3C",marginBottom:8}}>本当にリセットしますか？</div>
         <div style={{fontSize:15,color:T.text+"88",marginBottom:20,lineHeight:1.7}}>すべてのデータが完全に削除されます。<br/>この操作は元に戻せません。</div>
         <div style={{display:"flex",gap:10}}>
-          <button className="btn bs blg" style={{flex:1}} onClick={onCancel}>戻る</button>
-          <button style={{flex:1,padding:"13px 20px",border:"none",borderRadius:13,fontSize:17,fontWeight:600,cursor:"pointer",background:"#E74C3C",color:"#fff",fontFamily:"'M PLUS Rounded 1c',sans-serif"}} onClick={onConfirm}>はい、削除する</button>
+          <button className="btn bs blg" style={{flex:1,borderRadius:14}} onClick={onCancel}>戻る</button>
+          <button style={{flex:1,padding:"13px 20px",border:"none",borderRadius:14,fontSize:17,fontWeight:600,cursor:"pointer",background:"#E74C3C",color:"#fff",fontFamily:"'M PLUS Rounded 1c',sans-serif"}} onClick={onConfirm}>はい、削除する</button>
         </div>
       </div>
     </div>
