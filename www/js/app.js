@@ -83,14 +83,14 @@ function OnboardingScreen({T,onComplete}){
           style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:55,fontWeight:800,
             color:T.primary,width:150,textAlign:"center",outline:"none",
             letterSpacing:-2,lineHeight:1,borderBottomColor:T.soft}}/>
-        <span style={{fontSize:15,fontWeight:700,color:T.text+"66",paddingBottom:10}}>枚</span>
+        <span style={{fontSize:15,fontWeight:700,color:T.text+"66",paddingBottom:10}}>{LANG==="ja"?"枚":""}</span>
       </div>
     );
     if(step===2) return(
       <div style={{flex:1,display:"flex",flexDirection:"column",justifyContent:"center",padding:"0 4px"}}>
         <div style={{display:"flex",alignItems:"baseline",justifyContent:"center",gap:5,marginBottom:20}}>
           <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:55,fontWeight:800,color:T.primary,letterSpacing:-2,lineHeight:1}}>{intervalDays}</span>
-          <span style={{fontSize:15,fontWeight:700,color:T.text+"66",paddingBottom:10}}>日ごと</span>
+          <span style={{fontSize:15,fontWeight:700,color:T.text+"66",paddingBottom:10}}>{LANG==="ja"?"日ごと":"days"}</span>
         </div>
         <input type="range" min={3} max={15} value={intervalDays}
           onChange={e=>setIntervalDays(parseInt(e.target.value))}
@@ -98,8 +98,8 @@ function OnboardingScreen({T,onComplete}){
             WebkitAppearance:"none",appearance:"none",
             background:`linear-gradient(to right,${T.primary} ${((intervalDays-3)/12)*100}%,${T.soft} ${((intervalDays-3)/12)*100}%)`}}/>
         <div style={{display:"flex",justifyContent:"space-between",marginTop:10}}>
-          <span style={{fontSize:11,fontWeight:700,color:T.text+"55"}}>3日</span>
-          <span style={{fontSize:11,fontWeight:700,color:T.text+"55"}}>15日</span>
+          <span style={{fontSize:11,fontWeight:700,color:T.text+"55"}}>{LANG==="ja"?"3日":"3d"}</span>
+          <span style={{fontSize:11,fontWeight:700,color:T.text+"55"}}>{LANG==="ja"?"15日":"15d"}</span>
         </div>
       </div>
     );
@@ -107,7 +107,7 @@ function OnboardingScreen({T,onComplete}){
       <div style={{flex:1,display:"flex",flexDirection:"column",justifyContent:"center",padding:"0 4px"}}>
         <div style={{display:"flex",alignItems:"baseline",justifyContent:"center",gap:5,marginBottom:20}}>
           <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:55,fontWeight:800,color:T.primary,letterSpacing:-2,lineHeight:1}}>{targetHours}</span>
-          <span style={{fontSize:15,fontWeight:700,color:T.text+"66",paddingBottom:10}}>時間</span>
+          <span style={{fontSize:15,fontWeight:700,color:T.text+"66",paddingBottom:10}}>{LANG==="ja"?"時間":"hrs"}</span>
         </div>
         <input type="range" min={16} max={24} value={targetHours}
           onChange={e=>setTargetHours(parseInt(e.target.value))}
@@ -115,8 +115,8 @@ function OnboardingScreen({T,onComplete}){
             WebkitAppearance:"none",appearance:"none",
             background:`linear-gradient(to right,${T.primary} ${((targetHours-16)/8)*100}%,${T.soft} ${((targetHours-16)/8)*100}%)`}}/>
         <div style={{display:"flex",justifyContent:"space-between",marginTop:10}}>
-          <span style={{fontSize:11,fontWeight:700,color:T.text+"55"}}>16時間</span>
-          <span style={{fontSize:11,fontWeight:700,color:T.text+"55"}}>24時間</span>
+          <span style={{fontSize:11,fontWeight:700,color:T.text+"55"}}>{LANG==="ja"?"16時間":"16h"}</span>
+          <span style={{fontSize:11,fontWeight:700,color:T.text+"55"}}>{LANG==="ja"?"24時間":"24h"}</span>
         </div>
       </div>
     );
@@ -128,7 +128,7 @@ function OnboardingScreen({T,onComplete}){
       <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:30,fontWeight:900,letterSpacing:-0.5}}>
         <span style={{color:T.text+"99"}}>Smile</span><span style={{color:T.primary}}>Track</span>
       </div>
-      <div style={{fontSize:12,fontWeight:600,color:T.text+"66",letterSpacing:2,marginTop:2}}>マウスピース矯正管理</div>
+      <div style={{fontSize:12,fontWeight:600,color:T.text+"66",letterSpacing:2,marginTop:2}}>{t("appSub")}</div>
       <div style={{display:"flex",gap:5,marginTop:18}}>
         {[0,1,2,3].map(i=>(
           <div key={i} style={{flex:1,height:5,borderRadius:99,overflow:"hidden",background:T.soft}}>
@@ -160,11 +160,11 @@ function OnboardingScreen({T,onComplete}){
         </div>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:26,fontWeight:900,color:T.text+"99",marginBottom:8}}>設定完了</div>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:13,fontWeight:600,color:T.text+"66",lineHeight:1.75,marginBottom:16}}>
-          素敵な笑顔に向けて、一緒に頑張りましょう。
+          {t("obCompleteMsg")}
         </div>
         <div style={{width:"100%",height:1,background:T.soft,marginBottom:16}}/>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:14,fontWeight:700,letterSpacing:1.2,textTransform:"uppercase",color:T.text+"77",marginBottom:8}}>
-          治療終了予定日
+          {t("obEndDate")}
         </div>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:36,fontWeight:900,
           color:T.primary,letterSpacing:-1,lineHeight:1.1}}>
@@ -179,13 +179,13 @@ function OnboardingScreen({T,onComplete}){
             background:T.primary,color:"#fff",fontFamily:"'M PLUS Rounded 1c',sans-serif",
             fontSize:16,fontWeight:800,cursor:"pointer",letterSpacing:0.3,
             boxShadow:`0 6px 20px ${T.primary}44`,marginBottom:4}}>
-          はじめる →
+          {t("start")}
         </button>
         <button onClick={()=>setStep(3)}
           style={{background:"none",border:"none",fontFamily:"'M PLUS Rounded 1c',sans-serif",
             fontSize:13,fontWeight:700,color:T.text+"44",cursor:"pointer",
             padding:12,textAlign:"center",width:"100%"}}>
-          ← 戻る
+          {t("back")}
         </button>
       </div>
     </div>
