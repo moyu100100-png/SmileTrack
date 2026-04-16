@@ -57,7 +57,7 @@ function PinPad({T,title,onDone}){
   };
   return(
     <div>
-      <div style={{textAlign:"center",fontWeight:600,fontSize:16,marginBottom:4,color:error?T.accent:T.text}}>{error?"PINが違います":title}</div>
+      <div style={{textAlign:"center",fontWeight:600,fontSize:16,marginBottom:4,color:error?T.accent:T.text}}>{error?LANG==="ja"?"PINが違います":"Wrong PIN":title}</div>
       <div className="pin-dots">{[0,1,2,3].map(i=><div key={i} className={`pin-dot${val.length>i?" on":""}`} style={error?{borderColor:T.accent,background:T.accent}:{}}/>)}</div>
       <div className="pin-grid">
         {["1","2","3","4","5","6","7","8","9","","0","del"].map((k,i)=>
@@ -76,7 +76,7 @@ function Drawer({T,open,onClose,onSection,onReset}){
     {icon:Icons.camSettings,label:t("cameraSettings"),  key:"cameraSettings"},
     {icon:Icons.timerIcon, label:t("timerSettings"),    key:"timerSettings"},
     {icon:Icons.schedule,  label:t("schedule"),         key:"schedule"},
-    {icon:Icons.palette,   label:"カラーテーマ",       key:"color"},
+    {icon:Icons.palette,   label:t("colorTheme"),       key:"color"},
   ];
   const starIcon=(c,s=18)=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>;
   const coffeeIcon=(c,s=18)=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>;
@@ -105,11 +105,11 @@ function Drawer({T,open,onClose,onSection,onReset}){
           {/* 課金系 */}
           <div className="di" onClick={()=>{onSection("premium");onClose();}}>
             <span style={{width:26,display:"flex",alignItems:"center",justifyContent:"center"}}>{starIcon(T.primary)}</span>
-            <span className="di-lbl">プレミアムプラン</span>
+            <span className="di-lbl">{t("premium")}</span>
           </div>
           <div className="di" onClick={()=>{onSection("coffee");onClose();}}>
             <span style={{width:26,display:"flex",alignItems:"center",justifyContent:"center"}}>{coffeeIcon(T.primary)}</span>
-            <span className="di-lbl">開発者にコーヒーを差し入れ</span>
+            <span className="di-lbl">{t("coffee")}</span>
           </div>
 
           <div className="sep"/>
@@ -117,7 +117,7 @@ function Drawer({T,open,onClose,onSection,onReset}){
           {/* おすすめ */}
           <div className="di" onClick={()=>{window.open(AFFILIATE_ITEMS[0].url,"_blank");onClose();}}>
             <span style={{width:26,display:"flex",alignItems:"center",justifyContent:"center"}}>{giftIcon(T.primary)}</span>
-            <span className="di-lbl">おすすめグッズを見る</span>
+            <span className="di-lbl">{LANG==="ja"?"おすすめグッズを見る":"Recommended items"}</span>
           </div>
 
           <div className="sep"/>
@@ -125,18 +125,18 @@ function Drawer({T,open,onClose,onSection,onReset}){
           {/* その他 */}
           <div className="di" onClick={()=>{onSection("backup");onClose();}}>
             <span style={{width:26,display:"flex",alignItems:"center",justifyContent:"center"}}>{backupIcon(T.primary)}</span>
-            <span className="di-lbl">バックアップ</span>
+            <span className="di-lbl">{t("backup")}</span>
           </div>
           <div className="di" onClick={()=>{onSection("about");onClose();}}>
             <span style={{width:26,display:"flex",alignItems:"center",justifyContent:"center"}}>{infoIcon(T.primary)}</span>
-            <span className="di-lbl">アプリについて</span>
+            <span className="di-lbl">{t("about")}</span>
           </div>
 
           <div className="sep"/>
 
           <div className="di" onClick={()=>{onReset();onClose();}}>
             <span style={{width:26,display:"flex",alignItems:"center",justifyContent:"center"}}>{Icons.reset("#E74C3C")}</span>
-            <span className="di-lbl" style={{color:"#E74C3C"}}>記録をすべてリセット</span>
+            <span className="di-lbl" style={{color:"#E74C3C"}}>{LANG==="ja"?"記録をすべてリセット":"Reset All Data"}</span>
           </div>
         </div>
       </div>
@@ -193,7 +193,7 @@ function AffiliatePopup({T,type,onClose}){
             楽天で見る
           </button>
         </div>
-        <button className="btn bs" style={{width:"100%"}} onClick={onClose}>閉じる</button>
+        <button className="btn bs" style={{width:"100%"}} onClick={onClose}>{t("close")}</button>
       </div>
     </div>
   );

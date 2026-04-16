@@ -33,7 +33,7 @@ function HomePreviewModal({T,themeName,themeObj,onClose}){
         <div style={{fontSize:12,color:T.accent,marginBottom:14,fontWeight:600}}>
           🔒 プレミアムプランで全テーマ使い放題
         </div>
-        <button className="btn bs" style={{width:"100%"}} onClick={onClose}>閉じる</button>
+        <button className="btn bs" style={{width:"100%"}} onClick={onClose}>{t("close")}</button>
       </div>
     </div>
   );
@@ -46,7 +46,7 @@ function AboutModal({T,onClose}){
       navigator.share({title:"SmileTrack",text:"マウスピース矯正の管理アプリ「SmileTrack」を使ってみてください！",url:"https://smiletrack.app"});
     } else {
       navigator.clipboard?.writeText("https://smiletrack.app");
-      showToast(LANG==="ja"?"URLをコピーしました！":"URL copied!");
+      showToast(LANG==="ja"?LANG==="ja"?"URLをコピーしました！":"URL copied!":"URL copied!");
     }
   };
   const docIcon=<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>;
@@ -64,17 +64,17 @@ function AboutModal({T,onClose}){
   return(
     <div className="mo" onClick={onClose}>
       <div className="md" onClick={e=>e.stopPropagation()}>
-        <div className="mdtitle">アプリについて</div>
+        <div className="mdtitle">{t("about")}</div>
         <div style={{fontSize:11,color:T.text+"55",marginBottom:16,textAlign:"center"}}>SmileTrack ver 1.0.0</div>
 
-        <Row icon={docIcon} label="利用規約" onClick={()=>window.open("https://pickled-runner-04f.notion.site/ebd//329470522fe180399354fbae6be51bfb","_blank")}/>
-        <Row icon={lockIcon} label="プライバシーポリシー" onClick={()=>window.open("https://pickled-runner-04f.notion.site/ebd//329470522fe180d884bfc0afe2d3dd94","_blank")}/>
-        <Row icon={mailIcon} label="お問い合わせ" onClick={()=>window.open("mailto:contact.appname@gmail.com")}/>
-        <Row icon={starIcon} label="App Storeでレビューを書く" onClick={()=>window.open("https://apps.apple.com/app/smiletrack","_blank")}/>
-        <Row icon={starIcon} label="Google Playでレビューを書く" onClick={()=>window.open("https://play.google.com/store/apps/details?id=app.smiletrack","_blank")}/>
-        <Row icon={shareIcon} label="友人にアプリを教える" onClick={share}/>
+        <Row icon={docIcon} label={LANG==="ja"?"利用規約":"Terms of Service"} onClick={()=>window.open("https://pickled-runner-04f.notion.site/ebd//329470522fe180399354fbae6be51bfb","_blank")}/>
+        <Row icon={lockIcon} label={LANG==="ja"?"プライバシーポリシー":"Privacy Policy"} onClick={()=>window.open("https://pickled-runner-04f.notion.site/ebd//329470522fe180d884bfc0afe2d3dd94","_blank")}/>
+        <Row icon={mailIcon} label={LANG==="ja"?"お問い合わせ":"Contact"} onClick={()=>window.open("mailto:contact.appname@gmail.com")}/>
+        <Row icon={starIcon} label={t("review")} onClick={()=>window.open("https://apps.apple.com/app/smiletrack","_blank")}/>
+        <Row icon={starIcon} label={LANG==="ja"?"Google Playでレビューを書く":"Rate on Google Play"} onClick={()=>window.open("https://play.google.com/store/apps/details?id=app.smiletrack","_blank")}/>
+        <Row icon={shareIcon} label={LANG==="ja"?"友人にアプリを教える":"Share with friends"} onClick={share}/>
 
-        <button className="btn bs" style={{width:"100%",marginTop:16}} onClick={onClose}>閉じる</button>
+        <button className="btn bs" style={{width:"100%",marginTop:16}} onClick={onClose}>{t("close")}</button>
       </div>
     </div>
   );
@@ -152,7 +152,7 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
           SmileTrackの継続と新機能の開発のため<br/>コーヒー1杯分のサポートをいただけると<br/>大きな励みになります🙏
         </div>
         <button className="btn bp" style={{width:"100%",marginBottom:10,padding:"14px",fontSize:15,borderRadius:14}} onClick={()=>handlePurchase("coffee")} disabled={loading}>{loading?t("loading"):`差し入れる　${prices.coffee||"¥120"}`}</button>
-        <button className="btn bs" style={{width:"100%",padding:"14px",fontSize:15,borderRadius:14}} onClick={onClose}>閉じる</button>
+        <button className="btn bs" style={{width:"100%",padding:"14px",fontSize:15,borderRadius:14}} onClick={onClose}>{t("close")}</button>
       </div>
     </div>
   );
@@ -173,7 +173,7 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
         <div style={{fontSize:14,color:T.text+"88",lineHeight:1.8,marginBottom:24}}>
           コーヒーの差し入れ、とても嬉しいです。<br/>開発の大きな励みになります✨
         </div>
-        <button className="btn bp" style={{width:"100%",borderRadius:14}} onClick={onClose}>閉じる</button>
+        <button className="btn bp" style={{width:"100%",borderRadius:14}} onClick={onClose}>{t("close")}</button>
       </div>
     </div>
   );
@@ -230,7 +230,7 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
           ))}
         </div>
 
-        <button className="btn bs" style={{width:"100%",marginTop:8}} onClick={onClose}>閉じる</button>
+        <button className="btn bs" style={{width:"100%",marginTop:8}} onClick={onClose}>{t("close")}</button>
       </div>
     </div>
   );
@@ -278,7 +278,7 @@ function ColorModal({T,themeName,onPick,onClose}){
         {previewTheme&&THEMES[previewTheme]&&(
           <HomePreviewModal T={T} themeName={previewTheme} themeObj={THEMES[previewTheme]} onClose={()=>setPreviewTheme(null)}/>
         )}
-        <button className="btn bs" style={{width:"100%"}} onClick={onClose}>閉じる</button>
+        <button className="btn bs" style={{width:"100%"}} onClick={onClose}>{t("close")}</button>
       </div>
     </div>
   );
@@ -308,8 +308,8 @@ function SettingsModal({T,state,onSave,onClose}){
           <option value={0}>日曜日</option><option value={1}>月曜日</option>
         </select>
         <div style={{display:"flex",gap:8}}>
-          <button className="btn bs" style={{flex:1}} onClick={onClose}>キャンセル</button>
-          <button className="btn bp" style={{flex:1}} onClick={()=>{onSave(sf,th,sd,tp);onClose();}}>保存</button>
+          <button className="btn bs" style={{flex:1}} onClick={onClose}>{t("cancel")}</button>
+          <button className="btn bp" style={{flex:1}} onClick={()=>{onSave(sf,th,sd,tp);onClose();}}>{t("save")}</button>
         </div>
       </div>
     </div>
@@ -341,8 +341,8 @@ function TimerSettingsModal({T,state,onSave,onClose}){
 
   const addWord=()=>{
     const w=newWord.replace(/\s/g,"").slice(0,6);
-    if(!w){setErr(LANG==="ja"?"文字を入力してください":"Please enter text");return;}
-    if(pool.includes(w)){setErr(LANG==="ja"?"同じ項目がすでにあります":"Item already exists");return;}
+    if(!w){setErr(LANG==="ja"?LANG==="ja"?"文字を入力してください":"Please enter text":"Please enter text");return;}
+    if(pool.includes(w)){setErr(LANG==="ja"?LANG==="ja"?"同じ項目がすでにあります":"Item already exists":"Item already exists");return;}
     if(pool.length>=MAX_ALL-1){setErr(`項目は${MAX_ALL-1}個まで（ーを除く）`);return;}
     setPool(p=>[...p,w]);
     setNewWord("");setErr("");
@@ -466,8 +466,8 @@ function TimerSettingsModal({T,state,onSave,onClose}){
         })()}
 
         <div style={{display:"flex",gap:8,marginTop:16}}>
-          <button className="btn bs" style={{flex:1}} onClick={onClose}>キャンセル</button>
-          <button className="btn bp" style={{flex:1}} onClick={save}>保存</button>
+          <button className="btn bs" style={{flex:1}} onClick={onClose}>{t("cancel")}</button>
+          <button className="btn bp" style={{flex:1}} onClick={save}>{t("save")}</button>
         </div>
       </div>
     </div>
@@ -611,7 +611,7 @@ function ScheduleModal({T,state,update,onClose}){
           </div>
         </div>
 
-        <button className="btn bs" style={{width:"100%"}} onClick={onClose}>閉じる</button>
+        <button className="btn bs" style={{width:"100%"}} onClick={onClose}>{t("close")}</button>
       </div>
 
       {/* 個別ピース編集 */}
@@ -648,8 +648,8 @@ function ScheduleModal({T,state,update,onClose}){
                 {Array.from({length:21},(_,i)=>i+1).map(d=><option key={d} value={d}>{d}日間</option>)}
               </select>
               <div style={{display:"flex",gap:8,marginBottom:8}}>
-                <button className="btn bs" style={{flex:1}} onClick={()=>setEditPiece(null)}>キャンセル</button>
-                <button className="btn bp" style={{flex:1}} onClick={()=>{const ci={...(state.customIntervals||{})};ci[editPiece]=editDays;update({customIntervals:ci});setEditPiece(null);}}>保存</button>
+                <button className="btn bs" style={{flex:1}} onClick={()=>setEditPiece(null)}>{t("cancel")}</button>
+                <button className="btn bp" style={{flex:1}} onClick={()=>{const ci={...(state.customIntervals||{})};ci[editPiece]=editDays;update({customIntervals:ci});setEditPiece(null);}}>{t("save")}</button>
               </div>
               {state.customIntervals?.[editPiece]&&(
                 <button style={{width:"100%",padding:"9px",border:"none",borderRadius:10,background:"#FFF0F0",color:"#E74C3C",cursor:"pointer",fontWeight:600,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}
@@ -761,8 +761,8 @@ function NotifyModal({T,state,onSave,onClose}){
         )}
 
         <div style={{display:"flex",gap:8,marginTop:16}}>
-          <button className="btn bs" style={{flex:1}} onClick={onClose}>キャンセル</button>
-          <button className="btn bp" style={{flex:1}} onClick={()=>{onSave({...f,settings:{...state.settings,...sf}});onClose();}}>保存</button>
+          <button className="btn bs" style={{flex:1}} onClick={onClose}>{t("cancel")}</button>
+          <button className="btn bp" style={{flex:1}} onClick={()=>{onSave({...f,settings:{...state.settings,...sf}});onClose();}}>{t("save")}</button>
         </div>
       </div>
     </div>
@@ -801,7 +801,7 @@ function BackupModal({T,state,onImport,onClose}){
       const url=URL.createObjectURL(blob);
       if(navigator.share){
         const file=new File([blob],"smiletrack_backup.json",{type:"application/json"});
-        await navigator.share({files:[file],title:"SmileTrack バックアップ"});
+        await navigator.share({files:[file],title:LANG==="ja"?"SmileTrack バックアップ":"SmileTrack Backup"});
       } else {
         const a=document.createElement("a");
         a.href=url;
@@ -811,7 +811,7 @@ function BackupModal({T,state,onImport,onClose}){
         document.body.removeChild(a);
       }
       URL.revokeObjectURL(url);
-    }catch(e){console.warn(LANG==="ja"?"エクスポートに失敗しました":"Export failed",e);showToast(LANG==="ja"?"エクスポートに失敗しました":"Export failed");}
+    }catch(e){console.warn(LANG==="ja"?LANG==="ja"?"エクスポートに失敗しました":"Export failed":"Export failed",e);showToast(LANG==="ja"?LANG==="ja"?"エクスポートに失敗しました":"Export failed":"Export failed");}
     setExporting(false);
   };
 
@@ -831,7 +831,7 @@ function BackupModal({T,state,onImport,onClose}){
         <div style={{fontSize:12,color:T.text+"77",marginBottom:12}}>写真を含む全データをバックアップします</div>
         <button className="btn bp blg" style={{width:"100%",marginBottom:10,opacity:exporting?0.6:1}}
           onClick={doExport} disabled={exporting}>
-          {exporting?LANG==="ja"?"エクスポート中...":"Exporting...":LANG==="ja"?"エクスポート":"Export"}
+          {exporting?LANG==="ja"?LANG==="ja"?"エクスポート中...":"Exporting...":"Exporting...":LANG==="ja"?LANG==="ja"?"エクスポート":"Export":"Export"}
         </button>
         <button className="btn bs blg" style={{width:"100%"}} onClick={()=>fileRef.current?.click()}>インポート</button>
         <input ref={fileRef} type="file" accept=".json" style={{display:"none"}} onChange={e=>{
@@ -839,7 +839,7 @@ function BackupModal({T,state,onImport,onClose}){
           const r=new FileReader();
           r.onload=ev=>{
             try{doImport(JSON.parse(ev.target.result));}
-            catch{console.warn(LANG==="ja"?"ファイルが無効です":"Invalid file");showToast(LANG==="ja"?"ファイルが無効です":"Invalid file");}
+            catch{console.warn(LANG==="ja"?LANG==="ja"?"ファイルが無効です":"Invalid file":"Invalid file");showToast(LANG==="ja"?LANG==="ja"?"ファイルが無効です":"Invalid file":"Invalid file");}
           };
           r.readAsText(f);
         }}/>
@@ -849,7 +849,7 @@ function BackupModal({T,state,onImport,onClose}){
           <button className="btn bs blg" style={{width:"100%"}} onClick={handleRestore} disabled={loading}>{loading?t("loading"):"購入を復元する"}</button>
         </div>
         {errorMsg&&<div style={{fontSize:12,color:"#D4445A",textAlign:"center",margin:"8px 0",lineHeight:1.6}}>{errorMsg}</div>}
-        <button className="btn bs" style={{width:"100%",marginTop:12}} onClick={onClose}>閉じる</button>
+        <button className="btn bs" style={{width:"100%",marginTop:12}} onClick={onClose}>{t("close")}</button>
       </div>
     </div>
   );
@@ -901,7 +901,7 @@ function CameraSettingsModal({T,state,onSave,onClose}){
 
         {/* ミラー設定 */}
         <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif",marginBottom:6}}>保存設定</div>
-        <Toggle T={T} on={mirror} label=LANG==="ja"?"カメラ画像を左右反転して保存":"Save mirrored" onToggle={()=>setMirror(v=>!v)}/>
+        <Toggle T={T} on={mirror} label={LANG==="ja"?"カメラ画像を左右反転して保存":"Save mirrored image"} onToggle={()=>setMirror(v=>!v)}/>
 
 
         {/* 撮影スロット */}
@@ -919,7 +919,7 @@ function CameraSettingsModal({T,state,onSave,onClose}){
                 background:T.soft,borderRadius:10,padding:"8px 12px",cursor:"pointer"}}
                 onClick={()=>setSelectingSlot(isOpen?null:slotN)}>
                 <span style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>{slotN}：{modeInfo.labelJP}</span>
-                <span style={{fontSize:13,fontWeight:600,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>{isOpen?"▲ 閉じる":"▼ 変更"}</span>
+                <span style={{fontSize:13,fontWeight:600,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>{isOpen?(LANG==="ja"?"▲ 閉じる":"▲ Close"):(LANG==="ja"?"▼ 変更":"▼ Change")}</span>
               </div>
               {isOpen&&(
                 <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6,marginTop:8,padding:"8px",background:T.bg,borderRadius:10}}>
@@ -934,8 +934,8 @@ function CameraSettingsModal({T,state,onSave,onClose}){
         })}
 
         <div style={{display:"flex",gap:8,marginTop:14}}>
-          <button className="btn bs" style={{flex:1}} onClick={onClose}>キャンセル</button>
-          <button className="btn bp" style={{flex:1}} onClick={()=>{onSave({cameraSettings:{...cs,mirrorSave:mirror,slot1,slot2}});onClose();}}>保存</button>
+          <button className="btn bs" style={{flex:1}} onClick={onClose}>{t("cancel")}</button>
+          <button className="btn bp" style={{flex:1}} onClick={()=>{onSave({cameraSettings:{...cs,mirrorSave:mirror,slot1,slot2}});onClose();}}>{t("save")}</button>
         </div>
       </div>
     </div>

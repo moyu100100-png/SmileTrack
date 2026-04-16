@@ -194,7 +194,7 @@ function PhotoPage({T,state,update,todayStr}){
   return(
     <div style={{padding:12}}>
       <div className="card" style={{marginBottom:10}}>
-        <div className="ct" style={{marginBottom:8,fontSize:14}}>写真を撮影</div>
+        <div className="ct" style={{marginBottom:8,fontSize:14}}>{LANG==="ja"?"写真を撮影":"Take Photo"}</div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9}}>
           <button className="btn bp" onClick={()=>openCam(slot1Id)} style={{padding:"12px 8px",flexDirection:"column"}}>
             <div style={{display:"flex",alignItems:"center",gap:4}}>{Icons.camera("#fff",14)}<span style={{fontSize:14}}>{slot1Info.labelJP}</span></div>
@@ -234,28 +234,28 @@ function PhotoPage({T,state,update,todayStr}){
           <div style={{fontSize:22,marginBottom:6}}>🔒</div>
           <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4}}>{LANG==="ja"?"プレミアム限定です":"Premium only"}</div>
           <div style={{fontSize:12,color:T.accent,marginBottom:12}}>{LANG==="ja"?"2つ目の撮影スロットでより多くの角度を記録できます。":"Record more angles with a 2nd photo slot."}</div>
-          <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowSlot2Gate(false)}>閉じる</button>
+          <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowSlot2Gate(false)}>{t("close")}</button>
         </div>
       )}
       {showPinGate&&(
         <div className="card" style={{textAlign:"center",padding:"16px 14px"}}>
           <div style={{fontSize:22,marginBottom:6}}>🔒</div>
           <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4}}>PINロックはプレミアム限定です</div>
-          <div style={{fontSize:12,color:T.accent,marginBottom:12}}>写真アルバムをPINで保護できます。</div>
-          <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowPinGate(false)}>閉じる</button>
+          <div style={{fontSize:12,color:T.accent,marginBottom:12}}>{LANG==="ja"?"写真アルバムをPINで保護できます。":"Protect your album with a PIN."}</div>
+          <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowPinGate(false)}>{t("close")}</button>
         </div>
       )}
 
       <div className="card">
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
           <div style={{display:"flex",alignItems:"center",gap:8}}>
-            <div className="ct" style={{margin:0,fontSize:14}}>フォトアルバム</div>
+            <div className="ct" style={{margin:0,fontSize:14}}>{LANG==="ja"?"フォトアルバム":"Photo Album"}</div>
             {!isLocked&&(isPremium?(
               <button className={`btn bsm ${compareMode?"bp":"bs"}`} onClick={()=>{setCompareMode(v=>!v);setComparePick([]);}} style={{fontSize:11}}>
                 {compareMode?"キャンセル":"比較"}
               </button>
             ):(
-              <button className="btn bsm bs" style={{fontSize:11,opacity:0.6}} onClick={()=>setShowComparePreview(true)}>🔒比較</button>
+              <button className="btn bsm bs" style={{fontSize:11,opacity:0.6}} onClick={()=>setShowComparePreview(true)}>🔒{t("compare")}</button>
             ))}
           </div>
           {isPremium?(
@@ -264,11 +264,11 @@ function PhotoPage({T,state,update,todayStr}){
             </button>
           ):(
             <button onClick={()=>setShowPinGate(true)} style={{display:"flex",alignItems:"center",gap:5,padding:"5px 10px",border:`1.5px solid ${T.soft}`,borderRadius:8,background:T.soft,cursor:"pointer",color:T.primary,fontSize:13,fontWeight:600,fontFamily:"'M PLUS Rounded 1c',sans-serif",opacity:0.6}}>
-              <span style={{fontSize:13}}>🔒</span><span>ロック</span>
+              <span style={{fontSize:13}}>🔒</span><span>{t("pinLock")}</span>
             </button>
           )}
         </div>
-        {isLocked?<PinPad T={T} title="PINを入力" onDone={p=>{if(p===state.photoLock){setUnlocked(true);}else return false;}}/>
+        {isLocked?<PinPad T={T} title=t("pinInput") onDone={p=>{if(p===state.photoLock){setUnlocked(true);}else return false;}}/>
         :<>
           <div style={{display:"flex",gap:6,marginBottom:10,flexWrap:"wrap"}}>
             {filterTabs.map(([v,lbl])=>(
@@ -450,8 +450,8 @@ function PhotoPage({T,state,update,todayStr}){
                   </select>
                 </div>
                 <div style={{display:"flex",gap:8}}>
-                  <button className="btn bs" style={{flex:1}} onClick={()=>{setCaptured(null);openCam(cameraMode);}}>撮り直し</button>
-                  <button className="btn bp" style={{flex:1}} onClick={savePhoto}>保存</button>
+                  <button className="btn bs" style={{flex:1}} onClick={()=>{setCaptured(null);openCam(cameraMode);}}>{t("retake")}</button>
+                  <button className="btn bp" style={{flex:1}} onClick={savePhoto}>{t("savePhoto")}</button>
                 </div>
               </div>
             </div>
@@ -495,8 +495,8 @@ function PhotoPage({T,state,update,todayStr}){
               img.src=photo.data;
             }}>↔ 左右反転して保存</button>
             <div style={{display:"flex",gap:8,marginBottom:8}}>
-              <button className="btn bs" style={{flex:1}} onClick={()=>setEditId(null)}>キャンセル</button>
-              <button className="btn bp" style={{flex:1}} onClick={()=>{update({photos:state.photos.map(p=>p.id===editId?{...p,comment:editComment,date:editDate,piece:editPiece}:p)});setEditId(null);}}>保存</button>
+              <button className="btn bs" style={{flex:1}} onClick={()=>setEditId(null)}>{t("cancel")}</button>
+              <button className="btn bp" style={{flex:1}} onClick={()=>{update({photos:state.photos.map(p=>p.id===editId?{...p,comment:editComment,date:editDate,piece:editPiece}:p)});setEditId(null);}}>{t("savePhoto")}</button>
             </div>
 
           </div>
@@ -584,7 +584,7 @@ function PhotoPage({T,state,update,todayStr}){
             </select>
 
             <div style={{display:"flex",gap:8}}>
-              <button className="btn bs" style={{flex:1}} onClick={()=>{setAlbumCropPhoto(null);if(!state.isPremium&&!state.noAds) AdMobHelper.showBanner();}}>キャンセル</button>
+              <button className="btn bs" style={{flex:1}} onClick={()=>{setAlbumCropPhoto(null);if(!state.isPremium&&!state.noAds) AdMobHelper.showBanner();}}>{t("cancel")}</button>
               <button className="btn bp" style={{flex:1,opacity:albumMeta.shotMode?"1":"0.4",cursor:albumMeta.shotMode?"pointer":"default"}}
                 onClick={()=>{
                   if(!albumMeta.shotMode) return;
@@ -621,7 +621,7 @@ function PhotoPage({T,state,update,todayStr}){
                     if(!state.isPremium&&!state.noAds) AdMobHelper.showBanner();
                   };
                   img.src=albumCropPhoto.src;
-                }}>保存</button>
+                }}>{t("savePhoto")}</button>
             </div>
           </div>
         </div>
@@ -637,7 +637,7 @@ function PhotoPage({T,state,update,todayStr}){
             <div className="mdtitle" style={{marginBottom:8}}>写真を削除</div>
             <div style={{fontSize:14,color:T.text+"88",marginBottom:20}}>この写真を削除しますか？<br/>削除すると元に戻せません。</div>
             <div style={{display:"flex",gap:8}}>
-              <button className="btn bs" style={{flex:1}} onClick={()=>setDeleteConfirmId(null)}>キャンセル</button>
+              <button className="btn bs" style={{flex:1}} onClick={()=>setDeleteConfirmId(null)}>{t("cancel")}</button>
               <button style={{flex:1,padding:"10px",border:"none",borderRadius:12,background:"#E74C3C",color:"#fff",fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16}}
                 onClick={()=>{update({photos:state.photos.filter(p=>p.id!==deleteConfirmId)});setDeleteConfirmId(null);}}>{LANG==="ja"?"削除する":"Delete"}</button>
             </div>
@@ -645,7 +645,7 @@ function PhotoPage({T,state,update,todayStr}){
         </div>
       )}
       {showComparePreview&&<ComparePreviewModal T={T} onClose={()=>setShowComparePreview(false)}/>}
-      {showSetPin&&(<div className="mo" onClick={()=>setShowSetPin(false)}><div className="md" onClick={e=>e.stopPropagation()}><div className="mdtitle">アルバムをロック</div>{state.photoLockEnabled?<><div style={{fontSize:14,color:T.text+"88",marginBottom:12}}>解除するにはPINを入力してください</div><PinPad T={T} title="PINを入力" onDone={p=>{if(p===state.photoLock){update({photoLockEnabled:false,photoLock:null});setUnlocked(false);setShowSetPin(false);}else alert("PINが違います");}}/></>:<PinPad T={T} title="PINを設定（4桁）" onDone={p=>{update({photoLock:p,photoLockEnabled:true});alert("PINを設定しました");setShowSetPin(false);}}/>}<button className="btn bs" style={{width:"100%",marginTop:10}} onClick={()=>setShowSetPin(false)}>キャンセル</button></div></div>)}
+      {showSetPin&&(<div className="mo" onClick={()=>setShowSetPin(false)}><div className="md" onClick={e=>e.stopPropagation()}><div className="mdtitle">{t("pinLock")}</div>{state.photoLockEnabled?<><div style={{fontSize:14,color:T.text+"88",marginBottom:12}}>{t("pinUnlock")}</div><PinPad T={T} title={t("pinInput")} onDone={p=>{if(p===state.photoLock){update({photoLockEnabled:false,photoLock:null});setUnlocked(false);setShowSetPin(false);}else return false;}}/></>:<PinPad T={T} title={t("pinSet")} onDone={p=>{update({photoLock:p,photoLockEnabled:true});alert(t("pinSetDone"));setShowSetPin(false);}}/>}<button className="btn bs" style={{width:"100%",marginTop:10}} onClick={()=>setShowSetPin(false)}>{t("cancel")}</button></div></div>)}
     </div>
   );
 }
@@ -720,7 +720,7 @@ function PDFPreviewModal({T,onClose,onUpgrade}){
           <div dangerouslySetInnerHTML={{__html:previewHTML}}/>
         </div>
         <div style={{fontSize:11,color:T.text+"66",textAlign:"center",marginBottom:14}}>実際のデータで毎月1クリックでPDF出力できます</div>
-        <button className="btn bs" style={{width:"100%"}} onClick={onClose}>閉じる</button>
+        <button className="btn bs" style={{width:"100%"}} onClick={onClose}>{t("close")}</button>
       </div>
     </div>
   );
@@ -927,7 +927,7 @@ function ReportModal({T,state,onClose}){
           {months.map(({year,month})=>(<option key={year+"-"+month} value={year+"-"+month}>{year}年{month}月</option>))}
         </select>
         <div style={{display:"flex",gap:8}}>
-          <button className="btn bs" style={{flex:1}} onClick={onClose}>キャンセル</button>
+          <button className="btn bs" style={{flex:1}} onClick={onClose}>{t("cancel")}</button>
           <button className="btn bp" style={{flex:1}} onClick={openReport}>PDF出力</button>
         </div>
       </div>
@@ -975,7 +975,7 @@ function ComparePreviewModal({T,onClose}){
         <div style={{padding:"8px 0 0"}}>
           <input type="range" min={0} max={100} value={pos} onChange={e=>setPos(Number(e.target.value))} style={{width:"100%",accentColor:T.primary}}/>
         </div>
-        <button className="btn bs" style={{width:"100%",marginTop:10}} onClick={onClose}>閉じる</button>
+        <button className="btn bs" style={{width:"100%",marginTop:10}} onClick={onClose}>{t("close")}</button>
       </div>
     </div>
   );
@@ -997,7 +997,7 @@ function PhotoCompare({T,a,b,onClose}){
     <div style={{position:"fixed",inset:0,background:"#000",zIndex:400,display:"flex",flexDirection:"column"}}>
       {/* ヘッダー */}
       <div style={{padding:"10px 16px",paddingTop:"75px",display:"flex",alignItems:"center",justifyContent:"space-between",background:"rgba(0,0,0,0.7)",flexShrink:0}}>
-        <button onClick={onClose} style={{background:"rgba(255,255,255,0.18)",border:"none",color:"#fff",padding:"6px 14px",borderRadius:13,cursor:"pointer",fontSize:14}}>閉じる</button>
+        <button onClick={onClose} style={{background:"rgba(255,255,255,0.18)",border:"none",color:"#fff",padding:"6px 14px",borderRadius:13,cursor:"pointer",fontSize:14}}>{t("close")}</button>
         <span style={{color:"#fff",fontWeight:700,fontSize:14}}>写真比較</span>
         <div style={{width:60}}/>
       </div>
@@ -1259,7 +1259,7 @@ function PhotoViewer({T,photos,initialId,onClose,onEdit,state}){
           <img src={savePopupUrl} alt="" style={{maxWidth:"100%",maxHeight:"62dvh",objectFit:"contain",borderRadius:10}}/>
           <div style={{color:"rgba(255,255,255,0.5)",fontSize:12,marginTop:12,textAlign:"center",lineHeight:1.8}}>長押し →「写真に追加」でカメラロールへ</div>
           <button onTouchEnd={e=>{e.stopPropagation();setSavePopupUrl(null);}} onClick={()=>setSavePopupUrl(null)}
-            style={{marginTop:16,padding:"10px 32px",borderRadius:20,background:"rgba(255,255,255,0.2)",border:"none",color:"#fff",fontSize:14,cursor:"pointer"}}>閉じる</button>
+            style={{marginTop:16,padding:"10px 32px",borderRadius:20,background:"rgba(255,255,255,0.2)",border:"none",color:"#fff",fontSize:14,cursor:"pointer"}}>{t("close")}</button>
         </div>
       )}
     </div>
