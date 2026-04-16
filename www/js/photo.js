@@ -14,8 +14,8 @@ function PhotoPage({T,state,update,todayStr}){
   const existingModes = new Set((state.photos||[]).map(p=>p.shotMode||"face_front"));
   // タブ名：歯正面→「歯」、顔正面→「顔」、それ以外はlabelJPそのまま
   const tabLabel = id => {
-    if(id==="teeth_front") return "歯";
-    if(id==="face_front") return "顔";
+    if(id==="teeth_front") return LANG==="ja"?"歯":"Teeth";
+    if(id==="face_front") return LANG==="ja"?"顔":"Face";
     return (SHOT_MODES.find(x=>x.id===id)||{labelJP:id}).labelJP;
   };
   // タブに出すmode一覧（重複なし・順番制御）
@@ -232,8 +232,8 @@ function PhotoPage({T,state,update,todayStr}){
       {showSlot2Gate&&(
         <div className="card" style={{textAlign:"center",padding:"16px 14px"}}>
           <div style={{fontSize:22,marginBottom:6}}>🔒</div>
-          <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4}}>{LANG==="ja"?"プレミアム限定です":"Premium only"}</div>
-          <div style={{fontSize:12,color:T.accent,marginBottom:12}}>{LANG==="ja"?"2つ目の撮影スロットでより多くの角度を記録できます。":"Record more angles with a 2nd photo slot."}</div>
+          <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4}}>プレミアム限定です</div>
+          <div style={{fontSize:12,color:T.accent,marginBottom:12}}>2つ目の撮影スロットでより多くの角度を記録できます。</div>
           <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowSlot2Gate(false)}>{t("close")}</button>
         </div>
       )}
@@ -241,7 +241,7 @@ function PhotoPage({T,state,update,todayStr}){
         <div className="card" style={{textAlign:"center",padding:"16px 14px"}}>
           <div style={{fontSize:22,marginBottom:6}}>🔒</div>
           <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4}}>PINロックはプレミアム限定です</div>
-          <div style={{fontSize:12,color:T.accent,marginBottom:12}}>{LANG==="ja"?"写真アルバムをPINで保護できます。":"Protect your album with a PIN."}</div>
+          <div style={{fontSize:12,color:T.accent,marginBottom:12}}>写真アルバムをPINで保護できます。</div>
           <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowPinGate(false)}>{t("close")}</button>
         </div>
       )}
@@ -252,7 +252,7 @@ function PhotoPage({T,state,update,todayStr}){
             <div className="ct" style={{margin:0,fontSize:14}}>{LANG==="ja"?"フォトアルバム":"Photo Album"}</div>
             {!isLocked&&(isPremium?(
               <button className={`btn bsm ${compareMode?"bp":"bs"}`} onClick={()=>{setCompareMode(v=>!v);setComparePick([]);}} style={{fontSize:11}}>
-                {compareMode?"キャンセル":"比較"}
+                {compareMode?t("cancel"):t("compare")}
               </button>
             ):(
               <button className="btn bsm bs" style={{fontSize:11,opacity:0.6}} onClick={()=>setShowComparePreview(true)}>🔒{t("compare")}</button>
@@ -260,15 +260,15 @@ function PhotoPage({T,state,update,todayStr}){
           </div>
           {isPremium?(
             <button onClick={()=>setShowSetPin(true)} style={{display:"flex",alignItems:"center",gap:5,padding:"5px 10px",border:`1.5px solid ${state.photoLockEnabled?T.primary:T.soft}`,borderRadius:8,background:state.photoLockEnabled?T.primary:T.soft,cursor:"pointer",color:state.photoLockEnabled?"#fff":T.primary,fontSize:13,fontWeight:600,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>
-              {state.photoLockEnabled?Icons.lockClosed("#fff",13):Icons.lockOpen(T.primary,13)}<span>{state.photoLockEnabled?"ロック中":"ロック"}</span>
+              {state.photoLockEnabled?Icons.lockClosed("#fff",13):Icons.lockOpen(T.primary,13)}<span>{state.photoLockEnabled?(LANG==="ja"?"ロック中":"Locked"):t("pinLock")}</span>
             </button>
           ):(
             <button onClick={()=>setShowPinGate(true)} style={{display:"flex",alignItems:"center",gap:5,padding:"5px 10px",border:`1.5px solid ${T.soft}`,borderRadius:8,background:T.soft,cursor:"pointer",color:T.primary,fontSize:13,fontWeight:600,fontFamily:"'M PLUS Rounded 1c',sans-serif",opacity:0.6}}>
-              <span style={{fontSize:13}}>🔒</span><span>{t("pinLock")}</span>
+              <span style={{fontSize:13}}>🔒</span><span>ロック</span>
             </button>
           )}
         </div>
-        {isLocked?<PinPad T={T} title=t("pinInput") onDone={p=>{if(p===state.photoLock){setUnlocked(true);}else return false;}}/>
+        {isLocked?<PinPad T={T} title="PINを入力" onDone={p=>{if(p===state.photoLock){setUnlocked(true);}else return false;}}/>
         :<>
           <div style={{display:"flex",gap:6,marginBottom:10,flexWrap:"wrap"}}>
             {filterTabs.map(([v,lbl])=>(
@@ -276,7 +276,7 @@ function PhotoPage({T,state,update,todayStr}){
             ))}
           </div>
           {compareMode&&<div style={{fontSize:12,color:T.accent,marginBottom:8,fontWeight:600}}>
-            {comparePick.length===0?LANG==="ja"?"1枚目を選択してください":"Select 1st photo":comparePick.length===1?LANG==="ja"?"2枚目を選択してください（同じスロットの写真）":"Select 2nd photo":""}
+            {comparePick.length===0?LANG==="ja"?"1枚目を選択してください":"Select 1st photo":comparePick.length===1?LANG==="ja"?"2枚目を選択してください":"Select 2nd photo":""}
           </div>}
           {filtered.length===0
             ?<div style={{textAlign:"center",color:T.text+"55",padding:"22px 0",fontSize:14}}>{LANG==="ja"?"まだ写真がありません":"No photos yet"}</div>
@@ -440,7 +440,7 @@ function PhotoPage({T,state,update,todayStr}){
                 <img src={captured} alt="" style={{width:"100%",objectFit:"contain",maxHeight:"55dvh"}}/>
               </div>
               <div style={{padding:14,background:"#111",flexShrink:0}}>
-                <input value={capComment} onChange={e=>setCapComment(e.target.value)} placeholder="コメントを入力…" style={{background:"#222",color:"#fff",border:"1px solid #444",borderRadius:10,marginBottom:6}}/>
+                <input value={capComment} onChange={e=>setCapComment(e.target.value)} placeholder={t("comment")} style={{background:"#222",color:"#fff",border:"1px solid #444",borderRadius:10,marginBottom:6}}/>
                 <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
                   <span style={{color:"#aaa",fontSize:13,flexShrink:0}}># マウスピース番号</span>
                   <select value={capPiece||""} onChange={e=>setCapPiece(e.target.value?parseInt(e.target.value):null)}
@@ -477,7 +477,7 @@ function PhotoPage({T,state,update,todayStr}){
             <select value={editPiece} onChange={e=>setEditPiece(parseInt(e.target.value)||1)} style={{marginBottom:6,textAlign:"center"}}>
               {buildPieceList(state).map(p=><option key={p.n} value={p.n}>{p.label}</option>)}
             </select>
-            <div style={{fontSize:11,color:T.text+"55",marginBottom:14}}>{LANG==="ja"?"部位は変更できません":"Shot type cannot be changed"}</div>
+            <div style={{fontSize:11,color:T.text+"55",marginBottom:14}}>部位は変更できません</div>
             <button className="btn bs" style={{width:"100%",marginBottom:10}} onClick={()=>{
               const photo=state.photos.find(p=>p.id===editId);
               if(!photo||!photo.data)return;
@@ -573,7 +573,7 @@ function PhotoPage({T,state,update,todayStr}){
             {/* コメント */}
             <label>コメント</label>
             <input value={albumMeta.comment} onChange={e=>setAlbumMeta(v=>({...v,comment:e.target.value}))}
-              placeholder="コメントを入力…" style={{marginBottom:10}}/>
+              placeholder={t("comment")} style={{marginBottom:10}}/>
 
             {/* マウスピース番号 */}
             <label>マウスピース番号</label>

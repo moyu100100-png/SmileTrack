@@ -71,11 +71,11 @@ function PinPad({T,title,onDone}){
 // ── DRAWER ───────────────────────────────────────────────────────────────────
 function Drawer({T,open,onClose,onSection,onReset}){
   const items=[
-    {icon:Icons.settings,  label:t("settings"),        key:"settings"},
-    {icon:Icons.bell,      label:t("notify"),           key:"notify"},
-    {icon:Icons.camSettings,label:t("cameraSettings"),  key:"cameraSettings"},
-    {icon:Icons.timerIcon, label:t("timerSettings"),    key:"timerSettings"},
-    {icon:Icons.schedule,  label:t("schedule"),         key:"schedule"},
+    {icon:Icons.settings,  label:"設定",             key:"settings"},
+    {icon:Icons.bell,      label:"通知設定",           key:"notify"},
+    {icon:Icons.camSettings,label:"カメラ設定",        key:"cameraSettings"},
+    {icon:Icons.timerIcon, label:"タイマー設定",       key:"timerSettings"},
+    {icon:Icons.schedule,  label:"交換スケジュール",   key:"schedule"},
     {icon:Icons.palette,   label:t("colorTheme"),       key:"color"},
   ];
   const starIcon=(c,s=18)=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>;
@@ -172,10 +172,10 @@ const AFFILIATE_ITEMS = [
 function AffiliatePopup({T,type,onClose}){
   const item=AFFILIATE_ITEMS[0];
   const isWeek1=type==="week1";
-  const title=isWeek1?t("affiliateTitle"):t("affiliateMsg");
+  const title=isWeek1?"矯正アイテム、揃っていますか？":"矯正アイテムの在庫が切れていませんか？";
   const body=isWeek1
-    ?(LANG==="ja"?"矯正開始から7日目。毎日のケアに役立つおすすめアイテムをご紹介します。":"Day 7 of your treatment. Here are some helpful items for daily care.")
-    :(LANG==="ja"?"矯正開始から30日以上が経ちました。毎日のケアに役立つアイテムをご紹介します。":"Over 30 days in. Keep up with these daily care items.");
+    ?"矯正開始から7日目。毎日のケアに役立つおすすめアイテムをご紹介します。"
+    :"矯正開始から30日以上が経ちました。毎日のケアに役立つアイテムをご紹介します。";
   return(
     <div className="mo" onClick={onClose}>
       <div className="md" onClick={e=>e.stopPropagation()}>

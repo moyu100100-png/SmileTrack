@@ -370,10 +370,10 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                       「{selSessions.find(s=>s.id===confirmDeleteId)?.reason||'その他'}」の記録を削除します
                     </div>
                     <div style={{display:'flex',gap:10}}>
-                      <button className='btn bs' style={{flex:1}} onClick={()=>setConfirmDeleteId(null)}>キャンセル</button>
+                      <button className='btn bs' style={{flex:1}} onClick={()=>setConfirmDeleteId(null)}>{t("cancel")}</button>
                       <button style={{flex:1,padding:'10px',border:'none',borderRadius:12,background:'#E74C3C',
                         color:'#fff',cursor:'pointer',fontWeight:700,fontSize:16,fontFamily:'M PLUS Rounded 1c,sans-serif'}}
-                        onClick={()=>deleteSess(confirmDeleteId)}>削除</button>
+                        onClick={()=>deleteSess(confirmDeleteId)}>{t("delete")}</button>
                     </div>
                   </div>
                 </div>
@@ -414,11 +414,11 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                   <div style={{fontSize:13,color:T.text+"77",marginBottom:16,lineHeight:1.6}}>
                     当日の装着時間はリアルタイムで自動計算されるため変更できません。
                   </div>
-                  <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowWearEditConfirm(false)}>閉じる</button>
+                  <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowWearEditConfirm(false)}>{t("close")}</button>
                 </>
               ):(
                 <>
-                  <label>時間</label>
+                  <label>{LANG==="ja"?"時間":"Hours"}</label>
                   <input type='text' inputMode='numeric' maxLength={5} autoComplete='off'
                     value={editLogVal}
                     onChange={e=>{let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&editLogVal.length===1)v+=':';setEditLogVal(v);}}
@@ -441,13 +441,13 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                     </div>
                   ):(
                     <div style={{display:"flex",gap:8}}>
-                      <button className="btn bs" style={{flex:1}} onClick={()=>setShowWearEditConfirm(false)}>戻る</button>
+                      <button className="btn bs" style={{flex:1}} onClick={()=>setShowWearEditConfirm(false)}>{LANG==="ja"?"戻る":"Back"}</button>
                       <button className="btn bp" style={{flex:1}} onClick={()=>{
                         const log={...(state.dailyWearLog||{})};
                         log[sel]=parseHH(editLogVal);
                         update({dailyWearLog:log});
                         setShowWearEditConfirm(false);
-                      }}>保存</button>
+                      }}>{t("save")}</button>
                     </div>
                   )}
                 </>
@@ -467,7 +467,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
               <div className="mdtitle" style={{marginBottom:8}}>内訳をリセットしますか？</div>
               <div style={{fontSize:13,color:T.text+"77",marginBottom:20,lineHeight:1.7}}>この操作は元に戻せません。</div>
               <div style={{display:"flex",gap:8}}>
-                <button className="btn bs" style={{flex:1}} onClick={()=>setShowResetConfirm(false)}>キャンセル</button>
+                <button className="btn bs" style={{flex:1}} onClick={()=>setShowResetConfirm(false)}>{t("cancel")}</button>
                 <button className="btn bp" style={{flex:1}} onClick={()=>{
                   const log={...(state.dailyWearLog||{})};
                   log[sel]=parseHH2(editLogVal);
@@ -477,7 +477,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                   update({dailyWearLog:log,timerSessions:newSess});
                   setShowResetConfirm(false);
                   setShowWearEditConfirm(false);
-                }}>リセット</button>
+                }}>{LANG==="ja"?"リセット":"Reset"}</button>
               </div>
             </div>
           </div>
@@ -518,15 +518,15 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
                 <div className="mdtitle" style={{margin:0}}>取り外しを編集</div>
                 <button style={{background:'none',border:'none',color:'#E74C3C',fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:"'M PLUS Rounded 1c',sans-serif",padding:'4px 8px'}}
-                  onClick={()=>{setConfirmDeleteId(editSessId);setEditSessId(null);}}>削除</button>
+                  onClick={()=>{setConfirmDeleteId(editSessId);setEditSessId(null);}}>{t("delete")}</button>
               </div>
-              <label>理由</label>
+              <label>{LANG==="ja"?"理由":"Reason"}</label>
               <div style={{display:'flex',flexWrap:'wrap',gap:8,marginBottom:14}}>
                 {[...getReasonList(state),LANG==="ja"?"ー":"—"].map(r=>(
-                  <button key={r} onClick={()=>setEditSessReason(r===LANG==="ja"?"ー":"—"?"":r)}
-                    style={{padding:'10px 16px',borderRadius:20,border:`1.5px solid ${(editSessReason===r||(r===LANG==="ja"?"ー":"—"&&!editSessReason))?T.primary:T.soft}`,
-                      background:(editSessReason===r||(r===LANG==="ja"?"ー":"—"&&!editSessReason))?T.primary:'transparent',
-                      color:(editSessReason===r||(r===LANG==="ja"?"ー":"—"&&!editSessReason))?'#fff':T.text,
+                  <button key={r} onClick={()=>setEditSessReason(r===(LANG==="ja"?"ー":"—")?"":r)}
+                    style={{padding:'10px 16px',borderRadius:20,border:`1.5px solid ${(editSessReason===r||(r==="ー"&&!editSessReason))?T.primary:T.soft}`,
+                      background:(editSessReason===r||(r==="ー"&&!editSessReason))?T.primary:'transparent',
+                      color:(editSessReason===r||(r==="ー"&&!editSessReason))?'#fff':T.text,
                       fontSize:15,fontWeight:600,cursor:'pointer',fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>
                     {r}
                   </button>
@@ -558,7 +558,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                     }}}
                   style={{flex:1,height:44,fontSize:16,borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,padding:'0 12px',WebkitAppearance:'none',appearance:'none'}}/>
               </div>
-              <label>時間</label>
+              <label>{LANG==="ja"?"時間":"Hours"}</label>
               <input type='text' inputMode='numeric' maxLength={5} autoComplete='off' value={editSessDur}
                 onChange={e=>{let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&editSessDur.length===1)v+=':';setEditSessDur(v);}}
                 style={{marginBottom:14,textAlign:'center',fontSize:16}}/>
@@ -566,8 +566,8 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
               <input type='text' value={editSessComment} onChange={e=>setEditSessComment(e.target.value)}
                 placeholder='コメントを入力…' style={{marginBottom:16}}/>
               <div style={{display:'flex',gap:8}}>
-                <button className='btn bs' style={{flex:1}} onClick={()=>setEditSessId(null)}>キャンセル</button>
-                <button className='btn bp' style={{flex:1}} onClick={saveEdit}>保存</button>
+                <button className='btn bs' style={{flex:1}} onClick={()=>setEditSessId(null)}>{t("cancel")}</button>
+                <button className='btn bp' style={{flex:1}} onClick={saveEdit}>{t("save")}</button>
               </div>
             </div>
           </div>
@@ -580,7 +580,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
           <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:400}}>
             <div className="mdtitle">取り外しを追加</div>
             {/* 理由選択 */}
-            <label>理由</label>
+            <label>{LANG==="ja"?"理由":"Reason"}</label>
             <div style={{display:'flex',flexWrap:'wrap',gap:8,marginBottom:14}}>
               {[...getReasonList(state),LANG==="ja"?"ー":"—"].map(r=>(
                 <button key={r}
@@ -630,7 +630,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
               </div>
             )}
             <div style={{marginBottom:14}}>
-              <label>時間</label>
+              <label>{LANG==="ja"?"時間":"Hours"}</label>
               <input type='text' inputMode='numeric' maxLength={5} autoComplete='off' value={addBreakdownDur}
                 onChange={e=>{if(addUseTime)return;let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&addBreakdownDur.length===1)v+=':';setAddBreakdownDur(v);}}
                 readOnly={addUseTime}
@@ -641,7 +641,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
             <input type='text' value={addBreakdownComment} onChange={e=>setAddBreakdownComment(e.target.value)}
               placeholder='コメントを入力…' style={{marginBottom:16}}/>
             <div style={{display:'flex',gap:8}}>
-              <button className='btn bs' style={{flex:1}} onClick={()=>setAddBreakdownDay(null)}>キャンセル</button>
+              <button className='btn bs' style={{flex:1}} onClick={()=>setAddBreakdownDay(null)}>{t("cancel")}</button>
               <button className='btn bp' style={{flex:1}} onClick={()=>{
                 const sel=addBreakdownDay;
                 const parseHH=str=>{const p=(str||"").split(":");return Math.min(86400,Math.max(0,(parseInt(p[0])||0)*3600+(parseInt(p[1])||0)*60));};
@@ -703,7 +703,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
               </div>
             )}
             <div style={{display:"flex",gap:8}}>
-              <button className="btn bs" style={{flex:1}} onClick={()=>setShowAddModal(false)}>キャンセル</button>
+              <button className="btn bs" style={{flex:1}} onClick={()=>setShowAddModal(false)}>{t("cancel")}</button>
               <button className="btn bp" style={{flex:1}} onClick={addEvent}>追加</button>
             </div>
           </div>
@@ -724,7 +724,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
                 <div className="mdtitle" style={{margin:0}}>予定を編集</div>
                 <button style={{background:"none",border:"none",color:"#E74C3C",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",padding:"4px 8px"}}
-                  onClick={()=>{deleteEvent(ev);setEditEventId(null);}}>削除</button>
+                  onClick={()=>{deleteEvent(ev);setEditEventId(null);}}>{t("delete")}</button>
               </div>
               <label>タイトル</label>
               <input value={ev.title||""} onChange={e=>saveEvField({title:e.target.value})} style={{marginBottom:8}}/>
@@ -750,7 +750,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                 </div>
               )}
               <div style={{display:"flex",gap:8,marginTop:8}}>
-                <button className="btn bs" style={{flex:1}} onClick={()=>setEditEventId(null)}>閉じる</button>
+                <button className="btn bs" style={{flex:1}} onClick={()=>setEditEventId(null)}>{t("close")}</button>
               </div>
             </div>
           </div>

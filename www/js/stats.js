@@ -170,7 +170,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
     const dayMs=new Date(selectedDay+"T00:00:00").getTime();
     return sessInDay(s,dayMs,selectedDay);
   }):[];
-  const dayReasons={};dayDetail.forEach(s=>{const r=s.reason||"その他";dayReasons[r]=(dayReasons[r]||0)+Math.floor(s.ms/1000);});
+  const dayReasons={};dayDetail.forEach(s=>{const r=s.reason||t("others");dayReasons[r]=(dayReasons[r]||0)+Math.floor(s.ms/1000);});
 
   const [tooltip,setTooltip]=useState(null);
 
@@ -327,9 +327,9 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
             <div style={{fontSize:12,color:T.text+"88",marginBottom:4}}>サンプルデータによるイメージです</div>
             <div style={{fontSize:12,color:T.accent,fontWeight:600,marginBottom:12}}>🔒 PDF出力はプレミアム機能でご利用いただけます</div>
             <div style={{borderRadius:10,overflow:"hidden",marginBottom:14,border:`1px solid ${T.soft}`,maxHeight:"60dvh",overflowY:"auto"}}>
-              <img src={PDF_PREVIEW_IMG} alt={t("pdfPreview")} style={{width:"100%",display:"block"}}/>
+              <img src={PDF_PREVIEW_IMG} alt=t("pdfPreview") style={{width:"100%",display:"block"}}/>
             </div>
-            <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowReportPreview(false)}>閉じる</button>
+            <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowReportPreview(false)}>{t("close")}</button>
           </div>
         </div>
       )}

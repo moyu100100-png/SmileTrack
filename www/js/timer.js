@@ -76,7 +76,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
       for(let i=0;i<12;i++){
         const h=hrs+i;
         const ms=startMs+h*3600000;
-        if(ms>Date.now()) Notif.schedule(1002+i,LANG==="ja"?"取り外しタイマー":"Removal Timer",LANG==="ja"?`取り外し中のタイマーが${h}時間を超えています`:`Removal timer has exceeded ${h} hours`,ms);
+        if(ms>Date.now()) Notif.schedule(1002+i,LANG==="ja"?"取り外しタイマー":"Removal Timer",LANG==="ja"?`取り外し中のタイマーが${h}時間を超えています`:`Removal timer exceeded ${h}h`,ms);
       }
     }
   };
@@ -225,7 +225,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
                 ー（記録しない）
               </button>
             </div>
-            <button className="btn bs" style={{width:"100%",padding:"16px",fontSize:16}} onClick={()=>setPendingReason(null)}>キャンセル</button>
+            <button className="btn bs" style={{width:"100%",padding:"16px",fontSize:16}} onClick={()=>setPendingReason(null)}>{t("cancel")}</button>
           </div>
         </div>
       )}
@@ -292,9 +292,9 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
                 <div className="mdtitle" style={{margin:0}}>取り外しを編集</div>
                 <button style={{background:'none',border:'none',color:'#E74C3C',fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:"'M PLUS Rounded 1c',sans-serif",padding:'4px 8px'}}
-                  onClick={()=>{setTimerConfirmDeleteId(timerEditSessId);setTimerEditSessId(null);}}>削除</button>
+                  onClick={()=>{setTimerConfirmDeleteId(timerEditSessId);setTimerEditSessId(null);}}>{t("delete")}</button>
               </div>
-              <label>理由</label>
+              <label>{LANG==="ja"?"理由":"Reason"}</label>
               <div style={{display:'flex',flexWrap:'wrap',gap:8,marginBottom:14}}>
                 {[...getReasonList(state),t("reasonNone")].map(r=>(
                   <button key={r} onClick={()=>setTimerEditSessReason(r===t("reasonNone")?"":r)}
@@ -307,7 +307,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
                   </button>
                 ))}
               </div>
-              <label>時刻</label>
+              <label>{LANG==="ja"?"時刻":"Time"}</label>
               <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:14}}>
                 <input type='time' value={timerEditSessFrom}
                   onChange={e=>{setTimerEditSessFrom(e.target.value);}}
@@ -333,17 +333,17 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
                     }}}
                   style={{flex:1,height:44,fontSize:16,borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,padding:'0 12px',WebkitAppearance:'none',appearance:'none'}}/>
               </div>
-              <label>時間</label>
+              <label>{LANG==="ja"?"時間":"Duration"}</label>
               <input type='text' inputMode='numeric' maxLength={5} autoComplete='off' value={timerEditSessDur}
                 onChange={e=>{if(isFromTimer)return;let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&timerEditSessDur.length===1)v+=':';setTimerEditSessDur(v);}}
                 readOnly={isFromTimer}
                 style={{marginBottom:14,textAlign:'center',opacity:isFromTimer?0.6:1,background:isFromTimer?T.soft:T.bg,fontSize:16}}/>
-              <label>コメント</label>
+              <label>{LANG==="ja"?"コメント":"Comment"}</label>
               <input type='text' value={timerEditSessComment} onChange={e=>setTimerEditSessComment(e.target.value)}
                 placeholder='コメントを入力…' style={{marginBottom:16}}/>
               <div style={{display:'flex',gap:8}}>
-                <button className='btn bs' style={{flex:1}} onClick={()=>setTimerEditSessId(null)}>キャンセル</button>
-                <button className='btn bp' style={{flex:1}} onClick={saveTimerEdit}>保存</button>
+                <button className='btn bs' style={{flex:1}} onClick={()=>setTimerEditSessId(null)}>{t("cancel")}</button>
+                <button className='btn bp' style={{flex:1}} onClick={saveTimerEdit}>{t("save")}</button>
               </div>
             </div>
           </div>
@@ -361,9 +361,9 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
             </div>
             <div className="mdtitle" style={{marginBottom:8}}>この記録を削除しますか？</div>
             <div style={{display:"flex",gap:8,marginTop:16}}>
-              <button className="btn bs" style={{flex:1}} onClick={()=>setTimerConfirmDeleteId(null)}>キャンセル</button>
+              <button className="btn bs" style={{flex:1}} onClick={()=>setTimerConfirmDeleteId(null)}>{t("cancel")}</button>
               <button style={{flex:1,padding:"10px",border:"none",borderRadius:12,background:"#E74C3C",color:"#fff",fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16}}
-                onClick={()=>deleteSess(timerConfirmDeleteId)}>削除</button>
+                onClick={()=>deleteSess(timerConfirmDeleteId)}>{t("delete")}</button>
             </div>
           </div>
         </div>

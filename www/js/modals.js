@@ -46,7 +46,7 @@ function AboutModal({T,onClose}){
       navigator.share({title:"SmileTrack",text:"マウスピース矯正の管理アプリ「SmileTrack」を使ってみてください！",url:"https://smiletrack.app"});
     } else {
       navigator.clipboard?.writeText("https://smiletrack.app");
-      showToast(LANG==="ja"?LANG==="ja"?"URLをコピーしました！":"URL copied!":"URL copied!");
+      showToast(LANG==="ja"?"URLをコピーしました！":"URL copied!");
     }
   };
   const docIcon=<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>;
@@ -64,14 +64,14 @@ function AboutModal({T,onClose}){
   return(
     <div className="mo" onClick={onClose}>
       <div className="md" onClick={e=>e.stopPropagation()}>
-        <div className="mdtitle">{t("about")}</div>
+        <div className="mdtitle">アプリについて</div>
         <div style={{fontSize:11,color:T.text+"55",marginBottom:16,textAlign:"center"}}>SmileTrack ver 1.0.0</div>
 
         <Row icon={docIcon} label={LANG==="ja"?"利用規約":"Terms of Service"} onClick={()=>window.open("https://pickled-runner-04f.notion.site/ebd//329470522fe180399354fbae6be51bfb","_blank")}/>
         <Row icon={lockIcon} label={LANG==="ja"?"プライバシーポリシー":"Privacy Policy"} onClick={()=>window.open("https://pickled-runner-04f.notion.site/ebd//329470522fe180d884bfc0afe2d3dd94","_blank")}/>
         <Row icon={mailIcon} label={LANG==="ja"?"お問い合わせ":"Contact"} onClick={()=>window.open("mailto:contact.appname@gmail.com")}/>
         <Row icon={starIcon} label={t("review")} onClick={()=>window.open("https://apps.apple.com/app/smiletrack","_blank")}/>
-        <Row icon={starIcon} label={LANG==="ja"?"Google Playでレビューを書く":"Rate on Google Play"} onClick={()=>window.open("https://play.google.com/store/apps/details?id=app.smiletrack","_blank")}/>
+        <Row icon={starIcon} label="Google Playでレビューを書く" onClick={()=>window.open("https://play.google.com/store/apps/details?id=app.smiletrack","_blank")}/>
         <Row icon={shareIcon} label={LANG==="ja"?"友人にアプリを教える":"Share with friends"} onClick={share}/>
 
         <button className="btn bs" style={{width:"100%",marginTop:16}} onClick={onClose}>{t("close")}</button>
@@ -125,7 +125,7 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
       if(e?.code==="PURCHASE_CANCELLED"||e?.message?.includes("cancel")||e?.message?.includes("Cancel")){
         // キャンセルはno-op
       } else {
-        setErrorMsg("購入に失敗しました。時間をおいて再試行してください。");
+        setErrorMsg(LANG==="ja"?"購入に失敗しました。時間をおいて再試行してください。":"Purchase failed. Please try again later.");
       }
     }finally{ setLoading(false); }
   };
@@ -139,41 +139,41 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
       const noAds=await Purchases.hasNoAds();
       if(onPurchased) onPurchased({isPremium,noAds});
       if(isPremium){ onClose(); }
-      else{ setErrorMsg("復元できる購入履歴が見つかりませんでした。"); }
-    }catch(e){ setErrorMsg("復元に失敗しました。"); }
+      else{ setErrorMsg(LANG==="ja"?"復元できる購入履歴が見つかりませんでした。":"No purchases found to restore."); }
+    }catch(e){ setErrorMsg(LANG==="ja"?"復元に失敗しました。":"Restore failed."); }
     finally{ setLoading(false); }
   };
   if(showCoffee&&!thankYou) return(
-    <div className="mo" onClick={onClose} style={{alignItems:"center",justifyContent:"center"}}>
-      <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:24,width:"90%",maxWidth:400,textAlign:"center"}}>
+    <div className="mo" onClick={onClose}>
+      <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,width:"90%",maxWidth:400,textAlign:"center"}}>
         <div style={{fontSize:48,marginBottom:12}}>☕</div>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:700,color:T.primary,marginBottom:6}}>開発者にコーヒーを差し入れ</div>
         <div style={{fontSize:13,color:T.text+"88",marginBottom:20,lineHeight:1.7}}>
           SmileTrackの継続と新機能の開発のため<br/>コーヒー1杯分のサポートをいただけると<br/>大きな励みになります🙏
         </div>
-        <button className="btn bp" style={{width:"100%",marginBottom:10,padding:"14px",fontSize:15,borderRadius:14}} onClick={()=>handlePurchase("coffee")} disabled={loading}>{loading?t("loading"):`差し入れる　${prices.coffee||"¥120"}`}</button>
-        <button className="btn bs" style={{width:"100%",padding:"14px",fontSize:15,borderRadius:14}} onClick={onClose}>{t("close")}</button>
+        <button className="btn bp" style={{width:"100%",marginBottom:10,padding:"14px",fontSize:15}} onClick={()=>handlePurchase("coffee")} disabled={loading}>{loading?t("loading"):`差し入れる　${prices.coffee||"¥120"}`}</button>
+        <button className="btn bs" style={{width:"100%",padding:"14px",fontSize:15}} onClick={onClose}>{t("close")}</button>
       </div>
     </div>
   );
   const plans=[
-    {id:"monthly", label:t("monthlyPlan"), price:prices.monthly||t("monthlyPrice"), sub:"月額", badge:null, desc:t("monthlyDesc")},
-    {id:"yearly",  label:t("yearly"), price:prices.yearly||t("yearlyPrice"), sub:"年額", badge:t("recommended"), desc:t("yearlyDesc")},
-    {id:"lifetime",label:t("lifetime"), price:prices.lifetime||t("lifetimePrice"), sub:"一括", badge:null, desc:t("lifetimeDesc")},
+    {id:"monthly", label:t("monthlyPlan"), price:prices.monthly||t("monthlyPrice"), sub:LANG==="ja"?"月額":"Monthly", badge:null, desc:t("monthlyDesc")},
+    {id:"yearly",  label:t("yearly"), price:prices.yearly||t("yearlyPrice"), sub:LANG==="ja"?"年額":"Yearly", badge:t("recommended"), desc:t("yearlyDesc")},
+    {id:"lifetime",label:t("lifetime"), price:prices.lifetime||t("lifetimePrice"), sub:LANG==="ja"?"一括":"One-time", badge:null, desc:t("lifetimeDesc")},
   ];
   const extras=[
     {id:"no_ads", label:t("noAds"), price:prices.no_ads||t("noAdsPrice"), desc:t("noAdsDesc")},
   ];
 
   if(thankYou) return(
-    <div className="mo" onClick={onClose} style={{alignItems:"center",justifyContent:"center"}}>
-      <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center",padding:"32px 20px",borderRadius:24,width:"90%",maxWidth:400}}>
+    <div className="mo" onClick={onClose}>
+      <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center",padding:"32px 20px"}}>
         <div style={{fontSize:48,marginBottom:12}}>☕</div>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:20,fontWeight:700,color:T.primary,marginBottom:8}}>ありがとうございます！</div>
         <div style={{fontSize:14,color:T.text+"88",lineHeight:1.8,marginBottom:24}}>
           コーヒーの差し入れ、とても嬉しいです。<br/>開発の大きな励みになります✨
         </div>
-        <button className="btn bp" style={{width:"100%",borderRadius:14}} onClick={onClose}>{t("close")}</button>
+        <button className="btn bp" style={{width:"100%"}} onClick={onClose}>{t("close")}</button>
       </div>
     </div>
   );
@@ -341,8 +341,8 @@ function TimerSettingsModal({T,state,onSave,onClose}){
 
   const addWord=()=>{
     const w=newWord.replace(/\s/g,"").slice(0,6);
-    if(!w){setErr(LANG==="ja"?LANG==="ja"?"文字を入力してください":"Please enter text":"Please enter text");return;}
-    if(pool.includes(w)){setErr(LANG==="ja"?LANG==="ja"?"同じ項目がすでにあります":"Item already exists":"Item already exists");return;}
+    if(!w){setErr(LANG==="ja"?"文字を入力してください":"Please enter text");return;}
+    if(pool.includes(w)){setErr(LANG==="ja"?"同じ項目がすでにあります":"Item already exists");return;}
     if(pool.length>=MAX_ALL-1){setErr(`項目は${MAX_ALL-1}個まで（ーを除く）`);return;}
     setPool(p=>[...p,w]);
     setNewWord("");setErr("");
@@ -811,7 +811,7 @@ function BackupModal({T,state,onImport,onClose}){
         document.body.removeChild(a);
       }
       URL.revokeObjectURL(url);
-    }catch(e){console.warn(LANG==="ja"?LANG==="ja"?"エクスポートに失敗しました":"Export failed":"Export failed",e);showToast(LANG==="ja"?LANG==="ja"?"エクスポートに失敗しました":"Export failed":"Export failed");}
+    }catch(e){console.warn(LANG==="ja"?"エクスポートに失敗しました":"Export failed",e);showToast(LANG==="ja"?"エクスポートに失敗しました":"Export failed");}
     setExporting(false);
   };
 
@@ -831,7 +831,7 @@ function BackupModal({T,state,onImport,onClose}){
         <div style={{fontSize:12,color:T.text+"77",marginBottom:12}}>写真を含む全データをバックアップします</div>
         <button className="btn bp blg" style={{width:"100%",marginBottom:10,opacity:exporting?0.6:1}}
           onClick={doExport} disabled={exporting}>
-          {exporting?LANG==="ja"?LANG==="ja"?"エクスポート中...":"Exporting...":"Exporting...":LANG==="ja"?LANG==="ja"?"エクスポート":"Export":"Export"}
+          {exporting?LANG==="ja"?"エクスポート中...":"Exporting...":LANG==="ja"?"エクスポート":"Export"}
         </button>
         <button className="btn bs blg" style={{width:"100%"}} onClick={()=>fileRef.current?.click()}>インポート</button>
         <input ref={fileRef} type="file" accept=".json" style={{display:"none"}} onChange={e=>{
@@ -839,7 +839,7 @@ function BackupModal({T,state,onImport,onClose}){
           const r=new FileReader();
           r.onload=ev=>{
             try{doImport(JSON.parse(ev.target.result));}
-            catch{console.warn(LANG==="ja"?LANG==="ja"?"ファイルが無効です":"Invalid file":"Invalid file");showToast(LANG==="ja"?LANG==="ja"?"ファイルが無効です":"Invalid file":"Invalid file");}
+            catch{console.warn(LANG==="ja"?"ファイルが無効です":"Invalid file");showToast(LANG==="ja"?"ファイルが無効です":"Invalid file");}
           };
           r.readAsText(f);
         }}/>
@@ -944,14 +944,14 @@ function CameraSettingsModal({T,state,onSave,onClose}){
 
 function ResetConfirmModal({T,onConfirm,onCancel}){
   return(
-    <div className="mo" onClick={onCancel} style={{alignItems:"center",justifyContent:"center"}}>
-      <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center",borderRadius:24,width:"90%",maxWidth:400}}>
+    <div className="mo" onClick={onCancel}>
+      <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center",borderRadius:20}}>
         <div style={{fontSize:36,marginBottom:8}}>⚠️</div>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:17,fontWeight:700,color:"#E74C3C",marginBottom:8}}>本当にリセットしますか？</div>
         <div style={{fontSize:15,color:T.text+"88",marginBottom:20,lineHeight:1.7}}>すべてのデータが完全に削除されます。<br/>この操作は元に戻せません。</div>
         <div style={{display:"flex",gap:10}}>
-          <button className="btn bs blg" style={{flex:1,borderRadius:14}} onClick={onCancel}>戻る</button>
-          <button style={{flex:1,padding:"13px 20px",border:"none",borderRadius:14,fontSize:17,fontWeight:600,cursor:"pointer",background:"#E74C3C",color:"#fff",fontFamily:"'M PLUS Rounded 1c',sans-serif"}} onClick={onConfirm}>はい、削除する</button>
+          <button className="btn bs blg" style={{flex:1}} onClick={onCancel}>{LANG==="ja"?"戻る":"Back"}</button>
+          <button style={{flex:1,padding:"13px 20px",border:"none",borderRadius:13,fontSize:17,fontWeight:600,cursor:"pointer",background:"#E74C3C",color:"#fff",fontFamily:"'M PLUS Rounded 1c',sans-serif"}} onClick={onConfirm}>{LANG==="ja"?"削除する":"Delete"}</button>
         </div>
       </div>
     </div>
