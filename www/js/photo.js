@@ -16,7 +16,7 @@ function PhotoPage({T,state,update,todayStr}){
   const tabLabel = id => {
     if(id==="teeth_front") return t("shotTeeth");
     if(id==="face_front") return t("shotFace");
-    return (SHOT_MODES.find(x=>x.id===id)||{labelJP:id}).labelJP;
+    return t((SHOT_MODES.find(x=>x.id===id)||{labelKey:id}).labelKey)||id;
   };
   // タブに出すmode一覧（重複なし・順番制御）
   const tabModeIds = [];
@@ -171,7 +171,7 @@ function PhotoPage({T,state,update,todayStr}){
     const legacyMode=modeInfo.isLandscape?"teeth":"front";
     update({photos:[...(state.photos||[]),{
       id:Date.now(),data:captured,mode:legacyMode,
-      shotMode:cameraMode,shotLabel:modeInfo.labelJP,
+      shotMode:cameraMode,shotLabel:t(modeInfo.labelKey)||modeInfo.labelKey,
       piece:capPiece||null,date:todayStr,
       comment:capComment,timestamp:Date.now()
     }]});
@@ -197,11 +197,11 @@ function PhotoPage({T,state,update,todayStr}){
         <div className="ct" style={{marginBottom:8,fontSize:14}}>{t("takePhoto")}</div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9}}>
           <button className="btn bp" onClick={()=>openCam(slot1Id)} style={{padding:"12px 8px",flexDirection:"column"}}>
-            <div style={{display:"flex",alignItems:"center",gap:4}}>{Icons.camera("#fff",14)}<span style={{fontSize:14}}>{slot1Info.labelJP}</span></div>
+            <div style={{display:"flex",alignItems:"center",gap:4}}>{Icons.camera("#fff",14)}<span style={{fontSize:14}}>{t(slot1Info.labelKey)||slot1Info.labelKey}</span></div>
             {getOverlayPhoto(slot1Id)&&<div style={{fontSize:11,opacity:.7,marginTop:2}}>{t("prevExists")}</div>}
           </button>
           <button className="btn bp" onClick={()=>{if(!isPremium){setShowSlot2Gate(true);return;}openCam(slot2Id);}} style={{padding:"12px 8px",flexDirection:"column",opacity:isPremium?1:0.55}}>
-            <div style={{display:"flex",alignItems:"center",gap:4}}>{isPremium?Icons.camera("#fff",14):<span style={{fontSize:14}}>🔒</span>}<span style={{fontSize:14}}>{slot2Info.labelJP}</span></div>
+            <div style={{display:"flex",alignItems:"center",gap:4}}>{isPremium?Icons.camera("#fff",14):<span style={{fontSize:14}}>🔒</span>}<span style={{fontSize:14}}>{t(slot2Info.labelKey)||slot2Info.labelKey}</span></div>
             {isPremium&&getOverlayPhoto(slot2Id)&&<div style={{fontSize:11,opacity:.7,marginTop:2}}>{t("prevExists")}</div>}
           </button>
         </div>
@@ -335,7 +335,7 @@ function PhotoPage({T,state,update,todayStr}){
           {/* Header */}
           <div style={{padding:"10px 16px",paddingTop:"75px",display:"flex",alignItems:"center",justifyContent:"space-between",background:"rgba(0,0,0,0.7)",flexShrink:0}}>
             <button onClick={closeCam} style={{background:"rgba(255,255,255,0.18)",border:"none",color:"#fff",padding:"6px 14px",borderRadius:13,cursor:"pointer",fontSize:14}}>✕</button>
-            <span style={{color:"#fff",fontWeight:700,fontSize:15}}>{currentModeInfo.labelJP}</span>
+            <span style={{color:"#fff",fontWeight:700,fontSize:15}}>{t(currentModeInfo.labelKey)||currentModeInfo.labelKey}</span>
             <button onClick={()=>setShowColorPanel(v=>!v)} style={{background:showColorPanel?"rgba(255,255,255,0.35)":"rgba(255,255,255,0.18)",border:"none",color:"#fff",padding:"6px 10px",borderRadius:13,cursor:"pointer",display:"flex",alignItems:"center",gap:4,fontSize:12}}>
               {Icons.sun("#fff",14)} 調整
             </button>
@@ -565,7 +565,7 @@ function PhotoPage({T,state,update,todayStr}){
                     background:albumMeta.shotMode===m.id?T.primary:"transparent",
                     color:albumMeta.shotMode===m.id?"#fff":T.text,
                     fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>
-                  {m.labelJP}
+                  {t(m.labelKey)||m.labelKey}
                 </button>
               ))}
             </div>
@@ -613,7 +613,7 @@ function PhotoPage({T,state,update,todayStr}){
                     const data=canvas.toDataURL("image/webp",0.8);
                     update({photos:[...(state.photos||[]),{
                       id:Date.now()+Math.random(),data,
-                      mode:"front",shotMode:albumMeta.shotMode,shotLabel:shotInfo.labelJP,
+                      mode:"front",shotMode:albumMeta.shotMode,shotLabel:t(shotInfo.labelKey)||shotInfo.labelKey,
                       piece:albumMeta.piece,date:todayStr,
                       comment:albumMeta.comment,timestamp:Date.now()
                     }]});

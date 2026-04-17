@@ -327,7 +327,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
             <div style={{fontSize:12,color:T.text+"88",marginBottom:4}}>{t("sampleDataMsg")}</div>
             <div style={{fontSize:12,color:T.accent,fontWeight:600,marginBottom:12}}>{t("pdfPremiumMsg")}</div>
             <div style={{borderRadius:10,overflow:"hidden",marginBottom:14,border:`1px solid ${T.soft}`,maxHeight:"60dvh",overflowY:"auto"}}>
-              <img src={PDF_PREVIEW_IMG} alt=t("pdfPreview") style={{width:"100%",display:"block"}}/>
+              <img src={PDF_PREVIEW_IMG} alt={t("pdfPreview")} style={{width:"100%",display:"block"}}/>
             </div>
             <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowReportPreview(false)}>{t("close")}</button>
           </div>
