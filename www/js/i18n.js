@@ -229,7 +229,7 @@ const I18N = {
     copiedUrl: "URLをコピーしました！",
     contact: "お問い合わせ",
     mirrorSave: "カメラ画像を左右反転して保存",
-    affiliateTitle: "矯正アイテム、揃っていますか？",
+    affiliateTitle: "矯正アイテムおすすめ",
     affiliateMsg: "矯正アイテムの在庫が切れていませんか？",
     select1st: "1枚目を選択してください",
     select2nd: "2枚目を選択してください",

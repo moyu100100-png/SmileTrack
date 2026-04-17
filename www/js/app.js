@@ -296,8 +296,9 @@ function App(){
     })();
   },[]);
 
-  // ドロワー・モーダル表示中は広告を非表示
-  const isOverlayOpen = drawerOpen || !!drawerSection;
+  // ドロワー・モーダル・理由選択ポップアップ表示中は広告を非表示
+  const [reasonPopupOpen, setReasonPopupOpen] = useState(false);
+  const isOverlayOpen = drawerOpen || !!drawerSection || reasonPopupOpen;
   useEffect(()=>{
     if(state.isPremium||state.noAds) return;
     if(isOverlayOpen){
@@ -581,7 +582,7 @@ function App(){
           {tab==="home"    &&<HomePage T={T} state={state} update={update} todayStr={todayStr} todayDayStartMs={todayDayStartMs} onGoTimer={()=>setTab("timer")}/>}
           {tab==="calendar"&&<CalendarPage T={T} state={state} update={update} todayStr={todayStr} todayDayStartMs={todayDayStartMs}/>}
           {tab==="photo"   &&<PhotoPage T={T} state={state} update={update} todayStr={todayStr}/>}
-          {tab==="timer"   &&<TimerPage T={T} state={state} update={update} handleRemoveButton={handleRemoveButton} todayStr={todayStr} todayDayStartMs={todayDayStartMs} snoozedUntil={snoozedUntil} setSnoozedUntil={setSnoozedUntil} alarmStopped={alarmStopped} setAlarmStopped={setAlarmStopped}/>}
+          {tab==="timer"   &&<TimerPage T={T} state={state} update={update} handleRemoveButton={handleRemoveButton} todayStr={todayStr} todayDayStartMs={todayDayStartMs} snoozedUntil={snoozedUntil} setSnoozedUntil={setSnoozedUntil} alarmStopped={alarmStopped} setAlarmStopped={setAlarmStopped} onReasonPopup={setReasonPopupOpen}/>}
           {tab==="stats"   &&<StatsPage T={T} state={state} update={update} todayStr={todayStr} todayDayStartMs={todayDayStartMs}/>}
         </div>
         <div className="nav" style={(!state.isPremium&&!state.noAds)?{paddingBottom:`calc(env(safe-area-inset-bottom, 0px) + 35px)`}:{}}>

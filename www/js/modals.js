@@ -428,7 +428,22 @@ function TimerSettingsModal({T,state,onSave,onClose}){
         {/* アラームサウンド選択 */}
         {(()=>{
           const [soundOpen,setSoundOpen]=React.useState(false);
+          const [playingId,setPlayingId]=React.useState(null);
           const cur=ALARM_SOUNDS.find(s=>s.id===alarmSound)||ALARM_SOUNDS[0];
+
+          const handlePlay=(e,sid)=>{
+            e.stopPropagation();
+            if(playingId===sid){
+              stopAlarmSound();
+              setPlayingId(null);
+            } else {
+              playAlarmSound(sid);
+              setPlayingId(sid);
+              // ループしないサウンドは自動停止を検知（約5秒後にリセット）
+              setTimeout(()=>setPlayingId(p=>p===sid?null:p), 8000);
+            }
+          };
+
           return(
             <div style={{marginTop:16}}>
               <div style={{fontSize:13,fontWeight:700,color:T.accent,marginBottom:6,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>{t("alarmSoundLabel")}</div>
@@ -442,20 +457,26 @@ function TimerSettingsModal({T,state,onSave,onClose}){
               </div>
               {soundOpen&&(
                 <div style={{display:"flex",flexDirection:"column",gap:4,marginTop:6}}>
-                  {ALARM_SOUNDS.map(s=>(
-                    <div key={s.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 12px",borderRadius:10,background:alarmSound===s.id?(state.themeName==="blushhemp"?"rgba(64,41,36,0.12)":T.soft):"transparent",border:`1.5px solid ${alarmSound===s.id?T.primary:T.soft}`,cursor:"pointer"}}
-                      onClick={()=>{setAlarmSound(s.id);setSoundOpen(false);}}>
-                      <div style={{flex:1}}>
-                        <div style={{fontSize:13,fontWeight:600,color:alarmSound===s.id?T.primary:T.text}}>{s.label}</div>
-                        <div style={{fontSize:11,color:T.text+"66"}}>{s.desc}</div>
+                  {ALARM_SOUNDS.map(s=>{
+                    const isPlaying=playingId===s.id;
+                    return(
+                      <div key={s.id} style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"8px 12px",borderRadius:10,background:alarmSound===s.id?(state.themeName==="blushhemp"?"rgba(64,41,36,0.12)":T.soft):"transparent",border:`1.5px solid ${alarmSound===s.id?T.primary:T.soft}`,cursor:"pointer"}}
+                        onClick={()=>{setAlarmSound(s.id);setSoundOpen(false);if(isPlaying){stopAlarmSound();setPlayingId(null);}}}>
+                        <div style={{flex:1}}>
+                          <div style={{fontSize:13,fontWeight:600,color:alarmSound===s.id?T.primary:T.text}}>{s.label}</div>
+                          <div style={{fontSize:11,color:T.text+"66"}}>{s.desc}</div>
+                        </div>
+                        <button
+                          onClick={e=>handlePlay(e,s.id)}
+                          style={{background:isPlaying?T.accent:T.primary,border:"none",borderRadius:20,width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,marginLeft:8,transition:"background .2s"}}>
+                          {isPlaying
+                            ? <svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><rect x="5" y="3" width="4" height="18"/><rect x="15" y="3" width="4" height="18"/></svg>
+                            : <svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><polygon points="5,3 19,12 5,21"/></svg>
+                          }
+                        </button>
                       </div>
-                      <button
-                        onClick={e=>{e.stopPropagation();playAlarmSound(s.id);}}
-                        style={{background:T.primary,border:"none",borderRadius:20,width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,marginLeft:8}}>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><polygon points="5,3 19,12 5,21"/></svg>
-                      </button>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>

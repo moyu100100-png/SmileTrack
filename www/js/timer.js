@@ -1,4 +1,4 @@
-function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,snoozedUntil,setSnoozedUntil,alarmStopped,setAlarmStopped}){
+function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,snoozedUntil,setSnoozedUntil,alarmStopped,setAlarmStopped,onReasonPopup}){
   // タイマーページは常に毎秒更新（メインのタイマー表示）
   useTick(1000);
 
@@ -47,14 +47,19 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
   const expectedWear=Math.max(0,86400-totalRemovedSec);
 
   const onStartPress=async()=>{
-    if(!timerRunning){if(showBreakdown)setPendingReason("");else await handleRemoveButton(runningMs);}
-    else {
+    if(!timerRunning){
+      if(showBreakdown){
+        setPendingReason("");
+        if(onReasonPopup) onReasonPopup(true);
+      } else await handleRemoveButton(runningMs);
+    } else {
       await handleRemoveButton(runningMs);
     }
   };
   const confirmReason=async reason=>{
     const startMs=Date.now();
     setPendingReason(null);
+    if(onReasonPopup) onReasonPopup(false);
     update({timerRunning:true,timerStart:startMs,timerElapsed:0,_pendingReason:reason});
     // 通知許可確認
     if(Notif.isCapacitor()){
@@ -225,7 +230,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
                 {t("noReasonOption")}
               </button>
             </div>
-            <button className="btn bs" style={{width:"100%",padding:"16px",fontSize:16}} onClick={()=>setPendingReason(null)}>{t("cancel")}</button>
+            <button className="btn bs" style={{width:"100%",padding:"16px",fontSize:16}} onClick={()=>{setPendingReason(null);if(onReasonPopup)onReasonPopup(false);}}>{t("cancel")}</button>
           </div>
         </div>
       )}
