@@ -64,13 +64,13 @@ function HomePage({T,state,update,todayStr,todayDayStartMs,onGoTimer}){
                 strokeDasharray={`${CIRC*(1-wearPct)} ${CIRC}`} strokeDashoffset={-CIRC*wearPct} style={{transition:"all .6s"}}/>}
             </svg>
             <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2}}>
-              <div style={{fontSize:Math.round(centerFontSize*.5),color:T.text+"77",fontWeight:600}}>本日の装着時間</div>
+              <div style={{fontSize:Math.round(centerFontSize*.5),color:T.text+"77",fontWeight:600}}>{t("todayWearTime")}</div>
               {(()=>{
                 const tn=state.themeName;
                 const circleNumC=["atrium","navyrose","deepteal","ashviolet","blushhemp"].includes(tn)?T.soft:T.primary;
                 return <>
                   <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:centerFontSize,fontWeight:700,color:circleNumC,lineHeight:1}}>{fmt(actualWearSec)}</div>
-                  <div style={{fontSize:Math.round(centerFontSize*.5),color:T.text+"77"}}>取り外し</div>
+                  <div style={{fontSize:Math.round(centerFontSize*.5),color:T.text+"77"}}>{t("removal")}</div>
                   <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:Math.round(centerFontSize*.82),fontWeight:600,color:T.text+"99",lineHeight:1}}>{fmt(totalRemovedSec)}</div>
                 </>;
               })()}
@@ -82,8 +82,8 @@ function HomePage({T,state,update,todayStr,todayDayStartMs,onGoTimer}){
         {totalEndDate&&new Date(dsFromDate(totalEndDate)+"T00:00:00").getTime()<todayMs?(
           /* 治療完了 */
           <div style={{background:T.card,borderRadius:16,padding:"32px 16px",textAlign:"center"}}>
-            <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:22,fontWeight:700,color:T.primary,marginBottom:8}}>お疲れ様でした</div>
-            <div style={{fontSize:22,fontWeight:700,color:T.primary,lineHeight:1.7}}>毎日よく頑張りました✨</div>
+            <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:22,fontWeight:700,color:T.primary,marginBottom:8}}>{t("treatmentDone")}</div>
+            <div style={{fontSize:22,fontWeight:700,color:T.primary,lineHeight:1.7}}>{t("treatmentDoneMsg")}</div>
           </div>
         ):(
           <>
@@ -97,13 +97,15 @@ function HomePage({T,state,update,todayStr,todayDayStartMs,onGoTimer}){
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
               {/* 今日 */}
               <div style={{background:T.card,borderRadius:12,padding:"10px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:80}}>
-                <div style={lblStyle}>{LANG==="ja"?"今日":"Today"}</div>
+                <div style={lblStyle}>{t("todayLabel")}</div>
                 <div style={{position:"relative",width:"100%",display:"flex",justifyContent:"center",alignItems:"baseline",height:40}}>
                   <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:36,fontWeight:700,color:nC,lineHeight:1,position:"absolute",left:"50%",transform:"translateX(-50%)",bottom:0}}>
                     {isExchangeDayBeforeTap ? list[pieceIdx>0?pieceIdx-1:0].intervalDays+1 : dayNum}
                   </span>
                   <span style={{...subStyle,position:"absolute",left:"calc(50% + 22px + 4px)",bottom:2,whiteSpace:"nowrap"}}>
-                    {isExchangeDayBeforeTap ? LANG==="ja"?`日目/${list[pieceIdx>0?pieceIdx-1:0].intervalDays}日間`:`d/${list[pieceIdx>0?pieceIdx-1:0].intervalDays}d` : LANG==="ja"?`日目/${interval}日間`:`d/${interval}d`}
+                    {isExchangeDayBeforeTap
+                      ? `${t("dayOfUnit")}${list[pieceIdx>0?pieceIdx-1:0].intervalDays}${t("daySpanUnit")}`
+                      : `${t("dayOfUnit")}${interval}${t("daySpanUnit")}`}
                   </span>
                 </div>
               </div>
@@ -113,20 +115,20 @@ function HomePage({T,state,update,todayStr,todayDayStartMs,onGoTimer}){
                 onClick={isExchangeDayBeforeTap?()=>update({exchangedDates:[...exchangedDates,todayStr]}):undefined}
               >
                 {isFirstPieceFirstDay ? (
-                  <><div style={lblStyle}>{t("startDate")}</div><div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:24,fontWeight:700,color:nC}}>{LANG==="ja"?"今日":"Today"}</div></>
+                  <><div style={lblStyle}>{t("startDate")}</div><div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:24,fontWeight:700,color:nC}}>{t("todayLabel")}</div></>
                 ) : isExchangeDayBeforeTap ? (
                   <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
                     <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:26,fontWeight:700,color:nC}}>{t("todayEx")}</div>
-                    <div style={{fontSize:10,color:T.text+"66"}}>{LANG==="ja"?"交換後タップ":"Tap after"}</div>
+                    <div style={{fontSize:10,color:T.text+"66"}}>{t("tapAfterChange")}</div>
                   </div>
                 ) : isLastDay ? (
-                  <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:24,fontWeight:700,color:nC}}>{LANG==="ja"?"最終日✨":"Last Day✨"}</div>
+                  <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:24,fontWeight:700,color:nC}}>{t("lastDay")}</div>
                 ) : (
                   <>
                     <div style={lblStyle}>{t("exchange")}</div>
                     <div style={{position:"relative",width:"100%",display:"flex",justifyContent:"center",alignItems:"baseline",height:40}}>
                       <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:36,fontWeight:700,color:nC,lineHeight:1,position:"absolute",left:"50%",transform:"translateX(-50%)",bottom:0}}>{daysToEx}</span>
-                      <span style={{...subStyle,position:"absolute",left:"calc(50% + 22px + 4px)",bottom:2,whiteSpace:"nowrap"}}>{LANG==="ja"?"日":""}</span>
+                      <span style={{...subStyle,position:"absolute",left:"calc(50% + 22px + 4px)",bottom:2,whiteSpace:"nowrap"}}>{t("dayUnit")}</span>
                     </div>
                   </>
                 )}
@@ -135,18 +137,18 @@ function HomePage({T,state,update,todayStr,todayDayStartMs,onGoTimer}){
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
               {/* マウスピース */}
               <div style={{background:T.card,borderRadius:12,padding:"10px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:80}}>
-                <div style={lblStyle}>{LANG==="ja"?"マウスピース":"Aligner"}</div>
+                <div style={lblStyle}>{t("alignerLabel")}</div>
                 <div style={{position:"relative",width:"100%",display:"flex",justifyContent:"center",alignItems:"baseline",height:40}}>
                   <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:36,fontWeight:700,color:nC,lineHeight:1,position:"absolute",left:"50%",transform:"translateX(-50%)",bottom:0}}>{pieceLabel||pieceN}</span>
-                  <span style={{...subStyle,position:"absolute",left:"calc(50% + 22px + 4px)",bottom:2,whiteSpace:"nowrap"}}>{LANG==="ja"?`枚目/全${totalPiecesAll}枚`:`/${totalPiecesAll}`}</span>
+                  <span style={{...subStyle,position:"absolute",left:"calc(50% + 22px + 4px)",bottom:2,whiteSpace:"nowrap"}}>{t("alignerUnit")}{totalPiecesAll}{t("alignerUnitEnd")}</span>
                 </div>
               </div>
               {/* 残り */}
               <div style={{background:T.card,borderRadius:12,padding:"10px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",minHeight:80}}>
-                <div style={lblStyle}>{LANG==="ja"?"残り":"Left"}</div>
+                <div style={lblStyle}>{t("remainLabel")}</div>
                 <div style={{position:"relative",width:"100%",display:"flex",justifyContent:"center",alignItems:"baseline",height:40}}>
                   <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:36,fontWeight:700,color:nC,lineHeight:1,position:"absolute",left:"50%",transform:"translateX(-50%)",bottom:0}}>{remainPieces}</span>
-                  <span style={{...subStyle,position:"absolute",left:"calc(50% + 22px + 4px)",bottom:2,whiteSpace:"nowrap"}}>{LANG==="ja"?"枚":""}</span>
+                  <span style={{...subStyle,position:"absolute",left:"calc(50% + 22px + 4px)",bottom:2,whiteSpace:"nowrap"}}>{t("remainUnit")}</span>
                 </div>
               </div>
             </div>
@@ -155,8 +157,8 @@ function HomePage({T,state,update,todayStr,todayDayStartMs,onGoTimer}){
             {/* Progress bar */}
             <div style={{background:T.card,borderRadius:12,padding:"9px 12px"}}>
               <div style={{display:"flex",justifyContent:"space-between",marginBottom:5}}>
-                <span style={{fontSize:13,color:T.text+"66"}}>スタートから <strong style={{color:T.primary}}>{elapsedDays}</strong> 日目</span>
-                <span style={{fontSize:13,color:T.text+"66"}}>あと <strong style={{color:T.primary}}>{remainDays}</strong> 日</span>
+                <span style={{fontSize:13,color:T.text+"66"}}>{t("startFromDay")} <strong style={{color:T.primary}}>{elapsedDays}</strong> {t("dayCount")}</span>
+                <span style={{fontSize:13,color:T.text+"66"}}>{t("daysLeft")} <strong style={{color:T.primary}}>{remainDays}</strong> {t("dayUnit")}</span>
               </div>
               <div style={{position:"relative",height:12,background:state.themeName==="night"?"#204051":T.soft,borderRadius:99,overflow:"hidden"}}>
                 <div style={{position:"absolute",left:0,top:0,bottom:0,width:`${progressPct*100}%`,background:T.primary,borderRadius:99,transition:"width 1.2s"}}/>

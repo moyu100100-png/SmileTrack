@@ -99,8 +99,8 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
   const selEvents = [];
   if(sel){
     const exLabel = getExPieceLabel(state,sel);
-    if(exLabel) selEvents.push({type:"ex",label: sel===state.startDate ? `マウスピース開始 1日目` : `マウスピース交換 (${exLabel}枚目)`,color:T.accent,id:null});
-    (apptMap[sel]||[]).forEach(a=>selEvents.push({type:"appt",label:`${a.title||(LANG==="ja"?"歯科受診":"Dental Visit")}${a.time?" "+a.time:""}`,title:a.title||(LANG==="ja"?"歯科受診":"Dental Visit"),time:a.time||"",color:T.primary,id:a.id}));
+    if(exLabel) selEvents.push({type:"ex",label: sel===state.startDate ? t("scheduleStartLabel") : `${t("scheduleChangeLabel")} (${exLabel})`,color:T.accent,id:null});
+    (apptMap[sel]||[]).forEach(a=>selEvents.push({type:"appt",label:`${a.title||t("appointmentTitle")}${a.time?" "+a.time:""}`,title:a.title||t("appointmentTitle"),time:a.time||"",color:T.primary,id:a.id}));
   }
 
   const deleteEvent = ev => {
@@ -119,7 +119,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
       {/* Month nav */}
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px 6px",background:T.card,borderBottom:`1px solid ${T.soft}`}}>
         <button className="btn bs bsm" style={{fontSize:16,padding:"4px 14px"}} onClick={prevMonth}>‹</button>
-        <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,fontSize:17,color:T.primary}}>{vy}年 {vm+1}月</span>
+        <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,fontSize:17,color:T.primary}}>{t("yearMonth").replace("{y}",vy).replace("{m}",vm+1)}</span>
         <button className="btn bs bsm" style={{fontSize:16,padding:"4px 14px"}} onClick={nextMonth}>›</button>
       </div>
 
@@ -192,16 +192,16 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
 
         {/* Legend */}
         <div style={{display:"flex",gap:10,flexWrap:"wrap",paddingTop:6,borderTop:`1px solid ${T.soft}`,marginTop:4}}>
-          <span style={{fontSize:11,display:"flex",alignItems:"center",gap:3,color:T.text+"77"}}><span style={{width:10,height:10,borderRadius:2,background:`${T.primary}22`,border:`1.5px solid ${T.primary}`,display:"inline-block"}}/>達成</span>
+          <span style={{fontSize:11,display:"flex",alignItems:"center",gap:3,color:T.text+"77"}}><span style={{width:10,height:10,borderRadius:2,background:`${T.primary}22`,border:`1.5px solid ${T.primary}`,display:"inline-block"}}/>{t("achievedLabel")}</span>
           {(()=>{
             const gf=["blush","wisteria","powder","glacier","amber"];
             const af=["atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"];
             const isN=state.themeName==="night";
             const failBg=isN?"rgba(220,38,38,0.35)":af.includes(state.themeName)?T.soft+"99":gf.includes(state.themeName)?"rgba(160,160,160,0.25)":"rgba(220,38,38,0.12)";
             const failBd=isN?"1.5px solid rgba(220,38,38,0.7)":af.includes(state.themeName)?`1.5px solid ${T.soft}`:gf.includes(state.themeName)?"1.5px solid #aaa":"1.5px solid #DC2626";
-            return <span style={{fontSize:11,display:"flex",alignItems:"center",gap:3,color:T.text+"77"}}><span style={{width:10,height:10,borderRadius:2,background:failBg,border:failBd,display:"inline-block"}}/>未達</span>;
+            return <span style={{fontSize:11,display:"flex",alignItems:"center",gap:3,color:T.text+"77"}}><span style={{width:10,height:10,borderRadius:2,background:failBg,border:failBd,display:"inline-block"}}/>{t("failedLabel")}</span>;
           })()}
-          <span style={{fontSize:11,display:"flex",alignItems:"center",gap:3,color:T.text+"77"}}><span style={{width:10,height:10,borderRadius:"2px",border:`2px solid ${T.accent}`,display:"inline-block"}}/>交換日</span>
+          <span style={{fontSize:11,display:"flex",alignItems:"center",gap:3,color:T.text+"77"}}><span style={{width:10,height:10,borderRadius:"2px",border:`2px solid ${T.accent}`,display:"inline-block"}}/>{t("exchangeDayLabel")}</span>
         </div>
       </div>
 
@@ -209,7 +209,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
       <div style={{background:T.card,borderTop:`2px solid ${T.soft}`,padding:"12px 14px 14px",marginTop:4}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
           <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:15,fontWeight:700,color:T.text}}>{selLabel}</div>
-          <button className="btn bp bsm" onClick={()=>{setApptForm({date:sel||todayStr,time:"",title:"",note:""});setShowAddModal(true);}}>＋ 予定追加</button>
+          <button className="btn bp bsm" onClick={()=>{setApptForm({date:sel||todayStr,time:"",title:"",note:""});setShowAddModal(true);}}>{t("scheduleAddEvent")}</button>
         </div>
 
         {sel&&(()=>{
@@ -291,7 +291,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                 gap:8,userSelect:'none'}}>
                 <span style={{fontSize:13,color:T.primary,fontWeight:700,flex:1,cursor:'pointer'}}
                   onClick={()=>{setEditLogDay(isExpanded?null:sel);setAddBreakdownDay(null);}}>
-                  装着時間
+                  {t("wearTimeHeader")}
                 </span>
                 {isWearEdit
                   ?null
@@ -365,9 +365,9 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                         <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
                       </svg>
                     </div>
-                    <div style={{textAlign:'center',fontSize:17,fontWeight:700,color:T.text,marginBottom:6}}>削除しますか？</div>
+                    <div style={{textAlign:'center',fontSize:17,fontWeight:700,color:T.text,marginBottom:6}}>{t("deleteConfirmTitle")}</div>
                     <div style={{textAlign:'center',fontSize:14,color:T.text+'66',marginBottom:20}}>
-                      「{selSessions.find(s=>s.id===confirmDeleteId)?.reason||'その他'}」の記録を削除します
+                      「{selSessions.find(s=>s.id===confirmDeleteId)?.reason||t("others")}」{t("deleteRecordConfirmMsg")}
                     </div>
                     <div style={{display:'flex',gap:10}}>
                       <button className='btn bs' style={{flex:1}} onClick={()=>setConfirmDeleteId(null)}>{t("cancel")}</button>
@@ -383,7 +383,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
         })()})()}
 
         {selEvents.length===0
-          ? <div style={{fontSize:14,color:T.text+"40",padding:"4px 0"}}>この日の予定はありません</div>
+          ? <div style={{fontSize:14,color:T.text+"40",padding:"4px 0"}}>{t("noPlanLabel")}</div>
           : <div style={{display:"flex",flexDirection:"column",gap:5}}>
               {selEvents.map((ev,i)=>(
                 <div key={i} onClick={()=>ev.id&&setEditEventId(ev.id)}
@@ -408,17 +408,17 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
         return(
           <div className="mo" onClick={()=>setShowWearEditConfirm(false)} style={{alignItems:"center"}}>
             <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:340}}>
-              <div className="mdtitle" style={{marginBottom:12}}>装着時間を変更</div>
+              <div className="mdtitle" style={{marginBottom:12}}>{t("wearEditTitle")}</div>
               {isToday2?(
                 <>
                   <div style={{fontSize:13,color:T.text+"77",marginBottom:16,lineHeight:1.6}}>
-                    当日の装着時間はリアルタイムで自動計算されるため変更できません。
+                    {t("wearEditTodayMsg")}
                   </div>
                   <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowWearEditConfirm(false)}>{t("close")}</button>
                 </>
               ):(
                 <>
-                  <label>{LANG==="ja"?"時間":"Hours"}</label>
+                  <label>{t("hoursLabel")}</label>
                   <input type='text' inputMode='numeric' maxLength={5} autoComplete='off'
                     value={editLogVal}
                     onChange={e=>{let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&editLogVal.length===1)v+=':';setEditLogVal(v);}}
@@ -426,7 +426,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                     autoFocus/>
                   {hasBreakdown&&(
                     <div style={{fontSize:12,color:T.text+"66",marginBottom:14,lineHeight:1.6}}>
-                      内訳がある場合、変更すると内訳がリセットされます
+                      {t("breakdownExistsMsg")}
                     </div>
                   )}
                   {hasBreakdown?(
@@ -434,14 +434,14 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                       <button className="btn bp" style={{flex:1,fontSize:13}} onClick={()=>{
                         setShowWearEditConfirm(false);
                         setEditLogDay(sel);
-                      }}>内訳を編集</button>
+                      }}>{t("editBreakdownBtn")}</button>
                       <button className="btn bs" style={{flex:1,color:T.text+"66",fontSize:13}} onClick={()=>{
                         setShowResetConfirm(true);
-                      }}>内訳をリセット</button>
+                      }}>{t("resetBreakdownBtn")}</button>
                     </div>
                   ):(
                     <div style={{display:"flex",gap:8}}>
-                      <button className="btn bs" style={{flex:1}} onClick={()=>setShowWearEditConfirm(false)}>{LANG==="ja"?"戻る":"Back"}</button>
+                      <button className="btn bs" style={{flex:1}} onClick={()=>setShowWearEditConfirm(false)}>{t("backBtn")}</button>
                       <button className="btn bp" style={{flex:1}} onClick={()=>{
                         const log={...(state.dailyWearLog||{})};
                         log[sel]=parseHH(editLogVal);
@@ -464,8 +464,8 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
         return(
           <div className="mo" onClick={()=>setShowResetConfirm(false)} style={{alignItems:"center"}}>
             <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:340,textAlign:"center"}}>
-              <div className="mdtitle" style={{marginBottom:8}}>内訳をリセットしますか？</div>
-              <div style={{fontSize:13,color:T.text+"77",marginBottom:20,lineHeight:1.7}}>この操作は元に戻せません。</div>
+              <div className="mdtitle" style={{marginBottom:8}}>{t("resetBreakdownTitle")}</div>
+              <div style={{fontSize:13,color:T.text+"77",marginBottom:20,lineHeight:1.7}}>{t("cannotUndoMsg")}</div>
               <div style={{display:"flex",gap:8}}>
                 <button className="btn bs" style={{flex:1}} onClick={()=>setShowResetConfirm(false)}>{t("cancel")}</button>
                 <button className="btn bp" style={{flex:1}} onClick={()=>{
@@ -477,7 +477,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                   update({dailyWearLog:log,timerSessions:newSess});
                   setShowResetConfirm(false);
                   setShowWearEditConfirm(false);
-                }}>{LANG==="ja"?"リセット":"Reset"}</button>
+                }}>{t("resetBtn")}</button>
               </div>
             </div>
           </div>
@@ -516,23 +516,23 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
           <div className="mo" onClick={()=>setEditSessId(null)} style={{alignItems:"center"}}>
             <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:400}}>
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
-                <div className="mdtitle" style={{margin:0}}>取り外しを編集</div>
+                <div className="mdtitle" style={{margin:0}}>{t("editBreakdownTitle")}</div>
                 <button style={{background:'none',border:'none',color:'#E74C3C',fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:"'M PLUS Rounded 1c',sans-serif",padding:'4px 8px'}}
                   onClick={()=>{setConfirmDeleteId(editSessId);setEditSessId(null);}}>{t("delete")}</button>
               </div>
-              <label>{LANG==="ja"?"理由":"Reason"}</label>
+              <label>{t("reason")}</label>
               <div style={{display:'flex',flexWrap:'wrap',gap:8,marginBottom:14}}>
-                {[...getReasonList(state),LANG==="ja"?"ー":"—"].map(r=>(
-                  <button key={r} onClick={()=>setEditSessReason(r===(LANG==="ja"?"ー":"—")?"":r)}
-                    style={{padding:'10px 16px',borderRadius:20,border:`1.5px solid ${(editSessReason===r||(r==="ー"&&!editSessReason))?T.primary:T.soft}`,
-                      background:(editSessReason===r||(r==="ー"&&!editSessReason))?T.primary:'transparent',
-                      color:(editSessReason===r||(r==="ー"&&!editSessReason))?'#fff':T.text,
+                {[...getReasonList(state),t("reasonNone")].map(r=>(
+                  <button key={r} onClick={()=>setEditSessReason(r===t("reasonNone")?"":r)}
+                    style={{padding:'10px 16px',borderRadius:20,border:`1.5px solid ${(editSessReason===r||(r===t("reasonNone")&&!editSessReason))?T.primary:T.soft}`,
+                      background:(editSessReason===r||(r===t("reasonNone")&&!editSessReason))?T.primary:'transparent',
+                      color:(editSessReason===r||(r===t("reasonNone")&&!editSessReason))?'#fff':T.text,
                       fontSize:15,fontWeight:600,cursor:'pointer',fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>
                     {r}
                   </button>
                 ))}
               </div>
-              <label>時刻</label>
+              <label>{t("timeInputLabel")}</label>
               <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:8}}>
                 <input type='time' value={editSessFrom}
                   onChange={e=>{setEditSessFrom(e.target.value);}}
@@ -558,13 +558,13 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                     }}}
                   style={{flex:1,height:44,fontSize:16,borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,padding:'0 12px',WebkitAppearance:'none',appearance:'none'}}/>
               </div>
-              <label>{LANG==="ja"?"時間":"Hours"}</label>
+              <label>{t("hoursLabel")}</label>
               <input type='text' inputMode='numeric' maxLength={5} autoComplete='off' value={editSessDur}
                 onChange={e=>{let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&editSessDur.length===1)v+=':';setEditSessDur(v);}}
                 style={{marginBottom:14,textAlign:'center',fontSize:16}}/>
-              <label>コメント</label>
+              <label>{t("commentLabel")}</label>
               <input type='text' value={editSessComment} onChange={e=>setEditSessComment(e.target.value)}
-                placeholder='コメントを入力…' style={{marginBottom:16}}/>
+                placeholder={t("commentPlaceholder")} style={{marginBottom:16}}/>
               <div style={{display:'flex',gap:8}}>
                 <button className='btn bs' style={{flex:1}} onClick={()=>setEditSessId(null)}>{t("cancel")}</button>
                 <button className='btn bp' style={{flex:1}} onClick={saveEdit}>{t("save")}</button>
@@ -578,11 +578,11 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
       {addBreakdownDay&&(
         <div className="mo" onClick={()=>setAddBreakdownDay(null)} style={{alignItems:"center"}}>
           <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:400}}>
-            <div className="mdtitle">取り外しを追加</div>
+            <div className="mdtitle">{t("addBreakdownTitle")}</div>
             {/* 理由選択 */}
-            <label>{LANG==="ja"?"理由":"Reason"}</label>
+            <label>{t("reason")}</label>
             <div style={{display:'flex',flexWrap:'wrap',gap:8,marginBottom:14}}>
-              {[...getReasonList(state),LANG==="ja"?"ー":"—"].map(r=>(
+              {[...getReasonList(state),t("reasonNone")].map(r=>(
                 <button key={r}
                   onClick={()=>setAddBreakdownReason(r)}
                   style={{padding:'10px 16px',borderRadius:20,border:`1.5px solid ${addBreakdownReason===r?T.primary:T.soft}`,
@@ -595,7 +595,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
             </div>
             {/* 時刻/時間 */}
             <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:8}}>
-              <label style={{margin:0}}>時刻</label>
+              <label style={{margin:0}}>{t("timeInputLabel")}</label>
               <div style={{display:'flex',alignItems:'center',gap:8}}>
                 <span style={{fontSize:13,color:T.text+'66'}}>ON</span>
                 <button onClick={()=>{setAddUseTime(v=>!v);setAddBreakdownTimeFrom('');setAddBreakdownTimeTo('');}}
@@ -630,16 +630,16 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
               </div>
             )}
             <div style={{marginBottom:14}}>
-              <label>{LANG==="ja"?"時間":"Hours"}</label>
+              <label>{t("hoursLabel")}</label>
               <input type='text' inputMode='numeric' maxLength={5} autoComplete='off' value={addBreakdownDur}
                 onChange={e=>{if(addUseTime)return;let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&addBreakdownDur.length===1)v+=':';setAddBreakdownDur(v);}}
                 readOnly={addUseTime}
                 style={{textAlign:'center',opacity:addUseTime?0.6:1,background:addUseTime?T.soft:T.bg}}/>
             </div>
             {/* コメント */}
-            <label>コメント</label>
+            <label>{t("commentLabel")}</label>
             <input type='text' value={addBreakdownComment} onChange={e=>setAddBreakdownComment(e.target.value)}
-              placeholder='コメントを入力…' style={{marginBottom:16}}/>
+              placeholder={t("commentPlaceholder")} style={{marginBottom:16}}/>
             <div style={{display:'flex',gap:8}}>
               <button className='btn bs' style={{flex:1}} onClick={()=>setAddBreakdownDay(null)}>{t("cancel")}</button>
               <button className='btn bp' style={{flex:1}} onClick={()=>{
@@ -663,7 +663,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                 dl[sel]=Math.max(0,86400-Math.floor(newRem/1000));
                 update({timerSessions:allSess,dailyWearLog:dl});
                 setAddBreakdownDay(null);
-              }}>追加</button>
+              }}>{t("addBtn")}</button>
             </div>
           </div>
         </div>
@@ -673,18 +673,18 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
       {showAddModal&&(
         <div className="mo" onClick={()=>setShowAddModal(false)} style={{alignItems:"center"}}>
           <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:400}}>
-            <div className="mdtitle">予定を追加</div>
-            <label>タイトル</label>
-            <input value={apptForm.title} onChange={e=>setApptForm(f=>({...f,title:e.target.value}))} placeholder={LANG==="ja"?"タイトル":"Title"} style={{marginBottom:8}}/>
-            <label>日付</label>
+            <div className="mdtitle">{t("addEventTitle")}</div>
+            <label>{t("titleLabel")}</label>
+            <input value={apptForm.title} onChange={e=>setApptForm(f=>({...f,title:e.target.value}))} placeholder={t("titleLabel")} style={{marginBottom:8}}/>
+            <label>{t("dateLabel")}</label>
             <input type="date" value={apptForm.date} onChange={e=>setApptForm(f=>({...f,date:e.target.value}))}
               style={{marginBottom:8,width:"100%",boxSizing:"border-box",height:44,fontSize:16,
                 borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,
                 padding:"0 12px",WebkitAppearance:"none",appearance:"none"}}/>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
-              <label style={{margin:0}}>時間</label>
+              <label style={{margin:0}}>{t("timeLabel")}</label>
               <div style={{display:"flex",alignItems:"center",gap:8}}>
-                <span style={{fontSize:13,color:T.text+"66"}}>終日</span>
+                <span style={{fontSize:13,color:T.text+"66"}}>{t("allDayLabel")}</span>
                 <button onClick={()=>setApptForm(f=>({...f,allDay:!f.allDay}))}
                   style={{width:44,height:24,borderRadius:12,border:"none",cursor:"pointer",
                     background:apptForm.allDay?T.primary:T.soft,position:"relative",flexShrink:0,transition:"background .2s"}}>
@@ -704,7 +704,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
             )}
             <div style={{display:"flex",gap:8}}>
               <button className="btn bs" style={{flex:1}} onClick={()=>setShowAddModal(false)}>{t("cancel")}</button>
-              <button className="btn bp" style={{flex:1}} onClick={addEvent}>追加</button>
+              <button className="btn bp" style={{flex:1}} onClick={addEvent}>{t("addBtn")}</button>
             </div>
           </div>
         </div>
@@ -722,16 +722,16 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
           <div className="mo" onClick={()=>setEditEventId(null)} style={{alignItems:"center"}}>
             <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:400}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
-                <div className="mdtitle" style={{margin:0}}>予定を編集</div>
+                <div className="mdtitle" style={{margin:0}}>{t("editEventTitle")}</div>
                 <button style={{background:"none",border:"none",color:"#E74C3C",fontSize:14,fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",padding:"4px 8px"}}
                   onClick={()=>{deleteEvent(ev);setEditEventId(null);}}>{t("delete")}</button>
               </div>
-              <label>タイトル</label>
+              <label>{t("titleLabel")}</label>
               <input value={ev.title||""} onChange={e=>saveEvField({title:e.target.value})} style={{marginBottom:8}}/>
               <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
-                <label style={{margin:0}}>時間</label>
+                <label style={{margin:0}}>{t("timeLabel")}</label>
                 <div style={{display:"flex",alignItems:"center",gap:8}}>
-                  <span style={{fontSize:13,color:T.text+"66"}}>終日</span>
+                  <span style={{fontSize:13,color:T.text+"66"}}>{t("allDayLabel")}</span>
                   <button onClick={()=>saveEvField({allDay:!ev.allDay})}
                     style={{width:44,height:24,borderRadius:12,border:"none",cursor:"pointer",
                       background:ev.allDay?T.primary:T.soft,position:"relative",flexShrink:0,transition:"background .2s"}}>

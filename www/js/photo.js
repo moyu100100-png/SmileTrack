@@ -14,8 +14,8 @@ function PhotoPage({T,state,update,todayStr}){
   const existingModes = new Set((state.photos||[]).map(p=>p.shotMode||"face_front"));
   // タブ名：歯正面→「歯」、顔正面→「顔」、それ以外はlabelJPそのまま
   const tabLabel = id => {
-    if(id==="teeth_front") return LANG==="ja"?"歯":"Teeth";
-    if(id==="face_front") return LANG==="ja"?"顔":"Face";
+    if(id==="teeth_front") return t("shotTeeth");
+    if(id==="face_front") return t("shotFace");
     return (SHOT_MODES.find(x=>x.id===id)||{labelJP:id}).labelJP;
   };
   // タブに出すmode一覧（重複なし・順番制御）
@@ -27,7 +27,7 @@ function PhotoPage({T,state,update,todayStr}){
   // 過去写真に存在するmodeも追加（写真が1枚以上あるもの）
   existingModes.forEach(mid => addTab(mid));
   // 写真が1枚もないmodeは除外（スロット1・2も同様）
-  const filterTabs = [["all",LANG==="ja"?"全て":"All"],
+  const filterTabs = [["all",t("filterAll")],
     ...tabModeIds
       .filter(id => existingModes.has(id))
       .map(id => [id, tabLabel(id)])
@@ -194,15 +194,15 @@ function PhotoPage({T,state,update,todayStr}){
   return(
     <div style={{padding:12}}>
       <div className="card" style={{marginBottom:10}}>
-        <div className="ct" style={{marginBottom:8,fontSize:14}}>{LANG==="ja"?"写真を撮影":"Take Photo"}</div>
+        <div className="ct" style={{marginBottom:8,fontSize:14}}>{t("takePhoto")}</div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9}}>
           <button className="btn bp" onClick={()=>openCam(slot1Id)} style={{padding:"12px 8px",flexDirection:"column"}}>
             <div style={{display:"flex",alignItems:"center",gap:4}}>{Icons.camera("#fff",14)}<span style={{fontSize:14}}>{slot1Info.labelJP}</span></div>
-            {getOverlayPhoto(slot1Id)&&<div style={{fontSize:11,opacity:.7,marginTop:2}}>{LANG==="ja"?"前回あり":"Prev"}</div>}
+            {getOverlayPhoto(slot1Id)&&<div style={{fontSize:11,opacity:.7,marginTop:2}}>{t("prevExists")}</div>}
           </button>
           <button className="btn bp" onClick={()=>{if(!isPremium){setShowSlot2Gate(true);return;}openCam(slot2Id);}} style={{padding:"12px 8px",flexDirection:"column",opacity:isPremium?1:0.55}}>
             <div style={{display:"flex",alignItems:"center",gap:4}}>{isPremium?Icons.camera("#fff",14):<span style={{fontSize:14}}>🔒</span>}<span style={{fontSize:14}}>{slot2Info.labelJP}</span></div>
-            {isPremium&&getOverlayPhoto(slot2Id)&&<div style={{fontSize:11,opacity:.7,marginTop:2}}>{LANG==="ja"?"前回あり":"Prev"}</div>}
+            {isPremium&&getOverlayPhoto(slot2Id)&&<div style={{fontSize:11,opacity:.7,marginTop:2}}>{t("prevExists")}</div>}
           </button>
         </div>
         {/* アルバムから追加 */}
@@ -249,7 +249,7 @@ function PhotoPage({T,state,update,todayStr}){
       <div className="card">
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
           <div style={{display:"flex",alignItems:"center",gap:8}}>
-            <div className="ct" style={{margin:0,fontSize:14}}>{LANG==="ja"?"フォトアルバム":"Photo Album"}</div>
+            <div className="ct" style={{margin:0,fontSize:14}}>{t("photoAlbum")}</div>
             {!isLocked&&(isPremium?(
               <button className={`btn bsm ${compareMode?"bp":"bs"}`} onClick={()=>{setCompareMode(v=>!v);setComparePick([]);}} style={{fontSize:11}}>
                 {compareMode?t("cancel"):t("compare")}
@@ -260,7 +260,7 @@ function PhotoPage({T,state,update,todayStr}){
           </div>
           {isPremium?(
             <button onClick={()=>setShowSetPin(true)} style={{display:"flex",alignItems:"center",gap:5,padding:"5px 10px",border:`1.5px solid ${state.photoLockEnabled?T.primary:T.soft}`,borderRadius:8,background:state.photoLockEnabled?T.primary:T.soft,cursor:"pointer",color:state.photoLockEnabled?"#fff":T.primary,fontSize:13,fontWeight:600,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>
-              {state.photoLockEnabled?Icons.lockClosed("#fff",13):Icons.lockOpen(T.primary,13)}<span>{state.photoLockEnabled?(LANG==="ja"?"ロック中":"Locked"):t("pinLock")}</span>
+              {state.photoLockEnabled?Icons.lockClosed("#fff",13):Icons.lockOpen(T.primary,13)}<span>{state.photoLockEnabled?(t("locked")):t("pinLock")}</span>
             </button>
           ):(
             <button onClick={()=>setShowPinGate(true)} style={{display:"flex",alignItems:"center",gap:5,padding:"5px 10px",border:`1.5px solid ${T.soft}`,borderRadius:8,background:T.soft,cursor:"pointer",color:T.primary,fontSize:13,fontWeight:600,fontFamily:"'M PLUS Rounded 1c',sans-serif",opacity:0.6}}>
@@ -276,10 +276,10 @@ function PhotoPage({T,state,update,todayStr}){
             ))}
           </div>
           {compareMode&&<div style={{fontSize:12,color:T.accent,marginBottom:8,fontWeight:600}}>
-            {comparePick.length===0?LANG==="ja"?"1枚目を選択してください":"Select 1st photo":comparePick.length===1?LANG==="ja"?"2枚目を選択してください":"Select 2nd photo":""}
+            {comparePick.length===0?t("selectFirst"):comparePick.length===1?t("selectSecond"):""}
           </div>}
           {filtered.length===0
-            ?<div style={{textAlign:"center",color:T.text+"55",padding:"22px 0",fontSize:14}}>{LANG==="ja"?"まだ写真がありません":"No photos yet"}</div>
+            ?<div style={{textAlign:"center",color:T.text+"55",padding:"22px 0",fontSize:14}}>{t("noPhotos")}</div>
             :<div className="pgrid">{(()=>{
               // 比較モード時：1枚目が選択済みなら同じshotModeのみ表示
               const compareFiltered = compareMode && comparePick.length===1
@@ -400,11 +400,11 @@ function PhotoPage({T,state,update,todayStr}){
                 {/* ガイド/前回トグル行 */}
                 <div style={{padding:"8px 16px 0",display:"flex",gap:8}}>
                   <button onClick={()=>setShowGuide(v=>!v)} style={{flex:1,padding:"5px 0",border:"none",borderRadius:8,background:showGuide?T.primary:"rgba(255,255,255,0.15)",color:"#fff",fontSize:12,fontWeight:600,cursor:"pointer"}}>
-                    {showGuide?(LANG==="ja"?"⊙ ガイドON":"⊙ Guide ON"):(LANG==="ja"?"○ ガイドOFF":"○ Guide OFF")}
+                    {showGuide?(t("guideOn")):(t("guideOff"))}
                   </button>
                   {overlayPhoto&&(
                     <button onClick={()=>setShowOverlay(v=>!v)} style={{flex:1,padding:"5px 0",border:"none",borderRadius:8,background:showOverlay?"rgba(255,180,220,0.4)":"rgba(255,255,255,0.15)",color:"#fff",fontSize:12,fontWeight:600,cursor:"pointer"}}>
-                      {showOverlay?(LANG==="ja"?"◎ 前回ON":"◎ Prev ON"):(LANG==="ja"?"◯ 前回OFF":"◯ Prev OFF")}
+                      {showOverlay?(t("overlayOn")):(t("overlayOff"))}
                     </button>
                   )}
                 </div>
@@ -445,7 +445,7 @@ function PhotoPage({T,state,update,todayStr}){
                   <span style={{color:"#aaa",fontSize:13,flexShrink:0}}># マウスピース番号</span>
                   <select value={capPiece||""} onChange={e=>setCapPiece(e.target.value?parseInt(e.target.value):null)}
                     style={{background:"#222",color:"#fff",border:"1px solid #444",borderRadius:10,width:80,textAlign:"center"}}>
-                    <option value="">{LANG==="ja"?"ー":"—"}</option>
+                    <option value="">{t("reasonNone")}</option>
                     {buildPieceList(state).map(p=><option key={p.n} value={p.n}>{p.label}</option>)}
                   </select>
                 </div>
@@ -468,7 +468,7 @@ function PhotoPage({T,state,update,todayStr}){
             <div className="mdtitle">写真を編集</div>
             <label>コメント</label>
             <input value={editComment} onChange={e=>setEditComment(e.target.value)} style={{marginBottom:10}}/>
-            <label>{LANG==="ja"?"日付":"Date"}</label>
+            <label>{t("dateLabel")}</label>
             <input type="date" value={editDate} onChange={e=>setEditDate(e.target.value)}
               style={{marginBottom:10,width:"100%",boxSizing:"border-box",height:44,fontSize:16,
                 borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,
@@ -552,7 +552,7 @@ function PhotoPage({T,state,update,todayStr}){
             })()}
             <div style={{display:"flex",justifyContent:"center",gap:12,marginBottom:14}}>
               <button onClick={()=>setAlbumScale(s=>Math.min(8,s+0.2))} style={{background:T.soft,border:"none",borderRadius:8,padding:"6px 16px",fontSize:18,cursor:"pointer",color:T.primary}}>＋</button>
-              <button onClick={()=>{setAlbumScale(1);setAlbumOffset({x:0,y:0});}} style={{background:T.soft,border:"none",borderRadius:8,padding:"6px 12px",fontSize:13,cursor:"pointer",color:T.text}}>{LANG==="ja"?"リセット":"Reset"}</button>
+              <button onClick={()=>{setAlbumScale(1);setAlbumOffset({x:0,y:0});}} style={{background:T.soft,border:"none",borderRadius:8,padding:"6px 12px",fontSize:13,cursor:"pointer",color:T.text}}>{t("resetBtn")}</button>
               <button onClick={()=>setAlbumScale(s=>Math.max(0.5,s-0.2))} style={{background:T.soft,border:"none",borderRadius:8,padding:"6px 16px",fontSize:18,cursor:"pointer",color:T.primary}}>－</button>
             </div>
 
@@ -639,7 +639,7 @@ function PhotoPage({T,state,update,todayStr}){
             <div style={{display:"flex",gap:8}}>
               <button className="btn bs" style={{flex:1}} onClick={()=>setDeleteConfirmId(null)}>{t("cancel")}</button>
               <button style={{flex:1,padding:"10px",border:"none",borderRadius:12,background:"#E74C3C",color:"#fff",fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16}}
-                onClick={()=>{update({photos:state.photos.filter(p=>p.id!==deleteConfirmId)});setDeleteConfirmId(null);}}>{LANG==="ja"?"削除する":"Delete"}</button>
+                onClick={()=>{update({photos:state.photos.filter(p=>p.id!==deleteConfirmId)});setDeleteConfirmId(null);}}>{t("deleteBtn")}</button>
             </div>
           </div>
         </div>

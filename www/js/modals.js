@@ -23,15 +23,15 @@ function HomePreviewModal({T,themeName,themeObj,onClose}){
     <div className="mo" onClick={onClose}>
       <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center",borderRadius:24,width:"90%",maxWidth:400}}>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:15,fontWeight:700,color:T.primary,marginBottom:4}}>
-          プレビュー
+          {t("previewTitle")}
         </div>
-        <div style={{fontSize:12,color:T.text+"88",marginBottom:14}}>このテーマのホーム画面イメージです</div>
+        <div style={{fontSize:12,color:T.text+"88",marginBottom:14}}>{t("previewSubTitle")}</div>
         <div style={{display:"flex",justifyContent:"center",marginBottom:16}}>
           <div style={{borderRadius:16,overflow:"hidden",boxShadow:"0 4px 20px #0002",border:`1px solid ${T.soft}`}}
             dangerouslySetInnerHTML={{__html:svg}}/>
         </div>
         <div style={{fontSize:12,color:T.accent,marginBottom:14,fontWeight:600}}>
-          🔒 プレミアムプランで全テーマ使い放題
+          {t("previewPremiumMsg")}
         </div>
         <button className="btn bs" style={{width:"100%"}} onClick={onClose}>{t("close")}</button>
       </div>
@@ -46,7 +46,7 @@ function AboutModal({T,onClose}){
       navigator.share({title:"SmileTrack",text:"マウスピース矯正の管理アプリ「SmileTrack」を使ってみてください！",url:"https://smiletrack.app"});
     } else {
       navigator.clipboard?.writeText("https://smiletrack.app");
-      showToast(LANG==="ja"?LANG==="ja"?"URLをコピーしました！":"URL copied!":"URL copied!");
+      showToast(t("copiedUrl"));
     }
   };
   const docIcon=<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>;
@@ -64,15 +64,15 @@ function AboutModal({T,onClose}){
   return(
     <div className="mo" onClick={onClose}>
       <div className="md" onClick={e=>e.stopPropagation()}>
-        <div className="mdtitle">アプリについて</div>
+        <div className="mdtitle">{t("aboutTitle")}</div>
         <div style={{fontSize:11,color:T.text+"55",marginBottom:16,textAlign:"center"}}>SmileTrack ver 1.0.0</div>
 
-        <Row icon={docIcon} label={LANG==="ja"?"利用規約":"Terms of Service"} onClick={()=>window.open("https://pickled-runner-04f.notion.site/ebd//329470522fe180399354fbae6be51bfb","_blank")}/>
-        <Row icon={lockIcon} label={LANG==="ja"?"プライバシーポリシー":"Privacy Policy"} onClick={()=>window.open("https://pickled-runner-04f.notion.site/ebd//329470522fe180d884bfc0afe2d3dd94","_blank")}/>
-        <Row icon={mailIcon} label={LANG==="ja"?"お問い合わせ":"Contact"} onClick={()=>window.open("mailto:contact.appname@gmail.com")}/>
+        <Row icon={docIcon} label={t("termsLabel")} onClick={()=>window.open("https://pickled-runner-04f.notion.site/ebd//329470522fe180399354fbae6be51bfb","_blank")}/>
+        <Row icon={lockIcon} label={t("privacyLabel")} onClick={()=>window.open("https://pickled-runner-04f.notion.site/ebd//329470522fe180d884bfc0afe2d3dd94","_blank")}/>
+        <Row icon={mailIcon} label={t("contactLabel")} onClick={()=>window.open("mailto:contact.appname@gmail.com")}/>
         <Row icon={starIcon} label={t("review")} onClick={()=>window.open("https://apps.apple.com/app/smiletrack","_blank")}/>
-        <Row icon={starIcon} label="Google Playでレビューを書く" onClick={()=>window.open("https://play.google.com/store/apps/details?id=app.smiletrack","_blank")}/>
-        <Row icon={shareIcon} label={LANG==="ja"?"友人にアプリを教える":"Share with friends"} onClick={share}/>
+        <Row icon={starIcon} label={t("googlePlayReview")} onClick={()=>window.open("https://play.google.com/store/apps/details?id=app.smiletrack","_blank")}/>
+        <Row icon={shareIcon} label={t("shareLabel")} onClick={share}/>
 
         <button className="btn bs" style={{width:"100%",marginTop:16}} onClick={onClose}>{t("close")}</button>
       </div>
@@ -125,7 +125,7 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
       if(e?.code==="PURCHASE_CANCELLED"||e?.message?.includes("cancel")||e?.message?.includes("Cancel")){
         // キャンセルはno-op
       } else {
-        setErrorMsg(LANG==="ja"?LANG==="ja"?"購入に失敗しました。時間をおいて再試行してください。":"Purchase failed. Please try again.":"Purchase failed. Please try again later.");
+        setErrorMsg(t("purchaseFailed"));
       }
     }finally{ setLoading(false); }
   };
@@ -139,27 +139,27 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
       const noAds=await Purchases.hasNoAds();
       if(onPurchased) onPurchased({isPremium,noAds});
       if(isPremium){ onClose(); }
-      else{ setErrorMsg(LANG==="ja"?LANG==="ja"?"復元できる購入履歴が見つかりませんでした。":"No purchases found to restore.":"No purchases found to restore."); }
-    }catch(e){ setErrorMsg(LANG==="ja"?LANG==="ja"?"復元に失敗しました。":"Restore failed.":"Restore failed."); }
+      else{ setErrorMsg(t("restoreNotFound")); }
+    }catch(e){ setErrorMsg(t("restoreFailed")); }
     finally{ setLoading(false); }
   };
   if(showCoffee&&!thankYou) return(
     <div className="mo" onClick={onClose} style={{alignItems:"center",justifyContent:"center"}}>
       <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,width:"90%",maxWidth:400,textAlign:"center"}}>
         <div style={{fontSize:48,marginBottom:12}}>☕</div>
-        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:700,color:T.primary,marginBottom:6}}>開発者にコーヒーを差し入れ</div>
+        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:700,color:T.primary,marginBottom:6}}>{t("coffeeTitle")}</div>
         <div style={{fontSize:13,color:T.text+"88",marginBottom:20,lineHeight:1.7}}>
-          SmileTrackの継続と新機能の開発のため<br/>コーヒー1杯分のサポートをいただけると<br/>大きな励みになります🙏
+          {t("coffeeDesc").split("\n").map((l,i)=><span key={i}>{l}<br/></span>)}
         </div>
-        <button className="btn bp" style={{width:"100%",marginBottom:10,padding:"14px",fontSize:15}} onClick={()=>handlePurchase("coffee")} disabled={loading}>{loading?t("loading"):`差し入れる　${prices.coffee||"¥120"}`}</button>
+        <button className="btn bp" style={{width:"100%",marginBottom:10,padding:"14px",fontSize:15}} onClick={()=>handlePurchase("coffee")} disabled={loading}>{loading?t("loading"):t("coffeeBuy").replace("¥120",prices.coffee||"¥120")}</button>
         <button className="btn bs" style={{width:"100%",padding:"14px",fontSize:15}} onClick={onClose}>{t("close")}</button>
       </div>
     </div>
   );
   const plans=[
-    {id:"monthly", label:t("monthlyPlan"), price:prices.monthly||t("monthlyPrice"), sub:LANG==="ja"?"月額":"Monthly", badge:null, desc:t("monthlyDesc")},
-    {id:"yearly",  label:t("yearly"), price:prices.yearly||t("yearlyPrice"), sub:LANG==="ja"?"年額":"Yearly", badge:t("recommended"), desc:t("yearlyDesc")},
-    {id:"lifetime",label:t("lifetime"), price:prices.lifetime||t("lifetimePrice"), sub:LANG==="ja"?"一括":"One-time", badge:null, desc:t("lifetimeDesc")},
+    {id:"monthly", label:t("monthlyPlan"), price:prices.monthly||t("monthlyPrice"), sub:t("monthlySubLabel"), badge:null, desc:t("monthlyDesc")},
+    {id:"yearly",  label:t("yearly"), price:prices.yearly||t("yearlyPrice"), sub:t("yearlySubLabel"), badge:t("recommended"), desc:t("yearlyDesc")},
+    {id:"lifetime",label:t("lifetime"), price:prices.lifetime||t("lifetimePrice"), sub:t("lifetimeSubLabel"), badge:null, desc:t("lifetimeDesc")},
   ];
   const extras=[
     {id:"no_ads", label:t("noAds"), price:prices.no_ads||t("noAdsPrice"), desc:t("noAdsDesc")},
@@ -169,9 +169,9 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
     <div className="mo" onClick={onClose} style={{alignItems:"center",justifyContent:"center"}}>
       <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center",padding:"32px 20px"}}>
         <div style={{fontSize:48,marginBottom:12}}>☕</div>
-        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:20,fontWeight:700,color:T.primary,marginBottom:8}}>ありがとうございます！</div>
+        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:20,fontWeight:700,color:T.primary,marginBottom:8}}>{t("coffeeThankTitle")}</div>
         <div style={{fontSize:14,color:T.text+"88",lineHeight:1.8,marginBottom:24}}>
-          コーヒーの差し入れ、とても嬉しいです。<br/>開発の大きな励みになります✨
+          {t("coffeeThankMsg").split("\n").map((l,i)=><span key={i}>{l}<br/></span>)}
         </div>
         <button className="btn bp" style={{width:"100%"}} onClick={onClose}>{t("close")}</button>
       </div>
@@ -182,13 +182,12 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
     <div className="mo" onClick={onClose}>
       <div className="md" onClick={e=>e.stopPropagation()}>
         <div style={{textAlign:"center",marginBottom:16}}>
-          <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:700,color:T.primary,marginBottom:4}}>SmileTrack プレミアム</div>
-          <div style={{fontSize:12,color:T.text+"88"}}>矯正記録をもっと便利に、もっと楽しく</div>
-        </div>
+          <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:700,color:T.primary,marginBottom:4}}>{t("premiumTitle")}</div>
+          <div style={{fontSize:12,color:T.text+"88"}}>{t("premiumSub")}</div>
 
         {/* 機能一覧 */}
         <div style={{background:T.soft,borderRadius:12,padding:"10px 14px",marginBottom:16}}>
-          {["カラーテーマ全種類","PDF月次レポート出力","取り外し理由カスタマイズ","写真スロット2解放・比較機能","PINロック機能解放","写真ウォーターマーク削除","広告永久削除"].map((f,i)=>(
+          {t("premiumFeatureList").map((f,i)=>(
             <div key={i} style={{display:"flex",alignItems:"center",gap:8,padding:"4px 0",fontSize:13,color:T.text}}>
               <span style={{color:T.primary,fontWeight:700,flexShrink:0}}>✓</span>{f}
             </div>
@@ -217,7 +216,7 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
 
         {/* 広告削除 */}
         <div style={{borderTop:`1px solid ${T.soft}`,paddingTop:12,marginBottom:12}}>
-          <div style={{fontSize:11,fontWeight:700,color:T.text+"66",marginBottom:8}}>単品購入</div>
+          <div style={{fontSize:11,fontWeight:700,color:T.text+"66",marginBottom:8}}>{t("singlePurchaseLabel")}</div>
           {extras.map(p=>(
             <div key={p.id} style={{border:`2px solid ${selectedPlan===p.id?T.primary:T.soft}`,borderRadius:12,padding:"10px 14px",cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center",background:selectedPlan===p.id?T.soft:"transparent"}}
               onClick={()=>{setSelectedPlan(p.id);!loading&&handlePurchase(p.id);}}>
@@ -271,7 +270,7 @@ function ColorModal({T,themeName,onPick,onClose}){
   return(
     <div className="mo" onClick={onClose}>
       <div className="md" onClick={e=>e.stopPropagation()}>
-        <div className="mdtitle">カラーテーマ</div>
+        <div className="mdtitle">{t("colorThemeTitle")}</div>
         <div style={{display:"flex",flexWrap:"wrap",gap:12,justifyContent:"center",padding:"8px 0 16px"}}>
           {orderedKeys.map(renderSwatch)}
         </div>
@@ -293,19 +292,19 @@ function SettingsModal({T,state,onSave,onClose}){
   return(
     <div className="mo" onClick={onClose}>
       <div className="md" onClick={e=>e.stopPropagation()}>
-        <div className="mdtitle">設定</div>
-        <div style={{fontSize:13,fontWeight:700,color:T.accent,marginBottom:6}}>矯正開始日</div>
+        <div className="mdtitle">{t("settingsTitle")}</div>
+        <div style={{fontSize:13,fontWeight:700,color:T.accent,marginBottom:6}}>{t("startDate")}</div>
         <input type="date" value={sd} onChange={e=>setSd(e.target.value)}
           style={{marginBottom:12,width:"100%",boxSizing:"border-box",display:"flex",alignItems:"center",
           height:44,lineHeight:"44px",fontSize:16,borderRadius:10,border:"none",
           background:T.soft,color:["atrium","navyrose","deepteal","ashviolet","blushhemp"].includes(state.themeName)?T.accent:T.text,padding:"0 12px",WebkitAppearance:"none",appearance:"none",textAlign:"center"}}/>
-        <div style={{fontSize:13,fontWeight:700,color:T.accent,marginBottom:4}}>合計枚数</div>
+        <div style={{fontSize:13,fontWeight:700,color:T.accent,marginBottom:4}}>{t("totalPieces")}</div>
         <input type="number" min={1} max={100} value={tp} onChange={e=>setTp(parseInt(e.target.value)||1)} style={{textAlign:"center",marginBottom:12}}/>
-        <div style={{fontSize:13,fontWeight:700,color:T.accent,marginBottom:6}}>装着目標時間</div>
-        <select value={th} onChange={e=>setTh(parseInt(e.target.value))} style={{marginBottom:12}}>{[18,19,20,21,22,23].map(h=><option key={h} value={h}>{h}時間/日</option>)}</select>
-        <div style={{fontSize:13,fontWeight:700,color:T.accent,marginTop:4,marginBottom:6}}>カレンダー週始まり</div>
+        <div style={{fontSize:13,fontWeight:700,color:T.accent,marginBottom:6}}>{t("targetHours")}</div>
+        <select value={th} onChange={e=>setTh(parseInt(e.target.value))} style={{marginBottom:12}}>{[18,19,20,21,22,23].map(h=><option key={h} value={h}>{h}{t("obHoursUnit")}</option>)}</select>
+        <div style={{fontSize:13,fontWeight:700,color:T.accent,marginTop:4,marginBottom:6}}>{t("weekStart")}</div>
         <select value={sf.calendarWeekStart??0} onChange={e=>setSf(s=>({...s,calendarWeekStart:parseInt(e.target.value)}))} style={{marginBottom:14}}>
-          <option value={0}>日曜日</option><option value={1}>月曜日</option>
+          <option value={0}>{t("sunday")}</option><option value={1}>{t("monday")}</option>
         </select>
         <div style={{display:"flex",gap:8}}>
           <button className="btn bs" style={{flex:1}} onClick={onClose}>{t("cancel")}</button>
@@ -334,16 +333,16 @@ function TimerSettingsModal({T,state,onSave,onClose}){
   const toggleActive=(r)=>{
     setActive(prev=>{
       if(prev.includes(r)) return prev.filter(x=>x!==r);
-      if(prev.length>=MAX_ACTIVE){setErr(`選択できるのは${MAX_ACTIVE}項目まで`);setTimeout(()=>setErr(""),2000);return prev;}
+      if(prev.length>=MAX_ACTIVE){setErr(t("maxSelectError").replace("{n}",MAX_ACTIVE));setTimeout(()=>setErr(""),2000);return prev;}
       return [...prev,r];
     });
   };
 
   const addWord=()=>{
     const w=newWord.replace(/\s/g,"").slice(0,6);
-    if(!w){setErr(LANG==="ja"?LANG==="ja"?"文字を入力してください":"Please enter text":"Please enter text");return;}
-    if(pool.includes(w)){setErr(LANG==="ja"?LANG==="ja"?"同じ項目がすでにあります":"Item already exists":"Item already exists");return;}
-    if(pool.length>=MAX_ALL-1){setErr(`項目は${MAX_ALL-1}個まで（ーを除く）`);return;}
+    if(!w){setErr(t("addItemHint"));return;}
+    if(pool.includes(w)){setErr(LANG==="ja"?"同じ項目がすでにあります":"Item already exists");return;}
+    if(pool.length>=MAX_ALL-1){setErr(t("maxSelectError").replace("{n}",MAX_ALL-1));return;}
     setPool(p=>[...p,w]);
     setNewWord("");setErr("");
   };
@@ -366,17 +365,16 @@ function TimerSettingsModal({T,state,onSave,onClose}){
   return(
     <div className="mo" onClick={onClose}>
       <div className="md" onClick={e=>e.stopPropagation()}>
-        <div className="mdtitle">タイマー設定</div>
+        <div className="mdtitle">{t("timerSettingsTitle")}</div>
 
         {/* ON/OFFトグル */}
-        <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif",marginBottom:6}}>取り外し理由の内訳を表示</div>
-        <div style={{fontSize:12,color:T.text+"77",marginBottom:8}}>OFFにすると理由選択なしで即タイマー開始</div>
+        <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif",marginBottom:6}}>{t("showBreakdownLabel")}</div>
+        <div style={{fontSize:12,color:T.text+"77",marginBottom:8}}>{t("showBreakdownDescLabel")}</div>
         <Toggle T={T} on={showBreakdown} label="" onToggle={()=>setShowBreakdown(v=>!v)}/>
         <div style={{marginBottom:16}}/>
 
         {/* 理由カスタマイズ */}
-        <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif",marginBottom:8}}>取り外し理由のカスタマイズ</div>
-
+        <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif",marginBottom:8}}>{t("customReasonsLabel")}</div>
 
         <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:10,padding:"10px",background:state.themeName==="blushhemp"?"#F5EDE4":T.soft,borderRadius:12,minHeight:44}}>
           {pool.map(r=>{
@@ -402,29 +400,27 @@ function TimerSettingsModal({T,state,onSave,onClose}){
           <div style={{display:"flex",alignItems:"center",borderRadius:20,overflow:"hidden",
             border:`2px dashed ${T.text+"33"}`}}>
             <button style={{padding:"4px 14px",border:"none",fontSize:13,fontWeight:600,
-              background:"transparent",color:T.text+"55",fontFamily:"'M PLUS Rounded 1c',sans-serif",cursor:"default"}}>ー</button>
+              background:"transparent",color:T.text+"55",fontFamily:"'M PLUS Rounded 1c',sans-serif",cursor:"default"}}>{t("reasonNone")}</button>
           </div>
         </div>
-
-
 
         {/* 新規追加 */}
         {isPremium?(
           <>
-            <div style={{fontSize:11,color:T.text+"77",marginBottom:6}}>新しい項目を追加（全角6文字以内）</div>
+            <div style={{fontSize:11,color:T.text+"77",marginBottom:6}}>{t("addItemHint")}</div>
             <div style={{display:"flex",gap:8,marginBottom:4}}>
               <input value={newWord} onChange={e=>setNewWord(e.target.value.slice(0,6))}
                 onKeyDown={e=>{if(e.key==="Enter")addWord();}}
-                placeholder={LANG==="ja"?"例: カフェ":"e.g. Cafe"}
+                placeholder={t("addItemPlaceholder")}
                 style={{flex:1,marginBottom:0}}/>
-              <button className="btn bp" style={{flexShrink:0,padding:"8px 14px"}} onClick={addWord}>＋追加</button>
+              <button className="btn bp" style={{flexShrink:0,padding:"8px 14px"}} onClick={addWord}>{t("addItemBtn")}</button>
             </div>
             {err&&<div style={{fontSize:12,color:"#E74C3C",marginBottom:8}}>{err}</div>}
           </>
         ):(
           <div style={{display:"flex",alignItems:"center",gap:8,padding:"10px 12px",background:T.soft,borderRadius:10,marginBottom:4}}>
             <span style={{fontSize:16}}>🔒</span>
-            <span style={{fontSize:12,color:T.text}}>項目の追加・削除はプレミアム限定です</span>
+            <span style={{fontSize:12,color:T.text}}>{t("premiumOnlyHint")}</span>
           </div>
         )}
 
@@ -434,7 +430,7 @@ function TimerSettingsModal({T,state,onSave,onClose}){
           const cur=ALARM_SOUNDS.find(s=>s.id===alarmSound)||ALARM_SOUNDS[0];
           return(
             <div style={{marginTop:16}}>
-              <div style={{fontSize:13,fontWeight:700,color:T.accent,marginBottom:6,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>アラームサウンド</div>
+              <div style={{fontSize:13,fontWeight:700,color:T.accent,marginBottom:6,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>{t("alarmSoundLabel")}</div>
               <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 12px",borderRadius:10,background:T.soft,cursor:"pointer",border:`1.5px solid ${T.primary}44`}}
                 onClick={()=>setSoundOpen(v=>!v)}>
                 <div>
@@ -526,12 +522,12 @@ function ScheduleModal({T,state,update,onClose}){
                     {p.label}
                   </div>
                   <div>
-                    <div style={{fontSize:12,fontFamily:"'M PLUS Rounded 1c',sans-serif",color:canEdit?T.text:T.text+"66"}}>{rangeStr}{p.isExtra?<span style={{fontSize:11,color:T.accent,marginLeft:4}}>追加</span>:null}</div>
-                    <div style={{fontSize:11,color:hasCustom?T.accent:T.text+"55"}}>{p.intervalDays}日間{hasCustom?" (個別設定)":""}</div>
+                    <div style={{fontSize:12,fontFamily:"'M PLUS Rounded 1c',sans-serif",color:canEdit?T.text:T.text+"66"}}>{rangeStr}{p.isExtra?<span style={{fontSize:11,color:T.accent,marginLeft:4}}>{t("extraLabel")}</span>:null}</div>
+                    <div style={{fontSize:11,color:hasCustom?T.accent:T.text+"55"}}>{p.intervalDays}{t("daySpanUnit")}{hasCustom?` (${t("customIntervalLabel")})`:""}</div>
                   </div>
                 </div>
                 <div style={{display:"flex",alignItems:"center",gap:4}}>
-                  {isAct&&<div style={{fontSize:12,color:T.primary,fontWeight:700,flexShrink:0}}>装着中</div>}
+                  {isAct&&<div style={{fontSize:12,color:T.primary,fontWeight:700,flexShrink:0}}>{t("currentlyWearing")}</div>}
                   {canEdit&&<div style={{fontSize:11,color:T.accent+"88"}}>▶</div>}
                 </div>
               </div>
@@ -543,19 +539,19 @@ function ScheduleModal({T,state,update,onClose}){
         <div style={{background:T.soft,borderRadius:12,padding:"8px 12px",marginBottom:10}}>
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:showAddExtra?6:0}}>
             <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>
-              追加マウスピース
-              {(state.extraPieces?.length>0)&&<span style={{marginLeft:6,color:T.primary,fontWeight:700}}>{state.extraPieces.length}枚登録済</span>}
+              {t("addExtraTitle")}
+              {(state.extraPieces?.length>0)&&<span style={{marginLeft:6,color:T.primary,fontWeight:700}}>{t("extraRegistered").replace("{n}",state.extraPieces.length)}</span>}
             </div>
             <button className="btn bp bsm" style={{fontSize:12,padding:"4px 10px"}} onClick={()=>setShowAddExtra(v=>!v)}>
-              {showAddExtra?(LANG==="ja"?"▲ 閉じる":"▲ Close"):(LANG==="ja"?"＋ 追加":"＋ Add")}
+              {showAddExtra?t("closePanel"):t("add")}
             </button>
           </div>
-          {/* 番号方式トグル：追加ピースがある or 追加UI開いている時に表示 */}
+          {/* 番号方式トグル */}
           {(state.extraPieces?.length>0||showAddExtra)&&(
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8,marginTop:4}}>
-              <span style={{fontSize:12,color:state.themeName==="night"?T.text+"88":"#555555"}}>番号方式</span>
+              <span style={{fontSize:12,color:state.themeName==="night"?T.text+"88":"#555555"}}>{t("numberMode")}</span>
               <div style={{display:"flex",gap:6}}>
-                {[{key:"relative",label:LANG==="ja"?"+1〜":"+1~"},{key:"absolute",label:LANG==="ja"?"通し番号":"Sequential"}].map(opt=>(
+                {[{key:"relative",label:t("relativeMode")},{key:"absolute",label:t("absoluteMode")}].map(opt=>(
                   <button key={opt.key}
                     onClick={e=>{e.stopPropagation();update({extraLabelMode:opt.key});}}
                     style={{padding:"4px 12px",borderRadius:8,border:`1.5px solid ${(state.extraLabelMode||"relative")===opt.key?T.primary:T.soft}`,
@@ -571,14 +567,14 @@ function ScheduleModal({T,state,update,onClose}){
           {showAddExtra&&(<>
             {/* 枚数入力 */}
             <div style={{display:"flex",alignItems:"center",gap:8,marginTop:6,marginBottom:10}}>
-              <span style={{fontSize:13,color:state.themeName==="night"?T.text+"77":"#555555",flexShrink:0}}>枚数</span>
+              <span style={{fontSize:13,color:state.themeName==="night"?T.text+"77":"#555555",flexShrink:0}}>{t("countLabel")}</span>
               <input type="number" min={1} inputMode="numeric" value={tempExtraCount}
                 onChange={e=>setTempExtraCount(Math.max(1,parseInt(e.target.value)||1))}
                 style={{flex:1,textAlign:"center"}}/>
-              <span style={{fontSize:13,color:state.themeName==="night"?T.text+"77":"#555555",flexShrink:0}}>間隔</span>
+              <span style={{fontSize:13,color:state.themeName==="night"?T.text+"77":"#555555",flexShrink:0}}>{t("intervalLabel")}</span>
               <select value={tempExtraInterval} onChange={e=>setTempExtraInterval(parseInt(e.target.value))}
                 style={{flex:1,textAlign:"center",textAlignLast:"center"}}>
-                {Array.from({length:14},(_,i)=>i+1).map(d=><option key={d} value={d}>{d}日</option>)}
+                {Array.from({length:14},(_,i)=>i+1).map(d=><option key={d} value={d}>{d}{t("dayUnit")}</option>)}
               </select>
             </div>
             {/* プレビュー */}
@@ -589,25 +585,24 @@ function ScheduleModal({T,state,update,onClose}){
               if(mode==="absolute"){
                 preview=Array.from({length:Math.min(tempExtraCount,5)},(_,i)=>baseN+i+1).join(", ")+(tempExtraCount>5?"...":"");
               } else {
-                // 常に+1から始まる
                 preview=Array.from({length:Math.min(tempExtraCount,5)},(_,i)=>`+${i+1}`).join(", ")+(tempExtraCount>5?"...":"");
               }
-              return <div style={{fontSize:12,color:T.accent,marginBottom:8}}>追加後: {preview}</div>;
+              return <div style={{fontSize:12,color:T.accent,marginBottom:8}}>{t("afterAddPreview")}{preview}</div>;
             })()}
             <button className="btn bp" style={{width:"100%",padding:"8px"}} onClick={confirmExtras}>
-              ✓ {tempExtraCount}枚追加を確定
+              {t("confirmAddBtn").replace("{n}",tempExtraCount)}
             </button>
           </>)}
         </div>
 
         {/* 全体の交換間隔 */}
         <div style={{background:T.soft,borderRadius:12,padding:"8px 12px",marginBottom:12}}>
-          <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif",marginBottom:6}}>全体の交換間隔</div>
+          <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif",marginBottom:6}}>{t("globalIntervalTitle")}</div>
           <div style={{display:"flex",alignItems:"center",gap:8}}>
             <select value={globalDays} onChange={e=>setGlobalDays(parseInt(e.target.value))} style={{flex:1}}>
-              {Array.from({length:14},(_,i)=>i+1).map(d=><option key={d} value={d}>{d}日ごと</option>)}
+              {Array.from({length:14},(_,i)=>i+1).map(d=><option key={d} value={d}>{d}{t("dayEvery")}</option>)}
             </select>
-            <button className="btn bp bsm" onClick={()=>update({intervalDays:globalDays})}>適用</button>
+            <button className="btn bp bsm" onClick={()=>update({intervalDays:globalDays})}>{t("applyBtn")}</button>
           </div>
         </div>
 
@@ -628,7 +623,7 @@ function ScheduleModal({T,state,update,onClose}){
           <div className="mo" style={{zIndex:400}} onClick={()=>setEditPiece(null)}>
             <div className="md" onClick={e=>e.stopPropagation()}>
               <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
-                <div className="mdtitle" style={{margin:0}}>{editPiece}枚目の装着間隔</div>
+                <div className="mdtitle" style={{margin:0}}>{t("pieceIntervalTitle").replace("{n}",editPiece)}</div>
                 {isExtra&&(
                   <button onClick={deletePiece} style={{background:"none",border:"none",cursor:"pointer",padding:"4px 8px"}}>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E74C3C" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -645,7 +640,7 @@ function ScheduleModal({T,state,update,onClose}){
                 })()}
               </div>
               <select value={editDays} onChange={e=>setEditDays(parseInt(e.target.value))} style={{marginBottom:14}}>
-                {Array.from({length:21},(_,i)=>i+1).map(d=><option key={d} value={d}>{d}日間</option>)}
+                {Array.from({length:21},(_,i)=>i+1).map(d=><option key={d} value={d}>{d}{t("daySpanUnit")}</option>)}
               </select>
               <div style={{display:"flex",gap:8,marginBottom:8}}>
                 <button className="btn bs" style={{flex:1}} onClick={()=>setEditPiece(null)}>{t("cancel")}</button>
@@ -654,7 +649,7 @@ function ScheduleModal({T,state,update,onClose}){
               {state.customIntervals?.[editPiece]&&(
                 <button style={{width:"100%",padding:"9px",border:"none",borderRadius:10,background:"#FFF0F0",color:"#E74C3C",cursor:"pointer",fontWeight:600,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}
                   onClick={()=>{const ci={...(state.customIntervals||{})};delete ci[editPiece];update({customIntervals:ci});setEditPiece(null);}}>
-                  デフォルトに戻す ({state.intervalDays}日)
+                  {t("resetToDefault").replace("{n}",state.intervalDays)}
                 </button>
               )}
             </div>
@@ -679,12 +674,12 @@ function NotifyModal({T,state,onSave,onClose}){
   const [sf,setSf]=useState({...state.settings});
 
   // 縦スクロールピッカー
-    const timingOpts=[{v:0,l:LANG==="ja"?"当日":"Same day"},{v:1440,l:LANG==="ja"?"前日":"Day before"},{v:2880,l:LANG==="ja"?"2日前":"2 days before"}];
-  const hours=Array.from({length:24},(_,i)=>({v:i,l:`${i}時`}));
+    const timingOpts=[{v:0,l:t("sameDayOpt")},{v:1440,l:t("dayBeforeOpt")},{v:2880,l:t("twoDaysBeforeOpt")}];
+  const hours=Array.from({length:24},(_,i)=>({v:i,l:`${i}${t("obHoursUnit")}`}));
   const DOW_OPTS=[
-    {v:"exchange",l:LANG==="ja"?"交換日連動":"On change day"},
-    {v:"0",l:t("sunday")},{v:"1",l:t("monday")},{v:"2",l:LANG==="ja"?"火曜日":"Tuesday"},
-    {v:"3",l:LANG==="ja"?"水曜日":"Wednesday"},{v:"4",l:LANG==="ja"?"木曜日":"Thursday"},{v:"5",l:LANG==="ja"?"金曜日":"Friday"},{v:"6",l:LANG==="ja"?"土曜日":"Saturday"},
+    {v:"exchange",l:t("onChangeDayOpt")},
+    {v:"0",l:t("sunday")},{v:"1",l:t("monday")},{v:"2",l:t("tuesdayLabel")},
+    {v:"3",l:t("wednesdayLabel")},{v:"4",l:t("thursdayLabel")},{v:"5",l:t("fridayLabel")},{v:"6",l:t("saturdayLabel")},
   ];
 
   const sec=(title)=>(
@@ -701,18 +696,16 @@ function NotifyModal({T,state,onSave,onClose}){
   return(
     <div className="mo" onClick={onClose}>
       <div className="md" onClick={e=>e.stopPropagation()}>
-        <div className="mdtitle">通知設定</div>
-
-
+        <div className="mdtitle">{t("notifySettingsTitle")}</div>
 
         {/* 交換リマインダー */}
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8}}>
-          <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>交換リマインダー</div>
+          <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>{t("exchangeReminderLabel")}</div>
           <Toggle T={T} on={!!sf.reminderExchange} onToggle={async()=>{if(!sf.reminderExchange){const ok=await ensureNotifPermission();if(!ok)return;}setSf(s=>({...s,reminderExchange:!s.reminderExchange}));}}/>
         </div>
         {sf.reminderExchange&&expandBox(
           <div>
-            <div style={{fontSize:11,color:T.text+"77",marginBottom:10}}>通知タイミング・時間</div>
+            <div style={{fontSize:11,color:T.text+"77",marginBottom:10}}>{t("notifyTimingLabel")}</div>
             <div style={{display:"flex",gap:10}}>
               <select value={f.notifyBefore} onChange={e=>setF(x=>({...x,notifyBefore:parseInt(e.target.value)}))} style={{flex:1}}>
                 {timingOpts.map(o=><option key={o.v} value={o.v}>{o.l}</option>)}
@@ -726,12 +719,12 @@ function NotifyModal({T,state,onSave,onClose}){
 
         {/* 写真リマインダー */}
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8,marginTop:16,paddingTop:14,borderTop:`1px solid ${T.soft}`}}>
-          <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>写真リマインダー</div>
+          <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>{t("photoReminderLabel")}</div>
           <Toggle T={T} on={!!sf.reminderPhoto} onToggle={async()=>{if(!sf.reminderPhoto){const ok=await ensureNotifPermission();if(!ok)return;}setSf(s=>({...s,reminderPhoto:!s.reminderPhoto}));}}/>
         </div>
         {sf.reminderPhoto&&expandBox(
           <div>
-            <div style={{fontSize:11,color:T.text+"77",marginBottom:10}}>通知タイミング・時間</div>
+            <div style={{fontSize:11,color:T.text+"77",marginBottom:10}}>{t("notifyTimingLabel")}</div>
             <div style={{display:"flex",gap:10}}>
               <select value={f.photoReminderMode==="exchange"?"exchange":String(f.photoReminderDay)}
                 onChange={e=>{const v=e.target.value;if(v==="exchange")setF(x=>({...x,photoReminderMode:"exchange"}));else setF(x=>({...x,photoReminderMode:"weekly",photoReminderDay:parseInt(v)}));}}
@@ -747,16 +740,16 @@ function NotifyModal({T,state,onSave,onClose}){
 
         {/* タイマー放置防止 */}
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:8,marginTop:16,paddingTop:14,borderTop:`1px solid ${T.soft}`}}>
-          <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>タイマー放置防止アラート</div>
+          <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>{t("forgetTimerLabel")}</div>
           <Toggle T={T} on={f.forgetTimerAlert} onToggle={async()=>{if(!f.forgetTimerAlert){const ok=await ensureNotifPermission();if(!ok)return;}setF(x=>({...x,forgetTimerAlert:!x.forgetTimerAlert}));}}/>
         </div>
         {f.forgetTimerAlert&&expandBox(
           <div style={{display:"flex",alignItems:"center",gap:8}}>
-            <span style={{fontSize:13,color:T.text+"88",flexShrink:0}}>取り外しが</span>
+            <span style={{fontSize:13,color:T.text+"88",flexShrink:0}}>{t("removalIsLabel")}</span>
             <button className="btn bs bsm" style={{padding:"2px 10px",fontSize:16}} onClick={()=>setF(x=>({...x,forgetTimerHours:Math.max(1,x.forgetTimerHours-1)}))}>－</button>
             <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:700,color:T.primary,minWidth:24,textAlign:"center"}}>{f.forgetTimerHours}</span>
             <button className="btn bs bsm" style={{padding:"2px 10px",fontSize:16}} onClick={()=>setF(x=>({...x,forgetTimerHours:Math.min(24,x.forgetTimerHours+1)}))}>＋</button>
-            <span style={{fontSize:13,color:T.text+"88",flexShrink:0}}>時間を超えたら</span>
+            <span style={{fontSize:13,color:T.text+"88",flexShrink:0}}>{t("hoursExceededLabel")}</span>
           </div>
         )}
 
@@ -784,7 +777,7 @@ function BackupModal({T,state,onImport,onClose}){
       const noAds=await Purchases.hasNoAds();
       onImport({...state,isPremium,noAds});
       onClose();
-    }catch(e){setErrorMsg("復元に失敗しました");}
+    }catch(e){setErrorMsg(t("restoreFailed"));}
     setLoading(false);
   };
 
@@ -801,7 +794,7 @@ function BackupModal({T,state,onImport,onClose}){
       const url=URL.createObjectURL(blob);
       if(navigator.share){
         const file=new File([blob],"smiletrack_backup.json",{type:"application/json"});
-        await navigator.share({files:[file],title:LANG==="ja"?LANG==="ja"?"SmileTrack バックアップ":"SmileTrack Backup":"SmileTrack Backup"});
+        await navigator.share({files:[file],title:t("backupTitle")});
       } else {
         const a=document.createElement("a");
         a.href=url;
@@ -811,7 +804,7 @@ function BackupModal({T,state,onImport,onClose}){
         document.body.removeChild(a);
       }
       URL.revokeObjectURL(url);
-    }catch(e){console.warn(LANG==="ja"?LANG==="ja"?"エクスポートに失敗しました":"Export failed":"Export failed",e);showToast(LANG==="ja"?LANG==="ja"?"エクスポートに失敗しました":"Export failed":"Export failed");}
+    }catch(e){console.warn(t("exportFail"),e);showToast(t("exportFail"));}
     setExporting(false);
   };
 
@@ -827,26 +820,26 @@ function BackupModal({T,state,onImport,onClose}){
   return(
     <div className="mo" onClick={onClose}>
       <div className="md" onClick={e=>e.stopPropagation()}>
-        <div className="mdtitle">バックアップ</div>
-        <div style={{fontSize:12,color:T.text+"77",marginBottom:12}}>写真を含む全データをバックアップします</div>
+        <div className="mdtitle">{t("backupTitle2")}</div>
+        <div style={{fontSize:12,color:T.text+"77",marginBottom:12}}>{t("backupSubMsg")}</div>
         <button className="btn bp blg" style={{width:"100%",marginBottom:10,opacity:exporting?0.6:1}}
           onClick={doExport} disabled={exporting}>
-          {exporting?LANG==="ja"?LANG==="ja"?"エクスポート中...":"Exporting...":"Exporting...":LANG==="ja"?LANG==="ja"?"エクスポート":"Export":"Export"}
+          {exporting?t("exporting"):t("export")}
         </button>
-        <button className="btn bs blg" style={{width:"100%"}} onClick={()=>fileRef.current?.click()}>インポート</button>
+        <button className="btn bs blg" style={{width:"100%"}} onClick={()=>fileRef.current?.click()}>{t("importBtn")}</button>
         <input ref={fileRef} type="file" accept=".json" style={{display:"none"}} onChange={e=>{
           const f=e.target.files?.[0];if(!f)return;
           const r=new FileReader();
           r.onload=ev=>{
             try{doImport(JSON.parse(ev.target.result));}
-            catch{console.warn(LANG==="ja"?LANG==="ja"?"ファイルが無効です":"Invalid file":"Invalid file");showToast(LANG==="ja"?LANG==="ja"?"ファイルが無効です":"Invalid file":"Invalid file");}
+            catch{console.warn(t("invalidFileMsg"));showToast(t("invalidFileMsg"));}
           };
           r.readAsText(f);
         }}/>
         <div style={{borderTop:`1px solid ${T.soft}`,marginTop:16,paddingTop:16}}>
-          <div style={{fontSize:13,fontWeight:700,color:T.accent,marginBottom:8}}>購入の復元</div>
-          <div style={{fontSize:12,color:T.text+"77",marginBottom:10}}>機種変更後などに購入済みのプランを復元できます</div>
-          <button className="btn bs blg" style={{width:"100%"}} onClick={handleRestore} disabled={loading}>{loading?t("loading"):"購入を復元する"}</button>
+          <div style={{fontSize:13,fontWeight:700,color:T.accent,marginBottom:8}}>{t("restorePurchaseTitle")}</div>
+          <div style={{fontSize:12,color:T.text+"77",marginBottom:10}}>{t("restorePurchaseMsg")}</div>
+          <button className="btn bs blg" style={{width:"100%"}} onClick={handleRestore} disabled={loading}>{loading?t("loading"):t("restorePurchaseBtn")}</button>
         </div>
         {errorMsg&&<div style={{fontSize:12,color:"#D4445A",textAlign:"center",margin:"8px 0",lineHeight:1.6}}>{errorMsg}</div>}
         <button className="btn bs" style={{width:"100%",marginTop:12}} onClick={onClose}>{t("close")}</button>
@@ -857,12 +850,12 @@ function BackupModal({T,state,onImport,onClose}){
 
 // ── CAMERA SETTINGS MODAL ────────────────────────────────────────────────────
 const SHOT_MODES = [
-  {id:"face_front", labelJP:"顔正面",  svgD:"M50,15 C35,15 20,30 20,50 C20,70 35,85 50,85 C65,85 80,70 80,50 C80,30 65,15 50,15 Z", isLandscape:false},
-  {id:"face_right", labelJP:"顔右向き",svgD:"M55,15 C40,15 25,30 22,52 C20,70 35,85 55,85 C70,85 80,68 80,50 C80,32 70,15 55,15 Z", isLandscape:false},
-  {id:"face_left",  labelJP:"顔左向き",svgD:"M45,15 C60,15 75,30 78,52 C80,70 65,85 45,85 C30,85 20,68 20,50 C20,32 30,15 45,15 Z", isLandscape:false},
-  {id:"teeth_front",labelJP:"歯正面",  svgD:"M18,38 C20,28 80,28 82,38 L82,62 C80,72 20,72 18,62 Z", isLandscape:true},
-  {id:"teeth_right",labelJP:"歯右向き",svgD:"M18,38 C20,28 75,30 82,42 L82,62 C75,70 20,72 18,62 Z", isLandscape:true},
-  {id:"teeth_left", labelJP:"歯左向き",svgD:"M18,42 C25,30 80,28 82,38 L82,62 C80,72 25,70 18,58 Z", isLandscape:true},
+  {id:"face_front", labelKey:"shotFaceFront",  svgD:"M50,15 C35,15 20,30 20,50 C20,70 35,85 50,85 C65,85 80,70 80,50 C80,30 65,15 50,15 Z", isLandscape:false},
+  {id:"face_right", labelKey:"shotFaceRight",  svgD:"M55,15 C40,15 25,30 22,52 C20,70 35,85 55,85 C70,85 80,68 80,50 C80,32 70,15 55,15 Z", isLandscape:false},
+  {id:"face_left",  labelKey:"shotFaceLeft",   svgD:"M45,15 C60,15 75,30 78,52 C80,70 65,85 45,85 C30,85 20,68 20,50 C20,32 30,15 45,15 Z", isLandscape:false},
+  {id:"teeth_front",labelKey:"shotTeethFront", svgD:"M18,38 C20,28 80,28 82,38 L82,62 C80,72 20,72 18,62 Z", isLandscape:true},
+  {id:"teeth_right",labelKey:"shotTeethRight", svgD:"M18,38 C20,28 75,30 82,42 L82,62 C75,70 20,72 18,62 Z", isLandscape:true},
+  {id:"teeth_left", labelKey:"shotTeethLeft",  svgD:"M18,42 C25,30 80,28 82,38 L82,62 C80,72 25,70 18,58 Z", isLandscape:true},
 ];
 
 function ShotModePictogram({mode, size=56, selected, T, onClick}){
@@ -873,16 +866,14 @@ function ShotModePictogram({mode, size=56, selected, T, onClick}){
       border:`2px solid ${selected?T.primary:T.soft}`,transition:"all .15s",flex:1}}>
       <svg width={size} height={size} viewBox="0 0 100 100">
         <path d={m.svgD} fill="none" stroke={selected?T.primary:T.text+"66"} strokeWidth="4" strokeLinejoin="round"/>
-        {/* 目（顔系のみ） */}
         {!m.isLandscape && <><circle cx={m.id.includes("left")?55:m.id.includes("right")?45:44} cy="40" r="3" fill={selected?T.primary:T.text+"66"}/>
         <circle cx={m.id.includes("left")?65:m.id.includes("right")?55:56} cy="40" r="3" fill={selected?T.primary:T.text+"66"}/></>}
-        {/* 歯（歯系のみ）*/}
         {m.isLandscape && <><line x1="35" y1="50" x2="35" y2="62" stroke={selected?T.primary:T.text+"66"} strokeWidth="2"/>
         <line x1="50" y1="50" x2="50" y2="63" stroke={selected?T.primary:T.text+"66"} strokeWidth="2"/>
         <line x1="65" y1="50" x2="65" y2="62" stroke={selected?T.primary:T.text+"66"} strokeWidth="2"/>
         <line x1="18" y1="50" x2="82" y2="50" stroke={selected?T.primary:T.text+"66"} strokeWidth="2.5"/></>}
       </svg>
-      <span style={{fontSize:9,fontWeight:600,color:selected?T.primary:T.text+"66",textAlign:"center",lineHeight:1.2}}>{m.labelJP}</span>
+      <span style={{fontSize:9,fontWeight:600,color:selected?T.primary:T.text+"66",textAlign:"center",lineHeight:1.2}}>{t(m.labelKey)||m.labelKey}</span>
     </div>
   );
 }
@@ -897,15 +888,14 @@ function CameraSettingsModal({T,state,onSave,onClose}){
   return(
     <div className="mo" onClick={onClose}>
       <div className="md" onClick={e=>e.stopPropagation()}>
-        <div className="mdtitle">カメラ設定</div>
+        <div className="mdtitle">{t("cameraSettingsTitle")}</div>
 
         {/* ミラー設定 */}
-        <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif",marginBottom:6}}>保存設定</div>
-        <Toggle T={T} on={mirror} label={LANG==="ja"?"カメラ画像を左右反転して保存":"Save mirrored image"} onToggle={()=>setMirror(v=>!v)}/>
-
+        <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif",marginBottom:6}}>{t("saveSettingsLabel")}</div>
+        <Toggle T={T} on={mirror} label={t("mirrorSave")} onToggle={()=>setMirror(v=>!v)}/>
 
         {/* 撮影スロット */}
-        <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif",marginBottom:10}}>撮影ボタンの部位割り当て</div>
+        <div style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif",marginBottom:10}}>{t("slotAssignLabel")}</div>
 
         {/* スロット選択UI */}
         {[1,2].map(slotN=>{
@@ -918,8 +908,8 @@ function CameraSettingsModal({T,state,onSave,onClose}){
               <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",
                 background:T.soft,borderRadius:10,padding:"8px 12px",cursor:"pointer"}}
                 onClick={()=>setSelectingSlot(isOpen?null:slotN)}>
-                <span style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>{slotN}：{modeInfo.labelJP}</span>
-                <span style={{fontSize:13,fontWeight:600,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>{isOpen?(LANG==="ja"?"▲ 閉じる":"▲ Close"):(LANG==="ja"?"▼ 変更":"▼ Change")}</span>
+                <span style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>{slotN}：{t(modeInfo.labelKey)||modeInfo.labelKey}</span>
+                <span style={{fontSize:13,fontWeight:600,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>{isOpen?t("closePanel"):t("changePanel")}</span>
               </div>
               {isOpen&&(
                 <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6,marginTop:8,padding:"8px",background:T.bg,borderRadius:10}}>
@@ -947,11 +937,11 @@ function ResetConfirmModal({T,onConfirm,onCancel}){
     <div className="mo" onClick={onCancel} style={{alignItems:"center",justifyContent:"center"}}>
       <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center",borderRadius:20}}>
         <div style={{fontSize:36,marginBottom:8}}>⚠️</div>
-        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:17,fontWeight:700,color:"#E74C3C",marginBottom:8}}>本当にリセットしますか？</div>
-        <div style={{fontSize:15,color:T.text+"88",marginBottom:20,lineHeight:1.7}}>すべてのデータが完全に削除されます。<br/>この操作は元に戻せません。</div>
+        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:17,fontWeight:700,color:"#E74C3C",marginBottom:8}}>{t("resetConfirmTitle")}</div>
+        <div style={{fontSize:15,color:T.text+"88",marginBottom:20,lineHeight:1.7}}>{t("resetConfirmMsg").split("\n").map((l,i)=><span key={i}>{l}{i===0?<br/>:null}</span>)}</div>
         <div style={{display:"flex",gap:10}}>
-          <button className="btn bs blg" style={{flex:1}} onClick={onCancel}>{LANG==="ja"?"戻る":"Back"}</button>
-          <button style={{flex:1,padding:"13px 20px",border:"none",borderRadius:13,fontSize:17,fontWeight:600,cursor:"pointer",background:"#E74C3C",color:"#fff",fontFamily:"'M PLUS Rounded 1c',sans-serif"}} onClick={onConfirm}>{LANG==="ja"?"削除する":"Delete"}</button>
+          <button className="btn bs blg" style={{flex:1}} onClick={onCancel}>{t("backBtn")}</button>
+          <button style={{flex:1,padding:"13px 20px",border:"none",borderRadius:13,fontSize:17,fontWeight:600,cursor:"pointer",background:"#E74C3C",color:"#fff",fontFamily:"'M PLUS Rounded 1c',sans-serif"}} onClick={onConfirm}>{t("deleteBtn")}</button>
         </div>
       </div>
     </div>

@@ -66,7 +66,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
       const mins=state.alarmMinutes||30;
       Notif.cancel([1001]);
       const alarmSound=(state.alarmSound||"tone1")+".caf";
-      Notif.schedule(1001,t("alarm"),LANG==="ja"?`取り外しから${mins}分が経過しました`:`${mins} min have passed`,startMs+mins*60000,alarmSound,true);
+      Notif.schedule(1001,t("alarm"),t("alarmFromTimer").replace("{min}",mins),startMs+mins*60000,alarmSound,true);
     }
     // 放置防止通知
     if(Notif.isCapacitor()&&state.forgetTimerAlert){
@@ -76,7 +76,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
       for(let i=0;i<12;i++){
         const h=hrs+i;
         const ms=startMs+h*3600000;
-        if(ms>Date.now()) Notif.schedule(1002+i,LANG==="ja"?"取り外しタイマー":"Removal Timer",LANG==="ja"?`取り外し中のタイマーが${h}時間を超えています`:`Removal timer exceeded ${h}h`,ms);
+        if(ms>Date.now()) Notif.schedule(1002+i,t("removeTimer"),t("removalExceeded").replace("{h}",h),ms);
       }
     }
   };
@@ -138,13 +138,13 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
                 <div style={{fontSize:17,color:T.accent,fontWeight:700,marginBottom:2}}>{state._pendingReason}</div>
               )}
               <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:centerFontSize,fontWeight:700,color:T.primary,lineHeight:1}}>{fmt(currentSec)}</div>
-              <div style={{fontSize:Math.round(centerFontSize*.38),color:T.text+"66",marginTop:4}}>取り外し合計時間</div>
+              <div style={{fontSize:Math.round(centerFontSize*.38),color:T.text+"66",marginTop:4}}>{t("totalRemovalLabel")}</div>
               <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:Math.round(centerFontSize*.82),fontWeight:600,color:T.text+"77",lineHeight:1}}>{secToHHMM(totalRemovedSec)}</div>
             </div>
           </div>
         </div>
         <div style={{textAlign:"center",marginBottom:10}}>
-          <div style={{fontSize:15,color:T.text+"88"}}>本日の装着予定時間</div>
+          <div style={{fontSize:15,color:T.text+"88"}}>{t("expectedWearLabel")}</div>
           <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:22,fontWeight:700,color:T.primary}}>{fmt(expectedWear)}</div>
 
         </div>
@@ -154,7 +154,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
 
         {/* アラーム行 - コンパクト */}
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",background:T.soft,borderRadius:12,padding:"9px 14px"}}>
-          <span style={{fontSize:15,fontWeight:700,color:T.accent}}>アラーム</span>
+          <span style={{fontSize:15,fontWeight:700,color:T.accent}}>{t("alarmLabel")}</span>
           <div style={{display:"flex",alignItems:"center",gap:8}}>
             <button className="btn bs bsm" style={{padding:"3px 10px",fontSize:16}} onClick={()=>{
               const newMins=Math.max(5,(state.alarmMinutes||30)-5);
@@ -163,11 +163,11 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
                 const elapsed=Math.floor(runningMs/1000);
                 const remaining=newMins*60-elapsed;
                 Notif.cancel([1001]);
-                if(remaining>0) Notif.schedule(1001,t("alarm"),LANG==="ja"?`取り外しから${newMins}分が経過しました`:`${newMins} min have passed`,Date.now()+remaining*1000,(state.alarmSound||"tone1")+".caf",true);
+                if(remaining>0) Notif.schedule(1001,t("alarm"),t("alarmFromTimer").replace("{min}",newMins),Date.now()+remaining*1000,(state.alarmSound||"tone1")+".caf",true);
               }
             }}>－</button>
             <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,fontSize:17,color:state.themeName==="ashviolet"?"#ffffff":T.accent,minWidth:28,textAlign:"center"}}>{state.alarmMinutes||30}</span>
-            <span style={{fontSize:13,color:T.text+"77"}}>分</span>
+            <span style={{fontSize:13,color:T.text+"77"}}>{t("minUnit")}</span>
             <button className="btn bs bsm" style={{padding:"3px 10px",fontSize:16}} onClick={()=>{
               const newMins=Math.min(180,(state.alarmMinutes||30)+5);
               update({alarmMinutes:newMins});
@@ -175,7 +175,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
                 const elapsed=Math.floor(runningMs/1000);
                 const remaining=newMins*60-elapsed;
                 Notif.cancel([1001]);
-                if(remaining>0) Notif.schedule(1001,t("alarm"),LANG==="ja"?`取り外しから${newMins}分が経過しました`:`${newMins} min have passed`,Date.now()+remaining*1000,(state.alarmSound||"tone1")+".caf",true);
+                if(remaining>0) Notif.schedule(1001,t("alarm"),t("alarmFromTimer").replace("{min}",newMins),Date.now()+remaining*1000,(state.alarmSound||"tone1")+".caf",true);
               }
             }}>＋</button>
             <button className="tg" style={{background:state.alarmEnabled?T.accent:T.soft+"aa"}} onClick={async()=>{
@@ -189,7 +189,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
                   const remaining=mins*60-elapsed;
                   if(remaining>0){
                     Notif.cancel([1001]);
-                    Notif.schedule(1001,t("alarm"),LANG==="ja"?`取り外しから${mins}分が経過しました`:`${mins} min have passed`,Date.now()+remaining*1000,(state.alarmSound||"tone1")+".caf",true);
+                    Notif.schedule(1001,t("alarm"),t("alarmFromTimer").replace("{min}",mins),Date.now()+remaining*1000,(state.alarmSound||"tone1")+".caf",true);
                   }
                 }
               } else {
@@ -208,7 +208,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
       {pendingReason!==null&&(
         <div className="mo" style={{alignItems:"flex-end"}}>
           <div style={{background:T.card,borderRadius:"20px 20px 0 0",padding:"24px 20px 36px",width:"100%",boxSizing:"border-box"}}>
-            <div className="mdtitle" style={{marginBottom:16,fontSize:18}}>何のために外しますか？</div>
+            <div className="mdtitle" style={{marginBottom:16,fontSize:18}}>{t("reasonPickerTitle")}</div>
             <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:16}}>
               {getReasonList(state).map(r=>(
                 <button key={r} onClick={()=>confirmReason(r)}
@@ -222,7 +222,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
                 style={{width:"100%",padding:"16px",border:`1.5px solid ${T.soft}`,borderRadius:14,
                   background:T.bg,color:T.text+"55",fontSize:15,fontWeight:600,cursor:"pointer",
                   fontFamily:"'M PLUS Rounded 1c',sans-serif",textAlign:"center"}}>
-                ー（記録しない）
+                {t("noReasonOption")}
               </button>
             </div>
             <button className="btn bs" style={{width:"100%",padding:"16px",fontSize:16}} onClick={()=>setPendingReason(null)}>{t("cancel")}</button>
@@ -233,12 +233,12 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
       {/* Sessions */}
       <div className="card" style={{marginBottom:10}}>
         <div style={{marginBottom:8}}>
-          <div className="ct" style={{margin:0}}>本日の取り外し内訳</div>
+          <div className="ct" style={{margin:0}}>{t("todayBreakdownTitle")}</div>
         </div>
 
         {/* セッション一覧 */}
         {todaySess.length===0&&!timerRunning
-          ? <div style={{textAlign:"center",color:T.text+"44",fontSize:14,padding:8}}>まだ記録がありません</div>
+          ? <div style={{textAlign:"center",color:T.text+"44",fontSize:14,padding:8}}>{t("noRecordYet")}</div>
           : <>
             {todaySess.map((s,i)=>{
               const displayReason=(!s.noReason&&s.reason)?s.reason:null;
@@ -272,7 +272,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
                   {state._pendingReason&&<span style={{color:T.accent,fontSize:12,fontWeight:700,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{state._pendingReason}</span>}
                 </div>
                 <span style={{color:T.text+"88",fontSize:12,whiteSpace:"nowrap",textAlign:"center",flex:"0 0 auto",width:"44%"}}>
-                  {fmtTime(state.timerStart)}〜計測中
+                  {fmtTime(state.timerStart)}〜{t("measuring")}
                 </span>
                 <span style={{fontWeight:700,color:T.accent,fontSize:13,whiteSpace:"nowrap",textAlign:"right",width:"28%"}}>{fmt(currentSec)}</span>
               </div>
@@ -290,11 +290,11 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
           <div className="mo" onClick={()=>setTimerEditSessId(null)} style={{alignItems:"center"}}>
             <div className="md" onClick={e=>e.stopPropagation()} style={{borderRadius:20,maxWidth:400}}>
               <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14}}>
-                <div className="mdtitle" style={{margin:0}}>取り外しを編集</div>
+                <div className="mdtitle" style={{margin:0}}>{t("editBreakdownTitle")}</div>
                 <button style={{background:'none',border:'none',color:'#E74C3C',fontSize:14,fontWeight:600,cursor:'pointer',fontFamily:"'M PLUS Rounded 1c',sans-serif",padding:'4px 8px'}}
                   onClick={()=>{setTimerConfirmDeleteId(timerEditSessId);setTimerEditSessId(null);}}>{t("delete")}</button>
               </div>
-              <label>{LANG==="ja"?"理由":"Reason"}</label>
+              <label>{t("reason")}</label>
               <div style={{display:'flex',flexWrap:'wrap',gap:8,marginBottom:14}}>
                 {[...getReasonList(state),t("reasonNone")].map(r=>(
                   <button key={r} onClick={()=>setTimerEditSessReason(r===t("reasonNone")?"":r)}
@@ -307,7 +307,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
                   </button>
                 ))}
               </div>
-              <label>{LANG==="ja"?"時刻":"Time"}</label>
+              <label>{t("timeInputLabel")}</label>
               <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:14}}>
                 <input type='time' value={timerEditSessFrom}
                   onChange={e=>{setTimerEditSessFrom(e.target.value);}}
@@ -333,14 +333,14 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
                     }}}
                   style={{flex:1,height:44,fontSize:16,borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,padding:'0 12px',WebkitAppearance:'none',appearance:'none'}}/>
               </div>
-              <label>{LANG==="ja"?"時間":"Duration"}</label>
+              <label>{t("durationUnit")}</label>
               <input type='text' inputMode='numeric' maxLength={5} autoComplete='off' value={timerEditSessDur}
                 onChange={e=>{if(isFromTimer)return;let v=e.target.value.replace(/[^0-9:]/g,'');if(v.length===2&&!v.includes(':')&&timerEditSessDur.length===1)v+=':';setTimerEditSessDur(v);}}
                 readOnly={isFromTimer}
                 style={{marginBottom:14,textAlign:'center',opacity:isFromTimer?0.6:1,background:isFromTimer?T.soft:T.bg,fontSize:16}}/>
-              <label>{LANG==="ja"?"コメント":"Comment"}</label>
+              <label>{t("commentLabel")}</label>
               <input type='text' value={timerEditSessComment} onChange={e=>setTimerEditSessComment(e.target.value)}
-                placeholder='コメントを入力…' style={{marginBottom:16}}/>
+                placeholder={t("commentPlaceholder")} style={{marginBottom:16}}/>
               <div style={{display:'flex',gap:8}}>
                 <button className='btn bs' style={{flex:1}} onClick={()=>setTimerEditSessId(null)}>{t("cancel")}</button>
                 <button className='btn bp' style={{flex:1}} onClick={saveTimerEdit}>{t("save")}</button>
@@ -359,7 +359,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
                 <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
               </svg>
             </div>
-            <div className="mdtitle" style={{marginBottom:8}}>この記録を削除しますか？</div>
+            <div className="mdtitle" style={{marginBottom:8}}>{t("deleteSessionTitle")}</div>
             <div style={{display:"flex",gap:8,marginTop:16}}>
               <button className="btn bs" style={{flex:1}} onClick={()=>setTimerConfirmDeleteId(null)}>{t("cancel")}</button>
               <button style={{flex:1,padding:"10px",border:"none",borderRadius:12,background:"#E74C3C",color:"#fff",fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16}}

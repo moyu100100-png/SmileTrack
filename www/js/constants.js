@@ -17,7 +17,7 @@ const THEMES = {
   blushhemp:  { primary:"#C49090", accent:"#E8D8C8", bg:"#FAF6F2", card:"#FFFFFF", soft:"#402924", text:"#1A0C08", secondary:"#C49090", removedColor:"#D8C8B8" },
 };
 
-// 理由リストはstateから動的に取得する
+// 理由リストはstateから動的に取得する（日本語をデフォルトとして保持）
 const DEFAULT_REASONS = ["朝食","昼食","夕食","間食","洗浄","その他"];
 // 選択中5項目を返す（ーは含まない）
 function getReasonList(state){
@@ -54,8 +54,24 @@ const defaultState = () => {
     showReasonBreakdown:true,
     forgetTimerAlert:true, forgetTimerHours:4,
     settings:{ reminderAligner:true, reminderExchange:true, reminderPhoto:true, calendarWeekStart:0 },
-    customReasons:["朝食","昼食","夕食","間食","洗浄","その他","カフェ","歯磨き","運動"],
-    activeReasons:["朝食","昼食","夕食","間食","洗浄"],
+    customReasons:(()=>{
+      try{
+        const lang=typeof LANG!=="undefined"?LANG:"ja";
+        if(lang==="ja") return ["朝食","昼食","夕食","間食","洗浄","その他","カフェ","歯磨き","運動"];
+        if(lang==="ko") return ["아침식사","점심식사","저녁식사","간식","세척","기타","카페","양치","운동"];
+        if(lang==="zh") return ["早餐","午餐","晚餐","零食","清洗","其他","咖啡","刷牙","运动"];
+        return ["Breakfast","Lunch","Dinner","Snack","Cleaning","Other","Coffee","Brush","Exercise"];
+      }catch(e){ return ["Breakfast","Lunch","Dinner","Snack","Cleaning"]; }
+    })(),
+    activeReasons:(()=>{
+      try{
+        const lang=typeof LANG!=="undefined"?LANG:"ja";
+        if(lang==="ja") return ["朝食","昼食","夕食","間食","洗浄"];
+        if(lang==="ko") return ["아침식사","점심식사","저녁식사","간식","세척"];
+        if(lang==="zh") return ["早餐","午餐","晚餐","零食","清洗"];
+        return ["Breakfast","Lunch","Dinner","Snack","Cleaning"];
+      }catch(e){ return ["Breakfast","Lunch","Dinner","Snack","Cleaning"]; }
+    })(),
     cameraSettings:{
       mirrorSave:false,
       slot1:"teeth_front",
@@ -258,8 +274,8 @@ function scheduleExchangeNotif(state){
   const fallbackMs = exchDate.getTime();
   const rawMs = notifMs > Date.now() ? notifMs : (fallbackMs > Date.now() ? fallbackMs : null);
   if(rawMs){
-    const msg = before===0 ? "今日は交換日です！" : before===1440 ? "明日は交換日です！" : `${before/1440}日後は交換日です！`;
-    Notif.schedule(2001,"マウスピース交換",msg,rawMs);
+    const msg = before===0 ? t("todayEx") : before===1440 ? t("tomorrowEx") : `${before/1440}${t("dayUnit")}${t("daysToEx")}`;
+    Notif.schedule(2001,t("schedule"),msg,rawMs);
   }
 }
 
@@ -291,7 +307,7 @@ function schedulePhotoNotif(state){
     }
   }
   if(target>now){
-    Notif.schedule(3001,"写真リマインダー","矯正の経過写真を撮りましょう！",target.getTime());
+    Notif.schedule(3001,t("photoReminder"),t("photoReminderBody")||t("photoReminder"),target.getTime());
   }
 }
 

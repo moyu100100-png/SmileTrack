@@ -83,14 +83,14 @@ function OnboardingScreen({T,onComplete}){
           style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:55,fontWeight:800,
             color:T.primary,width:150,textAlign:"center",outline:"none",
             letterSpacing:-2,lineHeight:1,borderBottomColor:T.soft}}/>
-        <span style={{fontSize:15,fontWeight:700,color:T.text+"66",paddingBottom:10}}>枚</span>
+        <span style={{fontSize:15,fontWeight:700,color:T.text+"66",paddingBottom:10}}>{t("obPiecesUnit")}</span>
       </div>
     );
     if(step===2) return(
       <div style={{flex:1,display:"flex",flexDirection:"column",justifyContent:"center",padding:"0 4px"}}>
         <div style={{display:"flex",alignItems:"baseline",justifyContent:"center",gap:5,marginBottom:20}}>
           <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:55,fontWeight:800,color:T.primary,letterSpacing:-2,lineHeight:1}}>{intervalDays}</span>
-          <span style={{fontSize:15,fontWeight:700,color:T.text+"66",paddingBottom:10}}>日ごと</span>
+          <span style={{fontSize:15,fontWeight:700,color:T.text+"66",paddingBottom:10}}>{t("obDaysEvery")}</span>
         </div>
         <input type="range" min={3} max={15} value={intervalDays}
           onChange={e=>setIntervalDays(parseInt(e.target.value))}
@@ -98,8 +98,8 @@ function OnboardingScreen({T,onComplete}){
             WebkitAppearance:"none",appearance:"none",
             background:`linear-gradient(to right,${T.primary} ${((intervalDays-3)/12)*100}%,${T.soft} ${((intervalDays-3)/12)*100}%)`}}/>
         <div style={{display:"flex",justifyContent:"space-between",marginTop:10}}>
-          <span style={{fontSize:11,fontWeight:700,color:T.text+"55"}}>3日</span>
-          <span style={{fontSize:11,fontWeight:700,color:T.text+"55"}}>15日</span>
+          <span style={{fontSize:11,fontWeight:700,color:T.text+"55"}}>{t("daysRange3")}</span>
+          <span style={{fontSize:11,fontWeight:700,color:T.text+"55"}}>{t("daysRange15")}</span>
         </div>
       </div>
     );
@@ -107,7 +107,7 @@ function OnboardingScreen({T,onComplete}){
       <div style={{flex:1,display:"flex",flexDirection:"column",justifyContent:"center",padding:"0 4px"}}>
         <div style={{display:"flex",alignItems:"baseline",justifyContent:"center",gap:5,marginBottom:20}}>
           <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:55,fontWeight:800,color:T.primary,letterSpacing:-2,lineHeight:1}}>{targetHours}</span>
-          <span style={{fontSize:15,fontWeight:700,color:T.text+"66",paddingBottom:10}}>時間</span>
+          <span style={{fontSize:15,fontWeight:700,color:T.text+"66",paddingBottom:10}}>{t("obHoursUnit")}</span>
         </div>
         <input type="range" min={16} max={24} value={targetHours}
           onChange={e=>setTargetHours(parseInt(e.target.value))}
@@ -115,8 +115,8 @@ function OnboardingScreen({T,onComplete}){
             WebkitAppearance:"none",appearance:"none",
             background:`linear-gradient(to right,${T.primary} ${((targetHours-16)/8)*100}%,${T.soft} ${((targetHours-16)/8)*100}%)`}}/>
         <div style={{display:"flex",justifyContent:"space-between",marginTop:10}}>
-          <span style={{fontSize:11,fontWeight:700,color:T.text+"55"}}>16時間</span>
-          <span style={{fontSize:11,fontWeight:700,color:T.text+"55"}}>24時間</span>
+          <span style={{fontSize:11,fontWeight:700,color:T.text+"55"}}>{t("hoursRange16")}</span>
+          <span style={{fontSize:11,fontWeight:700,color:T.text+"55"}}>{t("hoursRange24")}</span>
         </div>
       </div>
     );
@@ -128,7 +128,7 @@ function OnboardingScreen({T,onComplete}){
       <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:30,fontWeight:900,letterSpacing:-0.5}}>
         <span style={{color:T.text+"99"}}>Smile</span><span style={{color:T.primary}}>Track</span>
       </div>
-      <div style={{fontSize:12,fontWeight:600,color:T.text+"66",letterSpacing:2,marginTop:2}}>マウスピース矯正管理</div>
+      <div style={{fontSize:12,fontWeight:600,color:T.text+"66",letterSpacing:2,marginTop:2}}>{t("appSub")}</div>
       <div style={{display:"flex",gap:5,marginTop:18}}>
         {[0,1,2,3].map(i=>(
           <div key={i} style={{flex:1,height:5,borderRadius:99,overflow:"hidden",background:T.soft}}>
@@ -158,13 +158,13 @@ function OnboardingScreen({T,onComplete}){
             <path d="m11 17 2 2a1 1 0 1 0 3-3"/><path d="m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4"/><path d="m21 3 1 11h-2"/><path d="M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3"/><path d="M3 4h8"/>
           </svg>
         </div>
-        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:26,fontWeight:900,color:T.text+"99",marginBottom:8}}>設定完了</div>
+        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:26,fontWeight:900,color:T.text+"99",marginBottom:8}}>{t("obComplete")}</div>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:13,fontWeight:600,color:T.text+"66",lineHeight:1.75,marginBottom:16}}>
-          素敵な笑顔に向けて、一緒に頑張りましょう。
+          {t("obCompleteMsg")}
         </div>
         <div style={{width:"100%",height:1,background:T.soft,marginBottom:16}}/>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:14,fontWeight:700,letterSpacing:1.2,textTransform:"uppercase",color:T.text+"77",marginBottom:8}}>
-          治療終了予定日
+          {t("obEndDate")}
         </div>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:36,fontWeight:900,
           color:T.primary,letterSpacing:-1,lineHeight:1.1}}>
@@ -179,13 +179,13 @@ function OnboardingScreen({T,onComplete}){
             background:T.primary,color:"#fff",fontFamily:"'M PLUS Rounded 1c',sans-serif",
             fontSize:16,fontWeight:800,cursor:"pointer",letterSpacing:0.3,
             boxShadow:`0 6px 20px ${T.primary}44`,marginBottom:4}}>
-          はじめる →
+          {t("start")}
         </button>
         <button onClick={()=>setStep(3)}
           style={{background:"none",border:"none",fontFamily:"'M PLUS Rounded 1c',sans-serif",
             fontSize:13,fontWeight:700,color:T.text+"44",cursor:"pointer",
             padding:12,textAlign:"center",width:"100%"}}>
-          ← 戻る
+          {t("back")}
         </button>
       </div>
     </div>
@@ -229,7 +229,7 @@ function OnboardingScreen({T,onComplete}){
             style={{background:"none",border:"none",fontFamily:"'M PLUS Rounded 1c',sans-serif",
               fontSize:13,fontWeight:700,color:T.text+"44",cursor:"pointer",
               padding:12,textAlign:"center",width:"100%"}}>
-            ← 戻る
+            {t("back")}
           </button>
         ):<div style={{height:37}}/>}
       </div>
@@ -383,7 +383,7 @@ function App(){
         Notif.cancel([1001]);
         const snoozeMs=Date.now()+5*60000;
         setSnoozedUntil(snoozeMs);
-        Notif.schedule(1001,t("alarm"),LANG==="ja"?`取り外しから${state.alarmMinutes||30}分が経過しました`:`${state.alarmMinutes||30} min have passed`,snoozeMs,(state.alarmSound||"tone1")+".caf",true);
+        Notif.schedule(1001,t("alarm"),t("alarmFromTimer").replace("{min}",state.alarmMinutes||30),snoozeMs,(state.alarmSound||"tone1")+".caf",true);
       }
     };
     window.addEventListener("AlarmAction",handler);
@@ -522,7 +522,7 @@ function App(){
         Notif.cancel([1001]);
         const alarmMs=startMs+mins*60000;
         const alarmSound=(state.alarmSound||"tone1")+".caf";
-        Notif.schedule(1001,t("alarm"),LANG==="ja"?`取り外しから${mins}分が経過しました`:`${mins} min have passed`,alarmMs,alarmSound,true);
+        Notif.schedule(1001,t("alarm"),t("alarmFromTimer").replace("{min}",mins),alarmMs,alarmSound,true);
       }
       // 放置防止アラート通知予約（設定した時間から1時間おき・最大12本）
       if(Notif.isCapacitor()&&state.forgetTimerAlert){
@@ -532,7 +532,7 @@ function App(){
         for(let i=0;i<12;i++){
           const h=hrs+i;
           const ms=startMs+h*3600000;
-          if(ms>Date.now()) Notif.schedule(1002+i,LANG==="ja"?"取り外しタイマー":"Removal Timer",LANG==="ja"?`取り外し中のタイマーが${h}時間を超えています`:`Removal timer exceeded ${h}h`,ms);
+          if(ms>Date.now()) Notif.schedule(1002+i,t("removeTimer"),t("removalExceeded").replace("{h}",h),ms);
         }
       }
     } else {
@@ -638,9 +638,9 @@ function App(){
             <div style={{fontSize:15,color:T.text+"88",marginBottom:20,lineHeight:1.7}}>
               {t("forgetMsg")}<br/>
               <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,color:T.primary,fontSize:16}}>
-                {Math.floor((Date.now()-(state.timerStart||Date.now()))/3600000)}{t("forgetHour").replace("時間以上動いています。",LANG==="ja"?"時間以上":"hours or more")}
+                {Math.floor((Date.now()-(state.timerStart||Date.now()))/3600000)}{t("hourOver")}
               </span><br/>
-              {LANG==="ja"?LANG==="ja"?"動いています。":"is running.":t("forgetHour")}
+              {t("moving")}
             </div>
             <div style={{display:"flex",flexDirection:"column",gap:8}}>
               <button className="btn bp" style={{width:"100%",padding:"12px"}}
@@ -666,7 +666,7 @@ function App(){
               <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3 2 6"/><path d="m22 6-3-3"/><path d="M6.38 18.7 4 21"/><path d="M17.64 18.67 20 21"/></svg>
             </div>
             <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:20,fontWeight:700,color:T.primary,marginBottom:6}}>{t("alarm")}</div>
-            <div style={{fontSize:14,color:T.text+"88",marginBottom:28}}>{t("tabTimer")}から{state.alarmMinutes||30}{t("alarmMsg")}</div>
+            <div style={{fontSize:14,color:T.text+"88",marginBottom:28}}>{t("alarmFromTimer").replace("{min}",state.alarmMinutes||30)}</div>
             <button onClick={()=>{stopAlarmSound();Notif.cancel([1001]);setAlarmStopped(true);}}
               style={{width:"100%",padding:"16px",border:"none",borderRadius:16,fontSize:17,fontWeight:700,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",background:T.primary,color:"#fff",marginBottom:12}}>
               {t("alarmStop")}
@@ -676,7 +676,7 @@ function App(){
                 const snoozeMs=Date.now()+5*60*1000;
                 setSnoozedUntil(snoozeMs);
                 Notif.cancel([1001]);
-                Notif.schedule(1001,t("alarm"),LANG==="ja"?`取り外しから${state.alarmMinutes||30}分が経過しました`:`${state.alarmMinutes||30} min have passed`,snoozeMs,(state.alarmSound||"tone1")+".caf",true);
+                Notif.schedule(1001,t("alarm"),t("alarmFromTimer").replace("{min}",state.alarmMinutes||30),snoozeMs,(state.alarmSound||"tone1")+".caf",true);
               }}
               style={{width:"100%",padding:"14px",border:`1.5px solid ${T.soft}`,borderRadius:16,fontSize:15,fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",background:"transparent",color:T.text}}>
               {t("snooze")}
