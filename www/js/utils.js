@@ -71,12 +71,12 @@ function PinPad({T,title,onDone}){
 // ── DRAWER ───────────────────────────────────────────────────────────────────
 function Drawer({T,open,onClose,onSection,onReset}){
   const items=[
-    {icon:Icons.settings,   label:t("settings"),       key:"settings"},
-    {icon:Icons.bell,       label:t("notify"),          key:"notify"},
-    {icon:Icons.camSettings,label:t("cameraSettings"),  key:"cameraSettings"},
-    {icon:Icons.timerIcon,  label:t("timerSettings"),   key:"timerSettings"},
-    {icon:Icons.schedule,   label:t("schedule"),        key:"schedule"},
-    {icon:Icons.palette,    label:t("colorTheme"),      key:"color"},
+    {icon:Icons.settings,  label:t("settings"),             key:"settings"},
+    {icon:Icons.bell,      label:t("notify"),           key:"notify"},
+    {icon:Icons.camSettings,label:t("cameraSettings"),        key:"cameraSettings"},
+    {icon:Icons.timerIcon, label:t("timerSettings"),       key:"timerSettings"},
+    {icon:Icons.schedule,  label:t("schedule"),   key:"schedule"},
+    {icon:Icons.palette,   label:t("colorTheme"),       key:"color"},
   ];
   const starIcon=(c,s=18)=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>;
   const coffeeIcon=(c,s=18)=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>;
@@ -172,10 +172,10 @@ const AFFILIATE_ITEMS = [
 function AffiliatePopup({T,type,onClose}){
   const item=AFFILIATE_ITEMS[0];
   const isWeek1=type==="week1";
-  const title=isWeek1?t("affiliateTitle"):t("affiliateMsg");
+  const title=isWeek1?"矯正アイテム、揃っていますか？":"矯正アイテムの在庫が切れていませんか？";
   const body=isWeek1
-    ?t("affiliateMsg")
-    :t("affiliateMsg");
+    ?"矯正開始から7日目。毎日のケアに役立つおすすめアイテムをご紹介します。"
+    :"矯正開始から30日以上が経ちました。毎日のケアに役立つアイテムをご紹介します。";
   return(
     <div className="mo" onClick={onClose}>
       <div className="md" onClick={e=>e.stopPropagation()}>
@@ -190,7 +190,7 @@ function AffiliatePopup({T,type,onClose}){
         </div>
         <div style={{background:T.soft,borderRadius:12,padding:"12px 14px",marginBottom:14}}>
           <button className="btn bp" style={{width:"100%"}} onClick={()=>{window.open(item.url,"_blank");onClose();}}>
-            {LANG==="ja"?"楽天で見る":"View on Rakuten"}
+            楽天で見る
           </button>
         </div>
         <button className="btn bs" style={{width:"100%"}} onClick={onClose}>{t("close")}</button>
@@ -200,41 +200,50 @@ function AffiliatePopup({T,type,onClose}){
 }
 
 // ── HOME PREVIEW SVG ─────────────────────────────────────────────────────────
-function makeHomeSVG(theme) {
-  const p=theme.primary,s=theme.soft,bg=theme.bg,card=theme.card,tx=theme.text;
+function makeHomeSVG(t) {
+  const p=t.primary,s=t.soft,bg=t.bg,card=t.card,tx=t.text;
   const isDark=bg==="#0F1117";
   const navBg=isDark?"#1C1F2E":card;
   return [
     "<svg width='200' height='360' viewBox='0 0 200 360' xmlns='http://www.w3.org/2000/svg'>",
     "<rect width='200' height='360' rx='16' fill='"+bg+"'/>",
+    // header
     "<rect width='200' height='40' rx='0' fill='"+navBg+"'/>",
     "<rect width='200' height='40' rx='14' fill='"+navBg+"'/>",
     "<rect y='26' width='200' height='14' fill='"+navBg+"'/>",
     "<text x='100' y='25' text-anchor='middle' font-size='11' font-weight='700' fill='"+p+"' font-family='sans-serif'>SmileTrack</text>",
+    // donut bg
     "<circle cx='100' cy='112' r='52' fill='none' stroke='"+s+"' stroke-width='11'/>",
+    // donut progress (~70%)
     "<circle cx='100' cy='112' r='52' fill='none' stroke='"+p+"' stroke-width='11' stroke-dasharray='228 327' stroke-dashoffset='0' transform='rotate(-90 100 112)'/>",
-    "<circle cx='100' cy='112' r='52' fill='none' stroke='"+theme.removedColor+"' stroke-width='11' stroke-dasharray='70 327' stroke-dashoffset='-228' transform='rotate(-90 100 112)'/>",
-    "<text x='100' y='103' text-anchor='middle' font-size='7' fill='"+tx+"77' font-family='sans-serif'>"+t("todayWearTime")+"</text>",
+    // donut removed
+    "<circle cx='100' cy='112' r='52' fill='none' stroke='"+t.removedColor+"' stroke-width='11' stroke-dasharray='70 327' stroke-dashoffset='-228' transform='rotate(-90 100 112)'/>",
+    // donut text
+    "<text x='100' y='103' text-anchor='middle' font-size='7' fill='"+tx+"77' font-family='sans-serif'>本日の装着時間</text>",
     "<text x='100' y='118' text-anchor='middle' font-size='14' font-weight='700' fill='"+p+"' font-family='sans-serif'>18:42:30</text>",
     "<line x1='82' y1='123' x2='118' y2='123' stroke='"+s+"' stroke-width='1'/>",
-    "<text x='100' y='131' text-anchor='middle' font-size='6.5' fill='"+tx+"66' font-family='sans-serif'>"+t("removal")+"  01:17:30</text>",
+    "<text x='100' y='131' text-anchor='middle' font-size='6.5' fill='"+tx+"66' font-family='sans-serif'>取り外し  01:17:30</text>",
+    // card row1
     "<rect x='8' y='178' width='88' height='44' rx='10' fill='"+card+"'/>",
     "<rect x='104' y='178' width='88' height='44' rx='10' fill='"+card+"'/>",
-    "<text x='52' y='192' text-anchor='middle' font-size='7' fill='"+tx+"66' font-family='sans-serif'>"+t("todayLabel")+"</text>",
+    "<text x='52' y='192' text-anchor='middle' font-size='7' fill='"+tx+"66' font-family='sans-serif'>今日</text>",
     "<text x='52' y='212' text-anchor='middle' font-size='17' font-weight='700' fill='"+p+"' font-family='sans-serif'>3</text>",
-    "<text x='148' y='192' text-anchor='middle' font-size='7' fill='"+tx+"66' font-family='sans-serif'>"+t("exchange")+"</text>",
+    "<text x='148' y='192' text-anchor='middle' font-size='7' fill='"+tx+"66' font-family='sans-serif'>交換まで</text>",
     "<text x='148' y='212' text-anchor='middle' font-size='17' font-weight='700' fill='"+p+"' font-family='sans-serif'>4</text>",
+    // card row2
     "<rect x='8' y='228' width='88' height='44' rx='10' fill='"+card+"'/>",
     "<rect x='104' y='228' width='88' height='44' rx='10' fill='"+card+"'/>",
-    "<text x='52' y='242' text-anchor='middle' font-size='7' fill='"+tx+"66' font-family='sans-serif'>"+t("alignerLabel")+"</text>",
+    "<text x='52' y='242' text-anchor='middle' font-size='7' fill='"+tx+"66' font-family='sans-serif'>マウスピース</text>",
     "<text x='52' y='262' text-anchor='middle' font-size='17' font-weight='700' fill='"+p+"' font-family='sans-serif'>5</text>",
-    "<text x='148' y='242' text-anchor='middle' font-size='7' fill='"+tx+"66' font-family='sans-serif'>"+t("remainLabel")+"</text>",
+    "<text x='148' y='242' text-anchor='middle' font-size='7' fill='"+tx+"66' font-family='sans-serif'>残り</text>",
     "<text x='148' y='262' text-anchor='middle' font-size='17' font-weight='700' fill='"+p+"' font-family='sans-serif'>15</text>",
+    // progress
     "<rect x='8' y='280' width='184' height='32' rx='10' fill='"+card+"'/>",
-    "<text x='18' y='293' font-size='7' fill='"+tx+"66' font-family='sans-serif'>"+t("startFromDay")+" 45 "+t("dayCount")+"</text>",
-    "<text x='182' y='293' text-anchor='end' font-size='7' fill='"+tx+"66' font-family='sans-serif'>"+t("daysLeft")+" 95 "+t("dayUnit")+"</text>",
+    "<text x='18' y='293' font-size='7' fill='"+tx+"66' font-family='sans-serif'>スタートから 45 日目</text>",
+    "<text x='182' y='293' text-anchor='end' font-size='7' fill='"+tx+"66' font-family='sans-serif'>あと 95 日</text>",
     "<rect x='16' y='298' width='168' height='7' rx='3.5' fill='"+s+"'/>",
     "<rect x='16' y='298' width='80' height='7' rx='3.5' fill='"+p+"'/>",
+    // navbar
     "<rect y='322' width='200' height='38' fill='"+navBg+"'/>",
     "<rect y='320' width='200' height='2' fill='"+s+"'/>",
     "<rect x='4' y='326' width='36' height='28' rx='7' fill='"+s+"'/>",
