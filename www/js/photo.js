@@ -224,7 +224,7 @@ function PhotoPage({T,state,update,todayStr}){
             }}/>
           <button className="btn bs" style={{width:"100%",padding:"10px"}}
             onClick={()=>document.getElementById("album-input").click()}>
-            <span style={{fontSize:14,marginRight:6}}>＋</span>アルバムから追加
+            <span style={{fontSize:14,marginRight:6}}>＋</span>{t("album")}
           </button>
         </div>
       </div>
@@ -268,7 +268,7 @@ function PhotoPage({T,state,update,todayStr}){
             </button>
           )}
         </div>
-        {isLocked?<PinPad T={T} title="PINを入力" onDone={p=>{if(p===state.photoLock){setUnlocked(true);}else return false;}}/>
+        {isLocked?<PinPad T={T} title={t("pinInput")} onDone={p=>{if(p===state.photoLock){setUnlocked(true);}else return false;}}/>
         :<>
           <div style={{display:"flex",gap:6,marginBottom:10,flexWrap:"wrap"}}>
             {filterTabs.map(([v,lbl])=>(
@@ -442,7 +442,7 @@ function PhotoPage({T,state,update,todayStr}){
               <div style={{padding:14,background:"#111",flexShrink:0}}>
                 <input value={capComment} onChange={e=>setCapComment(e.target.value)} placeholder={t("comment")} style={{background:"#222",color:"#fff",border:"1px solid #444",borderRadius:10,marginBottom:6}}/>
                 <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
-                  <span style={{color:"#aaa",fontSize:13,flexShrink:0}}># マウスピース番号</span>
+                  <span style={{color:"#aaa",fontSize:13,flexShrink:0}}>{t("pieceNo")}</span>
                   <select value={capPiece||""} onChange={e=>setCapPiece(e.target.value?parseInt(e.target.value):null)}
                     style={{background:"#222",color:"#fff",border:"1px solid #444",borderRadius:10,width:80,textAlign:"center"}}>
                     <option value="">{t("reasonNone")}</option>
@@ -465,19 +465,19 @@ function PhotoPage({T,state,update,todayStr}){
       {editId&&(
         <div className="mo" style={{alignItems:"center"}} onClick={()=>setEditId(null)}>
           <div className="md" style={{borderRadius:20,maxHeight:"80dvh",overflowY:"auto"}} onClick={e=>e.stopPropagation()}>
-            <div className="mdtitle">写真を編集</div>
-            <label>コメント</label>
+            <div className="mdtitle">{t("editPhoto")}</div>
+            <label>{t("commentLabel")}</label>
             <input value={editComment} onChange={e=>setEditComment(e.target.value)} style={{marginBottom:10}}/>
             <label>{t("dateLabel")}</label>
             <input type="date" value={editDate} onChange={e=>setEditDate(e.target.value)}
               style={{marginBottom:10,width:"100%",boxSizing:"border-box",height:44,fontSize:16,
                 borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,
                 padding:"0 12px",WebkitAppearance:"none",appearance:"none"}}/>
-            <label>マウスピース番号</label>
+            <label>{t("pieceNoLabel")}</label>
             <select value={editPiece} onChange={e=>setEditPiece(parseInt(e.target.value)||1)} style={{marginBottom:6,textAlign:"center"}}>
               {buildPieceList(state).map(p=><option key={p.n} value={p.n}>{p.label}</option>)}
             </select>
-            <div style={{fontSize:11,color:T.text+"55",marginBottom:14}}>部位は変更できません</div>
+            <div style={{fontSize:11,color:T.text+"55",marginBottom:14}}>{t("shotModeFixed")}</div>
             <button className="btn bs" style={{width:"100%",marginBottom:10}} onClick={()=>{
               const photo=state.photos.find(p=>p.id===editId);
               if(!photo||!photo.data)return;
@@ -493,7 +493,7 @@ function PhotoPage({T,state,update,todayStr}){
                 setEditId(null);
               };
               img.src=photo.data;
-            }}>↔ 左右反転して保存</button>
+            }}>{t("mirrorSaveBtn")}</button>
             <div style={{display:"flex",gap:8,marginBottom:8}}>
               <button className="btn bs" style={{flex:1}} onClick={()=>setEditId(null)}>{t("cancel")}</button>
               <button className="btn bp" style={{flex:1}} onClick={()=>{update({photos:state.photos.map(p=>p.id===editId?{...p,comment:editComment,date:editDate,piece:editPiece}:p)});setEditId(null);}}>{t("savePhoto")}</button>
@@ -505,7 +505,7 @@ function PhotoPage({T,state,update,todayStr}){
       {albumCropPhoto&&(
         <div className="mo" onClick={e=>e.stopPropagation()} style={{zIndex:250}}>
           <div className="md" onClick={e=>e.stopPropagation()} style={{maxHeight:"95dvh",overflowY:"auto",padding:"16px"}}>
-            <div className="mdtitle">写真を追加</div>
+            <div className="mdtitle">{t("album")}</div>
 
             {/* トリミングエリア */}
             {(()=>{
@@ -557,7 +557,7 @@ function PhotoPage({T,state,update,todayStr}){
             </div>
 
             {/* 部位選択（必須） */}
-            <label>部位 <span style={{color:"#E74C3C"}}>*必須</span></label>
+            <label>{t("shotMode")} <span style={{color:"#E74C3C"}}>*</span></label>
             <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:14,marginTop:4}}>
               {SHOT_MODES.map(m=>(
                 <button key={m.id} onClick={()=>setAlbumMeta(v=>({...v,shotMode:m.id}))}
@@ -565,18 +565,18 @@ function PhotoPage({T,state,update,todayStr}){
                     background:albumMeta.shotMode===m.id?T.primary:"transparent",
                     color:albumMeta.shotMode===m.id?"#fff":T.text,
                     fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>
-                  {m.labelJP}
+                  {t(m.labelKey)||m.labelJP}
                 </button>
               ))}
             </div>
 
             {/* コメント */}
-            <label>コメント</label>
+            <label>{t("commentLabel")}</label>
             <input value={albumMeta.comment} onChange={e=>setAlbumMeta(v=>({...v,comment:e.target.value}))}
               placeholder={t("comment")} style={{marginBottom:10}}/>
 
             {/* マウスピース番号 */}
-            <label>マウスピース番号</label>
+            <label>{t("pieceNoLabel")}</label>
             <select value={albumMeta.piece}
               onChange={e=>setAlbumMeta(v=>({...v,piece:parseInt(e.target.value)||1}))}
               style={{marginBottom:16}}>

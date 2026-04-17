@@ -94,7 +94,15 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
   const nextMonth = () => { if(vm===11){setVy(y=>y+1);setVm(0);}else setVm(m=>m+1); };
 
   const selDateObj = sel ? new Date(sel+"T00:00:00") : null;
-  const selLabel = selDateObj ? selDateObj.toLocaleDateString("ja-JP",{year:"numeric",month:"long",day:"numeric",weekday:"short"}) : "";
+  const WEEKDAYS = t("months") ? [t("sun"),t("mon"),t("tue"),t("wed"),t("thu"),t("fri"),t("sat")] : ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const selLabel = selDateObj ? (()=>{
+    const LANG_IS_JA = (typeof LANG !== "undefined" && LANG === "ja");
+    const d = selDateObj;
+    const mon = (t("months")||[])[d.getMonth()] || (d.getMonth()+1);
+    const wd = WEEKDAYS[d.getDay()];
+    if(LANG_IS_JA) return `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日(${wd})`;
+    return `${mon} ${d.getDate()}, ${d.getFullYear()} (${wd})`;
+  })() : "";
 
   const selEvents = [];
   if(sel){
@@ -119,7 +127,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
       {/* Month nav */}
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 14px 6px",background:T.card,borderBottom:`1px solid ${T.soft}`}}>
         <button className="btn bs bsm" style={{fontSize:16,padding:"4px 14px"}} onClick={prevMonth}>‹</button>
-        <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,fontSize:17,color:T.primary}}>{t("yearMonth").replace("{y}",vy).replace("{m}",vm+1)}</span>
+        <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,fontSize:17,color:T.primary}}>{t("yearMonth").replace("{y}",vy).replace("{m}",vm+1).replace("{mon}",(t("months")||[])[vm]||vm+1)}</span>
         <button className="btn bs bsm" style={{fontSize:16,padding:"4px 14px"}} onClick={nextMonth}>›</button>
       </div>
 
@@ -316,7 +324,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                   {[...selSessions].sort((a,b)=>(a.start||0)-(b.start||0)).map(s=>{
                     const hasRange=s.start&&s.end&&s.end>s.start
                       &&!(fmtTs(s.start)==='00:00'&&fmtTs(s.end)==='00:00');
-                    const rangeStr=hasRange?fmtTs(s.start)+'〜'+fmtTs(s.end):'';
+                    const rangeStr=hasRange?fmtTs(s.start)+' – '+fmtTs(s.end):'';
                     const durStr=toHHMM(Math.floor(s.ms/1000));
                     const displayReason=(s.reason&&!s.noReason)?s.reason:null;
 

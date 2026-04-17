@@ -521,7 +521,7 @@ function ScheduleModal({T,state,update,onClose}){
   return(
     <div className="mo" onClick={onClose}>
       <div className="md" onClick={e=>e.stopPropagation()}>
-        <div className="mdtitle">交換スケジュール</div>
+        <div className="mdtitle">{t("scheduleTitle")}</div>
 
         {/* Piece list - 日付範囲をタップで個別設定 */}
         <div style={{maxHeight:"38dvh",overflowY:"auto",marginBottom:10}}>
@@ -535,7 +535,7 @@ function ScheduleModal({T,state,update,onClose}){
             const canEdit=true; // 過去も含めて全て編集可能
             const isPast=pIdx<cpIdx2;
             const hasCustom=!p.isExtra&&state.customIntervals?.[p.n];
-            const rangeStr=exStart&&exEnd?`${fmtDateJP(dsFromDate(exStart))}〜${fmtDateJP(dsFromDate(exEnd))}`:"—";
+            const rangeStr=exStart&&exEnd?`${fmtDateJP(dsFromDate(exStart))} – ${fmtDateJP(dsFromDate(exEnd))}`:"—";
             return(
               <div key={p.n} className="wr" style={{background:isAct?T.soft+"88":"transparent",borderRadius:8,padding:"5px 7px",opacity:isPast&&!isAct?0.5:1,cursor:canEdit?"pointer":"default"}}
                 onClick={()=>{if(!canEdit)return;setEditPiece(p.n);setEditDays(p.intervalDays);}}>
@@ -658,7 +658,7 @@ function ScheduleModal({T,state,update,onClose}){
                 {(() => {
                   const exStart=getExchangeDate(state,editPiece);
                   const exEnd=getExchangeEndDate(state,editPiece);
-                  return exStart&&exEnd ? `${fmtDateJP(dsFromDate(exStart))}〜${fmtDateJP(dsFromDate(exEnd))}` : "—";
+                  return exStart&&exEnd ? `${fmtDateJP(dsFromDate(exStart))} – ${fmtDateJP(dsFromDate(exEnd))}` : "—";
                 })()}
               </div>
               <select value={editDays} onChange={e=>setEditDays(parseInt(e.target.value))} style={{marginBottom:14}}>
@@ -872,12 +872,12 @@ function BackupModal({T,state,onImport,onClose}){
 
 // ── CAMERA SETTINGS MODAL ────────────────────────────────────────────────────
 const SHOT_MODES = [
-  {id:"face_front", labelJP:"顔正面",  svgD:"M50,15 C35,15 20,30 20,50 C20,70 35,85 50,85 C65,85 80,70 80,50 C80,30 65,15 50,15 Z", isLandscape:false},
-  {id:"face_right", labelJP:"顔右向き",  svgD:"M55,15 C40,15 25,30 22,52 C20,70 35,85 55,85 C70,85 80,68 80,50 C80,32 70,15 55,15 Z", isLandscape:false},
-  {id:"face_left",  labelJP:"顔左向き",   svgD:"M45,15 C60,15 75,30 78,52 C80,70 65,85 45,85 C30,85 20,68 20,50 C20,32 30,15 45,15 Z", isLandscape:false},
-  {id:"teeth_front",labelJP:"歯正面", svgD:"M18,38 C20,28 80,28 82,38 L82,62 C80,72 20,72 18,62 Z", isLandscape:true},
-  {id:"teeth_right",labelJP:"歯右向き", svgD:"M18,38 C20,28 75,30 82,42 L82,62 C75,70 20,72 18,62 Z", isLandscape:true},
-  {id:"teeth_left", labelJP:"歯左向き",  svgD:"M18,42 C25,30 80,28 82,38 L82,62 C80,72 25,70 18,58 Z", isLandscape:true},
+  {id:"face_front", labelJP:"顔正面",   labelKey:"shotFaceFront",  svgD:"M50,15 C35,15 20,30 20,50 C20,70 35,85 50,85 C65,85 80,70 80,50 C80,30 65,15 50,15 Z", isLandscape:false},
+  {id:"face_right", labelJP:"顔右向き", labelKey:"shotFaceRight",  svgD:"M55,15 C40,15 25,30 22,52 C20,70 35,85 55,85 C70,85 80,68 80,50 C80,32 70,15 55,15 Z", isLandscape:false},
+  {id:"face_left",  labelJP:"顔左向き", labelKey:"shotFaceLeft",   svgD:"M45,15 C60,15 75,30 78,52 C80,70 65,85 45,85 C30,85 20,68 20,50 C20,32 30,15 45,15 Z", isLandscape:false},
+  {id:"teeth_front",labelJP:"歯正面",   labelKey:"shotTeethFront", svgD:"M18,38 C20,28 80,28 82,38 L82,62 C80,72 20,72 18,62 Z", isLandscape:true},
+  {id:"teeth_right",labelJP:"歯右向き", labelKey:"shotTeethRight", svgD:"M18,38 C20,28 75,30 82,42 L82,62 C75,70 20,72 18,62 Z", isLandscape:true},
+  {id:"teeth_left", labelJP:"歯左向き", labelKey:"shotTeethLeft",  svgD:"M18,42 C25,30 80,28 82,38 L82,62 C80,72 25,70 18,58 Z", isLandscape:true},
 ];
 
 function ShotModePictogram({mode, size=56, selected, T, onClick}){
@@ -895,7 +895,7 @@ function ShotModePictogram({mode, size=56, selected, T, onClick}){
         <line x1="65" y1="50" x2="65" y2="62" stroke={selected?T.primary:T.text+"66"} strokeWidth="2"/>
         <line x1="18" y1="50" x2="82" y2="50" stroke={selected?T.primary:T.text+"66"} strokeWidth="2.5"/></>}
       </svg>
-      <span style={{fontSize:9,fontWeight:600,color:selected?T.primary:T.text+"66",textAlign:"center",lineHeight:1.2}}>{m.labelJP}</span>
+      <span style={{fontSize:9,fontWeight:600,color:selected?T.primary:T.text+"66",textAlign:"center",lineHeight:1.2}}>{t(m.labelKey)||m.labelJP}</span>
     </div>
   );
 }
@@ -930,7 +930,7 @@ function CameraSettingsModal({T,state,onSave,onClose}){
               <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",
                 background:T.soft,borderRadius:10,padding:"8px 12px",cursor:"pointer"}}
                 onClick={()=>setSelectingSlot(isOpen?null:slotN)}>
-                <span style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>{slotN}：{modeInfo.labelJP}</span>
+                <span style={{fontSize:13,fontWeight:700,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>{slotN}：{t(modeInfo.labelKey)||modeInfo.labelJP}</span>
                 <span style={{fontSize:13,fontWeight:600,color:T.accent,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>{isOpen?t("closePanel"):t("changePanel")}</span>
               </div>
               {isOpen&&(

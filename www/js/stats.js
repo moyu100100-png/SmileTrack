@@ -1,7 +1,14 @@
 function StatsPage({T,state,update,todayStr,todayDayStartMs}){
   const isPremium=IS_PREMIUM;
   useTick(1000, state.timerRunning);
-  const fmtShort = ds => { if(!ds) return "—"; const d=new Date(ds+"T00:00:00"); return `${d.getMonth()+1}/${d.getDate()}`; };
+  const fmtShort = ds => {
+    if(!ds) return "—";
+    const d = new Date(ds+"T00:00:00");
+    const lang = typeof LANG !== "undefined" ? LANG : "ja";
+    if(lang === "ja") return `${d.getMonth()+1}/${d.getDate()}`;
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    return `${months[d.getMonth()]} ${d.getDate()}`;
+  };
   const accentFailThemes=["atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"];
   const greyFailThemes=["blush","wisteria","powder","glacier","amber"];
   const failCol=state.themeName==="night"?"rgba(220,38,38,0.8)":accentFailThemes.includes(state.themeName)?T.soft:greyFailThemes.includes(state.themeName)?"#A0A0A0":"#E88080";
@@ -67,7 +74,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
         const startDs=dsFromDate(start);
         const endDs=dsFromDate(end);
         const year=start.getFullYear();
-        const rangeLabel=`${start.getMonth()+1}/${start.getDate()}〜\n${end.getMonth()+1}/${end.getDate()}`;
+        const rangeLabel=`${start.getMonth()+1}/${start.getDate()} –\n${end.getMonth()+1}/${end.getDate()}`;
         bars.push({key:startDs,endKey:endDs,label:rangeLabel,yearLabel:`${year}`,secs:avgSecs,totalSecs:total,days:7,isPast:true,isToday:startDs===thisWeekDs});
       }
       return bars;
@@ -160,8 +167,8 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
       if(ds >= startStr && (!nextStartStr || ds < nextStartStr)) total += secs;
     });
     const rangeLabel = startStr && endStr
-      ? `${fmtShort(startStr)}〜${fmtShort(endStr)}`
-      : startStr ? `${fmtShort(startStr)}〜` : "—";
+      ? `${fmtShort(startStr)} – ${fmtShort(endStr)}`
+      : startStr ? `${fmtShort(startStr)} –` : "—";
     return { n: p.n, label: p.label, rangeLabel, total };
   });
 
@@ -305,7 +312,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
                     ? (()=>{let t=0;const s=new Date(b.key+"T00:00:00");const e=new Date(b.endKey+"T00:00:00");for(let d=new Date(s);d<=e;d.setDate(d.getDate()+1))t+=effectiveLog[dsFromDate(new Date(d))]||0;return t;})()
                     : (()=>{const parts=b.key.split("-");const y=parseInt(parts[0]),m=parseInt(parts[1]);let t=0;const days=new Date(y,m+1,0).getDate();for(let day=1;day<=days;day++)t+=effectiveLog[dsFromDate(new Date(y,m,day))]||0;return t;})();
                   const achieved=total>0&&total>=target*(period==="weekly"?7:new Date(parseInt(b.key.split("-")[0]),parseInt(b.key.split("-")[1])+1,0).getDate());
-                  const weekLabel=period==="weekly"?b.label.replace(/〜?\n/,"〜"):"";
+                  const weekLabel=period==="weekly"?b.label.replace(/–?\n/,"–"):"";
                   return(
                     <div key={b.key} className="wr" style={{background:isSelected?T.soft:"transparent",borderRadius:8,cursor:"pointer"}} onClick={()=>setSelectedBar(isSelected?null:b)}>
                       <span style={{fontSize:13,fontWeight:isSelected?700:400,color:isSelected?T.primary:T.text,whiteSpace:"nowrap",lineHeight:1.4,flex:1}}>{period==="weekly"?weekLabel:`${parseInt(b.key.split("-")[1])+1}${t("monthLabel")}`}</span>

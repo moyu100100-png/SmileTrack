@@ -102,7 +102,14 @@ const todayISO = () => {
   return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
 };
 
-const fmtDateJP = ds => { if(!ds) return "—"; const d=new Date(ds+"T00:00:00"); return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`; };
+const fmtDateJP = ds => {
+  if(!ds) return "—";
+  const d = new Date(ds+"T00:00:00");
+  const lang = typeof LANG !== "undefined" ? LANG : "ja";
+  if(lang === "ja") return `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}`;
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return `${months[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+};
 
 function buildPieceList(state) {
   const list = [];
