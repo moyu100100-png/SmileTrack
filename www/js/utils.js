@@ -105,7 +105,7 @@ function Drawer({T,open,onClose,onSection,onReset}){
           {/* 課金系 */}
           <div className="di" onClick={()=>{onSection("premium");onClose();}}>
             <span style={{width:26,display:"flex",alignItems:"center",justifyContent:"center"}}>{starIcon(T.primary)}</span>
-            <span className="di-lbl">{t("premiumMenu")}</span>
+            <span className="di-lbl">{t("premium")}</span>
           </div>
           <div className="di" onClick={()=>{onSection("coffee");onClose();}}>
             <span style={{width:26,display:"flex",alignItems:"center",justifyContent:"center"}}>{coffeeIcon(T.primary)}</span>

@@ -425,12 +425,16 @@ function App(){
 
   // 止め忘れダイアログ
   const [showForgetAlert,setShowForgetAlert]=useState(false);
+  const forgetDismissedAt=React.useRef(null);
   useEffect(()=>{
     const check=()=>{
       if(!state.timerRunning||!state.forgetTimerAlert) return;
       const elapsed=Date.now()-(state.timerStart||Date.now());
       const limitMs=(state.forgetTimerHours||4)*3600*1000;
-      if(elapsed>limitMs) setShowForgetAlert(true);
+      if(elapsed<=limitMs) return;
+      // 「このまま続ける」を押してから1時間以内は再表示しない
+      if(forgetDismissedAt.current&&Date.now()-forgetDismissedAt.current<3600*1000) return;
+      setShowForgetAlert(true);
     };
     check(); // 起動時即チェック
     const id=setInterval(check,60000); // 1分ごとにチェック
@@ -585,7 +589,7 @@ function App(){
           {tab==="timer"   &&<TimerPage T={T} state={state} update={update} handleRemoveButton={handleRemoveButton} todayStr={todayStr} todayDayStartMs={todayDayStartMs} snoozedUntil={snoozedUntil} setSnoozedUntil={setSnoozedUntil} alarmStopped={alarmStopped} setAlarmStopped={setAlarmStopped} onReasonPopup={setReasonPopupOpen}/>}
           {tab==="stats"   &&<StatsPage T={T} state={state} update={update} todayStr={todayStr} todayDayStartMs={todayDayStartMs}/>}
         </div>
-        <div className="nav" style={{paddingBottom:`calc(env(safe-area-inset-bottom, 0px) + ${(!state.isPremium&&!state.noAds)?"35px":"0px"})`}}>
+        <div className="nav" style={{paddingBottom:(!state.isPremium&&!state.noAds)?`calc(env(safe-area-inset-bottom, 0px) + 35px)`:`5px`}}>
           {tabs.map(t=>{const active=tab===t.id;return(<button key={t.id} className={`nb${active?" on":""}`} onClick={()=>{
   setTab(t.id);
   if(!state.isPremium&&!state.noAds&&["calendar","stats","photo"].includes(t.id)&&t.id!==tab){
@@ -598,7 +602,7 @@ function App(){
       {drawerSection==="color"        &&<ColorModal T={T} themeName={state.themeName} onPick={k=>update({themeName:k})} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="settings"     &&<SettingsModal T={T} state={state} onSave={(sf,th,sd,tp)=>update({settings:sf,targetWearHours:th,startDate:sd,totalPieces:tp})} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="schedule"     &&<ScheduleModal T={T} state={state} update={update} onClose={()=>setDrawerSection(null)}/>}
-      {drawerSection==="backup"       &&<BackupModal T={T} state={state} onImport={s=>setState(s)} onClose={()=>setDrawerSection(null)}/>}
+      {drawerSection==="backup"       &&<BackupModal T={T} state={state} onImport={s=>setState(prev=>({...s,isPremium:prev.isPremium,noAds:prev.noAds}))} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="notify"       &&<NotifyModal T={T} state={state} onSave={f=>{
         update(f);
         const list=buildPieceList(state);
@@ -645,7 +649,7 @@ function App(){
             </div>
             <div style={{display:"flex",flexDirection:"column",gap:8}}>
               <button className="btn bp" style={{width:"100%",padding:"12px"}}
-                onClick={()=>setShowForgetAlert(false)}>
+                onClick={()=>{forgetDismissedAt.current=Date.now();setShowForgetAlert(false);}}>
                 {t("keepGoing")}
               </button>
               <button style={{width:"100%",padding:"12px",border:"none",borderRadius:12,
