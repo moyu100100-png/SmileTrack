@@ -13,10 +13,15 @@ function PhotoPage({T,state,update,todayStr}){
   // 写真が存在するshotModeを収集
   const existingModes = new Set((state.photos||[]).map(p=>p.shotMode||"face_front"));
   // タブ名：歯正面→「歯」、顔正面→「顔」、それ以外はlabelJPそのまま
+  const getShotLabel = (modeInfo) => {
+    if(!modeInfo) return "";
+    return t(modeInfo.labelKey) || modeInfo.labelJP;
+  };
   const tabLabel = id => {
     if(id==="teeth_front") return t("shotTeeth");
     if(id==="face_front") return t("shotFace");
-    return (SHOT_MODES.find(x=>x.id===id)||{labelJP:id}).labelJP;
+    const m = SHOT_MODES.find(x=>x.id===id);
+    return m ? (t(m.labelKey)||m.labelJP) : id;
   };
   // タブに出すmode一覧（重複なし・順番制御）
   const tabModeIds = [];
@@ -197,11 +202,11 @@ function PhotoPage({T,state,update,todayStr}){
         <div className="ct" style={{marginBottom:8,fontSize:14}}>{t("takePhoto")}</div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9}}>
           <button className="btn bp" onClick={()=>openCam(slot1Id)} style={{padding:"12px 8px",flexDirection:"column"}}>
-            <div style={{display:"flex",alignItems:"center",gap:4}}>{Icons.camera("#fff",14)}<span style={{fontSize:14}}>{slot1Info.labelJP}</span></div>
+            <div style={{display:"flex",alignItems:"center",gap:4}}>{Icons.camera("#fff",14)}<span style={{fontSize:14}}>{getShotLabel(slot1Info)}</span></div>
             {getOverlayPhoto(slot1Id)&&<div style={{fontSize:11,opacity:.7,marginTop:2}}>{t("prevExists")}</div>}
           </button>
           <button className="btn bp" onClick={()=>{if(!isPremium){setShowSlot2Gate(true);return;}openCam(slot2Id);}} style={{padding:"12px 8px",flexDirection:"column",opacity:isPremium?1:0.55}}>
-            <div style={{display:"flex",alignItems:"center",gap:4}}>{isPremium?Icons.camera("#fff",14):<span style={{fontSize:14}}>🔒</span>}<span style={{fontSize:14}}>{slot2Info.labelJP}</span></div>
+            <div style={{display:"flex",alignItems:"center",gap:4}}>{isPremium?Icons.camera("#fff",14):<span style={{fontSize:14}}>🔒</span>}<span style={{fontSize:14}}>{getShotLabel(slot2Info)}</span></div>
             {isPremium&&getOverlayPhoto(slot2Id)&&<div style={{fontSize:11,opacity:.7,marginTop:2}}>{t("prevExists")}</div>}
           </button>
         </div>
@@ -305,7 +310,7 @@ function PhotoPage({T,state,update,todayStr}){
                       <rect width="100%" height="100%" fill="url(#wm-grid)"/>
                     </svg>}
                     <div style={{position:"absolute",bottom:0,left:0,right:0,background:"linear-gradient(transparent,rgba(0,0,0,0.72))",padding:"14px 8px 8px",pointerEvents:"none"}}>
-                      <div style={{color:"#fff",fontSize:11}}>{p.piece?"#"+p.piece:"ー"} · {p.shotLabel||p.mode}</div>
+                      <div style={{color:"#fff",fontSize:11}}>{p.piece?"#"+p.piece:"ー"} · {(()=>{const m=SHOT_MODES.find(x=>x.id===(p.shotMode||"face_front"));return m?(t(m.labelKey)||m.labelJP):(p.shotLabel||p.mode);})()}</div>
                       <div style={{color:"#ffffffbb",fontSize:11}}>{p.date}</div>
                       {p.comment&&<div style={{color:"#ffffffaa",fontSize:11,marginTop:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.comment}</div>}
                     </div>
@@ -335,7 +340,7 @@ function PhotoPage({T,state,update,todayStr}){
           {/* Header */}
           <div style={{padding:"10px 16px",paddingTop:"75px",display:"flex",alignItems:"center",justifyContent:"space-between",background:"rgba(0,0,0,0.7)",flexShrink:0}}>
             <button onClick={closeCam} style={{background:"rgba(255,255,255,0.18)",border:"none",color:"#fff",padding:"6px 14px",borderRadius:13,cursor:"pointer",fontSize:14}}>✕</button>
-            <span style={{color:"#fff",fontWeight:700,fontSize:15}}>{currentModeInfo.labelJP}</span>
+            <span style={{color:"#fff",fontWeight:700,fontSize:15}}>{getShotLabel(currentModeInfo)}</span>
             <button onClick={()=>setShowColorPanel(v=>!v)} style={{background:showColorPanel?"rgba(255,255,255,0.35)":"rgba(255,255,255,0.18)",border:"none",color:"#fff",padding:"6px 10px",borderRadius:13,cursor:"pointer",display:"flex",alignItems:"center",gap:4,fontSize:12}}>
               {Icons.sun("#fff",14)} 調整
             </button>
