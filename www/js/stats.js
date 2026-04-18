@@ -330,7 +330,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
                   return(
                     <div key={n} className="wr" style={{opacity:(total===0&&!isAct)?0.45:1}}>
                       <div style={{display:"flex",alignItems:"center",gap:8,flex:1,minWidth:0}}>
-                        <div style={{width:22,height:22,borderRadius:"50%",background:isAct?T.primary:T.soft,color:isAct?"#fff":T.text,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,flexShrink:0}}>{label}</div>
+                        <div style={{width:22,height:22,borderRadius:"50%",background:isAct?T.primary:(["atrium","blushhemp"].includes(state.themeName)?T.accent:T.soft),color:isAct?"#fff":(["atrium","blushhemp"].includes(state.themeName)?"#fff":T.text),display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,flexShrink:0}}>{label}</div>
                         <span style={{fontSize:12,color:T.text+"99",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:160}}>{rangeLabel}</span>
                       </div>
                       <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,color:isAct?T.primary:T.text+"88",fontSize:14,flexShrink:0}}>{fmt(total)}</span>
