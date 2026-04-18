@@ -1,4 +1,4 @@
-const IS_PREMIUM = true;
+const IS_PREMIUM = false;
 
 const THEMES = {
   // ── S1〜S6 単色テーマ ────────────────────────────────────────────────────
@@ -19,31 +19,10 @@ const THEMES = {
 
 // 理由リストはstateから動的に取得する（日本語をデフォルトとして保持）
 const DEFAULT_REASONS = ["朝食","昼食","夕食","間食","洗浄","その他"];
-
-// 日本語の理由名 → i18nキー対応表
-const REASON_I18N_MAP = {
-  "朝食": "reasonBreakfast",
-  "昼食": "reasonLunch",
-  "夕食": "reasonDinner",
-  "間食": "reasonSnack",
-  "洗浄": "reasonCleaning",
-  "その他": "reasonOther",
-};
-
-// 理由名をローカライズ（日本語キーがあれば翻訳、なければそのまま）
-function localizeReason(r) {
-  if(!r) return r;
-  const key = REASON_I18N_MAP[r];
-  if(key && typeof t === "function") return t(key);
-  return r;
-}
-
-// 選択中5項目を返す（ーは含まない）・表示用にローカライズ済み
+// 選択中5項目を返す（ーは含まない）
 function getReasonList(state){
-  const list = (state&&state.activeReasons&&state.activeReasons.length>0)
-    ? state.activeReasons
-    : DEFAULT_REASONS.slice(0,5);
-  return list.map(localizeReason);
+  if(state&&state.activeReasons&&state.activeReasons.length>0) return state.activeReasons;
+  return DEFAULT_REASONS.slice(0,5);
 }
 
 // セッションが指定日に属するか（startあり・なし両対応）
@@ -299,10 +278,22 @@ function scheduleExchangeNotif(state){
   const before = state.notifyBefore??1440;
   const exchDate = new Date(state.nextExchangeDate+"T"+String(hour).padStart(2,"0")+":00:00");
   const notifMs = exchDate.getTime() - before*60000;
-  const fallbackMs = exchDate.getTime();
-  const rawMs = notifMs > Date.now() ? notifMs : (fallbackMs > Date.now() ? fallbackMs : null);
+  const fallbackMs = exchDate.getTime(); // 当日hour時
+  const now = Date.now();
+
+  let rawMs = null;
+  let actualBefore = before; // 実際に使う"何分前"
+  if(notifMs > now){
+    rawMs = notifMs;
+    actualBefore = before;
+  } else if(fallbackMs > now){
+    // 前日通知が過去 → 当日hour時にフォールバック
+    rawMs = fallbackMs;
+    actualBefore = 0; // 当日扱い
+  }
+
   if(rawMs){
-    const msg = before===0 ? t("todayEx") : before===1440 ? t("tomorrowEx") : `${before/1440}${t("dayUnit")}${t("daysToEx")}`;
+    const msg = actualBefore===0 ? t("todayEx") : actualBefore===1440 ? t("tomorrowEx") : `${actualBefore/1440}${t("dayUnit")}${t("daysToEx")}`;
     Notif.schedule(2001,t("schedule"),msg,rawMs);
   }
 }
@@ -315,9 +306,11 @@ function schedulePhotoNotif(state){
   const now = new Date();
   let target;
   if(state.photoReminderMode==="exchange"&&state.nextExchangeDate){
+    // 交換日のhour時を設定
     target = new Date(state.nextExchangeDate+"T"+String(hour).padStart(2,"0")+":00:00");
-    // 交換日が過去の場合は7日後にフォールバック
     if(target<=now){
+      // 交換日当日でhour時が過去 → 翌日の同時刻（次回交換まで待つより早め通知）
+      // または7日後フォールバック
       target = new Date();
       target.setDate(target.getDate()+7);
       target.setHours(hour,0,0,0);
