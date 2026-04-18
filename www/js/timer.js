@@ -2,6 +2,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
   // タイマーページは常に毎秒更新（メインのタイマー表示）
   useTick(1000);
 
+
   const todayDayEndMs=todayDayStartMs+86400000;
   const todaySavedMs=(state.timerSessions||[]).filter(s=>sessInDay(s,todayDayStartMs,todayStr)).reduce((a,s)=>a+s.ms,0);
   const runningMs=state.timerRunning?state.timerElapsed+(Date.now()-(state.timerStart||Date.now())):state.timerElapsed;

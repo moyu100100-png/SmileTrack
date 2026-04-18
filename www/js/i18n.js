@@ -31,7 +31,7 @@ const I18N = {
     target: "目標",
     exchange: "交換",
     daysToEx: "日後に交換",
-    todayEx: "今日交換日！",
+    todayEx: "交換日",
     tomorrowEx: "明日交換！",
     treatmentEnd: "治療終了予定",
     avg7: "7日平均",
@@ -268,6 +268,13 @@ const I18N = {
     tapAfterChange: "交換後タップ",
     progressEndDate: "治療終了予定日",
 
+    // photo.js ゲートカード
+    slot2GateTitle: "プレミアム限定です",
+    slot2GateMsg: "2つ目の撮影スロットでより多くの角度を記録できます。",
+    pinGateTitle: "PINロックはプレミアム限定です",
+    pinGateMsg: "写真アルバムをPINで保護できます。",
+    lockBtn: "ロック",
+
     // 追加: カレンダー
     yearMonth: "{y}年 {m}月",
     months: ["1","2","3","4","5","6","7","8","9","10","11","12"],
@@ -431,6 +438,14 @@ const I18N = {
     mirrorSaveBtn: "↔ 左右反転して保存",
     shotModeRequired: "部位 *必須",
     pieceNoLabel: "マウスピース番号",
+
+    // 取り外し理由デフォルトリスト
+    reasonBreakfast: "朝食",
+    reasonLunch: "昼食",
+    reasonDinner: "夕食",
+    reasonSnack: "間食",
+    reasonCleaning: "洗浄",
+    reasonOther: "その他",
   },
 
   en: {
@@ -461,7 +476,7 @@ const I18N = {
     target: "Target",
     exchange: "Change",
     daysToEx: "days to change",
-    todayEx: "Change today!",
+    todayEx: "Change Day",
     tomorrowEx: "Change tomorrow!",
     treatmentEnd: "Est. End Date",
     avg7: "7-day avg",
@@ -681,6 +696,13 @@ const I18N = {
     tapAfterChange: "Tap after",
     progressEndDate: "Est. End Date",
 
+    // photo.js gate cards
+    slot2GateTitle: "Premium Feature",
+    slot2GateMsg: "The 2nd shot slot lets you capture more angles.",
+    pinGateTitle: "PIN Lock is a Premium Feature",
+    pinGateMsg: "Protect your photo album with a PIN.",
+    lockBtn: "Lock",
+
     yearMonth: "{mon} {y}",
     months: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
     failedLabel: "Missed",
@@ -839,6 +861,14 @@ const I18N = {
     mirrorSaveBtn: "↔ Save mirrored",
     shotModeRequired: "Shot type *required",
     pieceNoLabel: "Aligner No.",
+
+    // default removal reasons
+    reasonBreakfast: "Breakfast",
+    reasonLunch: "Lunch",
+    reasonDinner: "Dinner",
+    reasonSnack: "Snack",
+    reasonCleaning: "Cleaning",
+    reasonOther: "Other",
   },
 
   ko: {
@@ -1088,6 +1118,12 @@ const I18N = {
     lastDay: "마지막 날 ✨",
     tapAfterChange: "교체 후 탭",
     progressEndDate: "치료 종료 예정일",
+
+    slot2GateTitle: "프리미엄 전용",
+    slot2GateMsg: "두 번째 촬영 슬롯으로 더 많은 각도를 기록할 수 있습니다.",
+    pinGateTitle: "PIN 잠금은 프리미엄 전용입니다",
+    pinGateMsg: "PIN으로 사진 앨범을 보호할 수 있습니다.",
+    lockBtn: "잠금",
     yearMonth: "{y}년 {m}월",
     months: ["1","2","3","4","5","6","7","8","9","10","11","12"],
     achievedLabel: "달성",
@@ -1227,6 +1263,13 @@ const I18N = {
     alarmFromTimer: "제거 후 {min}분이 경과했습니다",
     removalExceeded: "제거 타이머가 {h}시간을 초과했습니다",
     shareAppText: "투명교정 관리 앱 SmileTrack을 사용해 보세요!",
+
+    reasonBreakfast: "아침식사",
+    reasonLunch: "점심식사",
+    reasonDinner: "저녁식사",
+    reasonSnack: "간식",
+    reasonCleaning: "세정",
+    reasonOther: "기타",
   },
 
   zh: {
@@ -1476,6 +1519,12 @@ const I18N = {
     lastDay: "最后一天 ✨",
     tapAfterChange: "更换后点击",
     progressEndDate: "预计治疗结束日",
+
+    slot2GateTitle: "高级专属功能",
+    slot2GateMsg: "第二拍摄槽位可记录更多角度。",
+    pinGateTitle: "PIN锁定是高级专属功能",
+    pinGateMsg: "可用PIN保护相册。",
+    lockBtn: "锁定",
     yearMonth: "{y}年{m}月",
     months: ["1","2","3","4","5","6","7","8","9","10","11","12"],
     achievedLabel: "达成",
@@ -1615,6 +1664,13 @@ const I18N = {
     alarmFromTimer: "摘除后{min}分钟已过",
     removalExceeded: "摘除计时器已超过{h}小时",
     shareAppText: "推荐使用隐形矫正管理应用SmileTrack！",
+
+    reasonBreakfast: "早餐",
+    reasonLunch: "午餐",
+    reasonDinner: "晚餐",
+    reasonSnack: "零食",
+    reasonCleaning: "清洗",
+    reasonOther: "其他",
   },
 
   de: {
@@ -1864,6 +1920,12 @@ const I18N = {
     lastDay: "Letzter Tag ✨",
     tapAfterChange: "Nach Wechsel tippen",
     progressEndDate: "Voraus. Behandlungsende",
+
+    slot2GateTitle: "Premium-Funktion",
+    slot2GateMsg: "Mit dem 2. Aufnahmeslot kannst du mehr Winkel festhalten.",
+    pinGateTitle: "PIN-Sperre ist eine Premium-Funktion",
+    pinGateMsg: "Schütze dein Fotoalbum mit einem PIN.",
+    lockBtn: "Sperren",
     yearMonth: "{mon} {y}",
     months: ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"],
     achievedLabel: "Erreicht",
@@ -2003,6 +2065,13 @@ const I18N = {
     alarmFromTimer: "{min} Min. vergangen",
     removalExceeded: "Entnahme-Timer hat {h}Std. überschritten",
     shareAppText: "Probier SmileTrack – den Aligner-Tracker!",
+
+    reasonBreakfast: "Frühstück",
+    reasonLunch: "Mittagessen",
+    reasonDinner: "Abendessen",
+    reasonSnack: "Snack",
+    reasonCleaning: "Reinigung",
+    reasonOther: "Sonstiges",
   },
 
   es: {
@@ -2252,6 +2321,12 @@ const I18N = {
     lastDay: "Último día ✨",
     tapAfterChange: "Tap después",
     progressEndDate: "Fin estimado del tratamiento",
+
+    slot2GateTitle: "Función Premium",
+    slot2GateMsg: "El 2.º slot de disparo permite capturar más ángulos.",
+    pinGateTitle: "El bloqueo PIN es una función Premium",
+    pinGateMsg: "Protege tu álbum de fotos con un PIN.",
+    lockBtn: "Bloquear",
     yearMonth: "{mon} {y}",
     months: ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"],
     achievedLabel: "Logrado",
@@ -2391,6 +2466,13 @@ const I18N = {
     alarmFromTimer: "{min} min transcurridos",
     removalExceeded: "Temporizador de retirada supera {h}h",
     shareAppText: "¡Prueba SmileTrack, el seguidor de alineadores!",
+
+    reasonBreakfast: "Desayuno",
+    reasonLunch: "Almuerzo",
+    reasonDinner: "Cena",
+    reasonSnack: "Snack",
+    reasonCleaning: "Limpieza",
+    reasonOther: "Otro",
   },
 };
 

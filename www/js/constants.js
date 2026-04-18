@@ -19,10 +19,31 @@ const THEMES = {
 
 // 理由リストはstateから動的に取得する（日本語をデフォルトとして保持）
 const DEFAULT_REASONS = ["朝食","昼食","夕食","間食","洗浄","その他"];
-// 選択中5項目を返す（ーは含まない）
+
+// 日本語の理由名 → i18nキー対応表
+const REASON_I18N_MAP = {
+  "朝食": "reasonBreakfast",
+  "昼食": "reasonLunch",
+  "夕食": "reasonDinner",
+  "間食": "reasonSnack",
+  "洗浄": "reasonCleaning",
+  "その他": "reasonOther",
+};
+
+// 理由名をローカライズ（日本語キーがあれば翻訳、なければそのまま）
+function localizeReason(r) {
+  if(!r) return r;
+  const key = REASON_I18N_MAP[r];
+  if(key && typeof t === "function") return t(key);
+  return r;
+}
+
+// 選択中5項目を返す（ーは含まない）・表示用にローカライズ済み
 function getReasonList(state){
-  if(state&&state.activeReasons&&state.activeReasons.length>0) return state.activeReasons;
-  return DEFAULT_REASONS.slice(0,5);
+  const list = (state&&state.activeReasons&&state.activeReasons.length>0)
+    ? state.activeReasons
+    : DEFAULT_REASONS.slice(0,5);
+  return list.map(localizeReason);
 }
 
 // セッションが指定日に属するか（startあり・なし両対応）

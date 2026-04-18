@@ -232,16 +232,16 @@ function PhotoPage({T,state,update,todayStr}){
       {showSlot2Gate&&(
         <div className="card" style={{textAlign:"center",padding:"16px 14px"}}>
           <div style={{fontSize:22,marginBottom:6}}>🔒</div>
-          <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4}}>プレミアム限定です</div>
-          <div style={{fontSize:12,color:T.accent,marginBottom:12}}>2つ目の撮影スロットでより多くの角度を記録できます。</div>
+          <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4}}>{t("slot2GateTitle")}</div>
+          <div style={{fontSize:12,color:T.accent,marginBottom:12}}>{t("slot2GateMsg")}</div>
           <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowSlot2Gate(false)}>{t("close")}</button>
         </div>
       )}
       {showPinGate&&(
         <div className="card" style={{textAlign:"center",padding:"16px 14px"}}>
           <div style={{fontSize:22,marginBottom:6}}>🔒</div>
-          <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4}}>PINロックはプレミアム限定です</div>
-          <div style={{fontSize:12,color:T.accent,marginBottom:12}}>写真アルバムをPINで保護できます。</div>
+          <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4}}>{t("pinGateTitle")}</div>
+          <div style={{fontSize:12,color:T.accent,marginBottom:12}}>{t("pinGateMsg")}</div>
           <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowPinGate(false)}>{t("close")}</button>
         </div>
       )}
@@ -264,7 +264,7 @@ function PhotoPage({T,state,update,todayStr}){
             </button>
           ):(
             <button onClick={()=>setShowPinGate(true)} style={{display:"flex",alignItems:"center",gap:5,padding:"5px 10px",border:`1.5px solid ${T.soft}`,borderRadius:8,background:T.soft,cursor:"pointer",color:T.primary,fontSize:13,fontWeight:600,fontFamily:"'M PLUS Rounded 1c',sans-serif",opacity:0.6}}>
-              <span style={{fontSize:13}}>🔒</span><span>ロック</span>
+              <span style={{fontSize:13}}>🔒</span><span>{t("lockBtn")}</span>
             </button>
           )}
         </div>

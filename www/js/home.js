@@ -117,7 +117,7 @@ function HomePage({T,state,update,todayStr,todayDayStartMs,onGoTimer}){
                 {isFirstPieceFirstDay ? (
                   <><div style={lblStyle}>{t("startDate")}</div><div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:24,fontWeight:700,color:nC}}>{t("todayLabel")}</div></>
                 ) : isExchangeDayBeforeTap ? (
-                  <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
+                  <div style={{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4,width:"100%",textAlign:"center"}}>
                     <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:26,fontWeight:700,color:nC}}>{t("todayEx")}</div>
                     <div style={{fontSize:10,color:T.text+"66"}}>{t("tapAfterChange")}</div>
                   </div>
