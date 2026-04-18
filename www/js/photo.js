@@ -639,8 +639,8 @@ function PhotoPage({T,state,update,todayStr}){
                 <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
               </svg>
             </div>
-            <div className="mdtitle" style={{marginBottom:8}}>写真を削除</div>
-            <div style={{fontSize:14,color:T.text+"88",marginBottom:20}}>この写真を削除しますか？<br/>削除すると元に戻せません。</div>
+            <div className="mdtitle" style={{marginBottom:8}}>{t("deletePhotoConfirm")}</div>
+            <div style={{fontSize:14,color:T.text+"88",marginBottom:20}}>{t("deletePhotoConfirm")}<br/></div>
             <div style={{display:"flex",gap:8}}>
               <button className="btn bs" style={{flex:1}} onClick={()=>setDeleteConfirmId(null)}>{t("cancel")}</button>
               <button style={{flex:1,padding:"10px",border:"none",borderRadius:12,background:"#E74C3C",color:"#fff",fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16}}
@@ -650,6 +650,7 @@ function PhotoPage({T,state,update,todayStr}){
         </div>
       )}
       {showComparePreview&&<ComparePreviewModal T={T} onClose={()=>setShowComparePreview(false)}/>}
+      {compareView&&<PhotoCompare T={T} a={compareView.a} b={compareView.b} onClose={()=>setCompareView(null)}/>}
       {showSetPin&&(<div className="mo" onClick={()=>setShowSetPin(false)}><div className="md" onClick={e=>e.stopPropagation()}><div className="mdtitle">{t("pinLock")}</div>{state.photoLockEnabled?<><div style={{fontSize:14,color:T.text+"88",marginBottom:12}}>{t("pinUnlock")}</div><PinPad T={T} title={t("pinInput")} onDone={p=>{if(p===state.photoLock){update({photoLockEnabled:false,photoLock:null});setUnlocked(false);setShowSetPin(false);}else return false;}}/></>:<PinPad T={T} title={t("pinSet")} onDone={p=>{update({photoLock:p,photoLockEnabled:true});alert(t("pinSetDone"));setShowSetPin(false);}}/>}<button className="btn bs" style={{width:"100%",marginTop:10}} onClick={()=>setShowSetPin(false)}>{t("cancel")}</button></div></div>)}
     </div>
   );
@@ -910,6 +911,12 @@ function buildReportHTML(state, y, m) {
 }
 
 function ReportModal({T,state,onClose}){
+  const MONTHS_SHORT=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const fmtMonthLabel=(y,m)=>{
+    const lang=typeof LANG!=="undefined"?LANG:"ja";
+    if(lang==="ja") return `${y}${t("yearLabel")}${m+1}${t("monthLabel")}`;
+    return `${MONTHS_SHORT[m]} ${y}`;
+  };
   const today=new Date();
   const months=[];
   const start=state.startDate?new Date(state.startDate+"T00:00:00"):new Date(today.getFullYear(),today.getMonth(),1);
@@ -919,21 +926,57 @@ function ReportModal({T,state,onClose}){
   const [sel,setSel]=React.useState(months[0]||{year:today.getFullYear(),month:today.getMonth()+1});
   const openReport=()=>{
     const html=buildReportHTML(state,sel.year,sel.month);
-    const w=window.open("","_blank");
-    if(w){w.document.write(html);w.document.close();}
+    try {
+      // iOSのWKWebViewではwindow.open("","_blank")がブロックされるためBlob URLを使用
+      const blob=new Blob([html],{type:"text/html;charset=utf-8"});
+      if(navigator.share){
+        const file=new File([blob],`smiletrack_report_${sel.year}_${String(sel.month).padStart(2,"0")}.html`,{type:"text/html"});
+        navigator.share({files:[file],title:t("reportPreviewTitle")}).catch(()=>{
+          // シェアに失敗した場合はダウンロードリンクで対応
+          const url=URL.createObjectURL(blob);
+          const a=document.createElement("a");
+          a.href=url;
+          a.download=`smiletrack_report_${sel.year}_${String(sel.month).padStart(2,"0")}.html`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(()=>URL.revokeObjectURL(url),60000);
+        });
+      } else {
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement("a");
+        a.href=url;
+        a.download=`smiletrack_report_${sel.year}_${String(sel.month).padStart(2,"0")}.html`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(()=>URL.revokeObjectURL(url),60000);
+      }
+    } catch(e){
+      // フォールバック: ダウンロードリンク
+      const blob2=new Blob([html],{type:"text/html;charset=utf-8"});
+      const url2=URL.createObjectURL(blob2);
+      const a2=document.createElement("a");
+      a2.href=url2;
+      a2.download=`smiletrack_report_${sel.year}_${String(sel.month).padStart(2,"0")}.html`;
+      document.body.appendChild(a2);
+      a2.click();
+      document.body.removeChild(a2);
+      setTimeout(()=>URL.revokeObjectURL(url2),60000);
+    }
     onClose();
   };
   return(
     <div className="mo" onClick={onClose}>
       <div className="md" onClick={e=>e.stopPropagation()}>
-        <div className="mdtitle">レポート出力</div>
-        <div style={{fontSize:13,color:T.text+"88",marginBottom:14}}>出力する月を選択してください</div>
+        <div className="mdtitle">{t("reportPreviewTitle")}</div>
+        <div style={{fontSize:13,color:T.text+"88",marginBottom:14}}>{t("sampleDataMsg")}</div>
         <select value={sel.year+"-"+sel.month} onChange={e=>{const[y,m]=e.target.value.split("-");setSel({year:parseInt(y),month:parseInt(m)});}} style={{marginBottom:20}}>
-          {months.map(({year,month})=>(<option key={year+"-"+month} value={year+"-"+month}>{year}年{month}月</option>))}
+          {months.map(({year,month})=>(<option key={year+"-"+month} value={year+"-"+month}>{fmtMonthLabel?fmtMonthLabel(year,month-1):`${year}/${month}`}</option>))}
         </select>
         <div style={{display:"flex",gap:8}}>
           <button className="btn bs" style={{flex:1}} onClick={onClose}>{t("cancel")}</button>
-          <button className="btn bp" style={{flex:1}} onClick={openReport}>PDF出力</button>
+          <button className="btn bp" style={{flex:1}} onClick={openReport}>{t("export")}</button>
         </div>
       </div>
     </div>

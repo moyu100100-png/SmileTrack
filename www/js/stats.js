@@ -351,7 +351,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
                   const achieved=total>0&&total>=target*(period==="weekly"?7:new Date(parseInt(b.key.split("-")[0]),parseInt(b.key.split("-")[1])+1,0).getDate());
                   const weekLabel=period==="weekly"?b.label.replace(/–?\n/,"–"):"";
                   return(
-                    <div key={b.key} className="wr" style={{background:isSelected?T.soft:"transparent",borderRadius:8,cursor:"pointer"}} onClick={()=>setSelectedBar(isSelected?null:b)}>
+                    <div key={b.key} className="wr" style={{background:isSelected?T.soft:"transparent",borderRadius:8,cursor:"pointer",borderBottom:`1px solid ${T.text}07`}} onClick={()=>setSelectedBar(isSelected?null:b)}>
                       <span style={{fontSize:13,fontWeight:isSelected?700:400,color:isSelected?T.primary:T.text,whiteSpace:"nowrap",lineHeight:1.4,flex:1}}>{period==="weekly"?weekLabel:fmtMonthLabel(parseInt(b.key.split("-")[0]),parseInt(b.key.split("-")[1]))}</span>
                       <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,color:total===0?T.text+"44":achieved?T.primary:failCol,fontSize:14,flexShrink:0}}>{total===0?t("noRecord"):fmt(total)}</span>
                     </div>
