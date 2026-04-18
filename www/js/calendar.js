@@ -107,8 +107,8 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
   const selEvents = [];
   if(sel){
     const exLabel = getExPieceLabel(state,sel);
-    if(exLabel) selEvents.push({type:"ex",label: sel===state.startDate ? t("scheduleStartLabel") : `${t("scheduleChangeLabel")} (${exLabel})`,color:T.accent,id:null});
-    (apptMap[sel]||[]).forEach(a=>selEvents.push({type:"appt",label:`${a.title||t("appointmentTitle")}${a.time?" "+a.time:""}`,title:a.title||t("appointmentTitle"),time:a.time||"",color:T.primary,id:a.id}));
+    if(exLabel) selEvents.push({type:"ex",label: sel===state.startDate ? t("scheduleStartLabel") : `${t("scheduleChangeLabel")} (${exLabel}${t("pieceUnit")})`,color:T.accent,id:null});
+    (apptMap[sel]||[]).forEach(a=>selEvents.push({type:"appt",label:`${a.title||t("appointmentTitle")}${a.time?" "+a.time:""}`,title:a.title||t("appointmentTitle"),time:a.time||"",timeTo:a.timeTo||"",color:T.primary,id:a.id}));
   }
 
   const deleteEvent = ev => {
@@ -397,7 +397,7 @@ function CalendarPage({T,state,update,todayStr,todayDayStartMs}){
                 <div key={i} onClick={()=>ev.id&&setEditEventId(ev.id)}
                   style={{display:"flex",alignItems:"center",padding:"7px 10px",background:T.bg,borderRadius:9,borderLeft:`3px solid ${ev.color}`,position:"relative",minHeight:32,cursor:ev.id?"pointer":"default"}}>
                   <span style={{flex:1,fontSize:14,color:T.text,fontWeight:600}}>{ev.title||ev.label}</span>
-                  {ev.time&&<span style={{position:"absolute",left:"50%",transform:"translateX(-50%)",fontSize:13,color:T.text+"66",fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:600,whiteSpace:"nowrap",pointerEvents:"none"}}>{ev.time}</span>}
+                  {ev.time&&<span style={{position:"absolute",left:"50%",transform:"translateX(-50%)",fontSize:13,color:T.text+"66",fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:600,whiteSpace:"nowrap",pointerEvents:"none"}}>{ev.time}{ev.timeTo?`〜${ev.timeTo}`:""}</span>}
                 </div>
               ))}
             </div>
