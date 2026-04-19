@@ -13,10 +13,10 @@
   "dependencies": {
     "@capacitor-community/admob": "^8.0.0",
     "@capacitor/cli": "^8.2.0",
-    "@capacitor/core": "^8.2.0",
+    "@capacitor/core": "^8.3.1",
     "@capacitor/ios": "^8.2.0",
     "@capacitor/local-notifications": "^8.0.2",
     "@capacitor/splash-screen": "^8.0.0",
-    "@revenuecat/purchases-capacitor": "^13.0.0"
+    "@revenuecat/purchases-capacitor": "^11.3.2"
   }
 }
