@@ -82,7 +82,6 @@ const I18N = {
     deletePhoto: "写真を削除",
     deletePhotoConfirm: "この写真を削除しますか？",
     noPhotos: "写真がありません",
-    offlineNotice: "本アプリはオフライン設計です。\nフォトアルバム内の写真は、端末内だけで保存されるため、\n開発者やその他の第三者に画像が見られることは\n一切ございませんのでご安心ください。",
     shotMode: "撮影部位",
 
     // 統計
@@ -511,7 +510,6 @@ const I18N = {
     deletePhoto: "Delete Photo",
     deletePhotoConfirm: "Delete this photo?",
     noPhotos: "No photos yet",
-    offlineNotice: "This app is designed for offline use.\nPhotos in the album are stored only on your device.\nNeither the developer nor any third party\ncan ever access your images.",
     shotMode: "Shot Type",
 
     statsTitle: "Statistics",
@@ -593,7 +591,7 @@ const I18N = {
     coffeeTitle: "Buy the Developer a Coffee",
     coffeeDesc: "If this app has been helpful,\na small coffee tip keeps development going 🙏",
     coffeeFeatures: ["Keep using the app ad-free","Support new feature development","Developer gets coffee☕"],
-    coffeeBuy: "Buy a Coffee ☕ $0.99",
+    coffeeBuy: "Buy a Coffee ☕ ¥120",
     coffeeThankTitle: "Thank you!",
     coffeeThankMsg: "Your support means a lot.\nIt keeps this app going ✨",
 
@@ -920,7 +918,6 @@ const I18N = {
     deletePhoto: "사진 삭제",
     deletePhotoConfirm: "이 사진을 삭제하시겠습니까?",
     noPhotos: "사진이 없습니다",
-    offlineNotice: "이 앱은 오프라인 전용으로 설계되었습니다.\n앨범 내 사진은 기기에만 저장되며,\n개발자 및 제3자는 사진에 접근할 수 없습니다.",
     shotMode: "촬영 부위",
 
     statsTitle: "통계",
@@ -1002,7 +999,7 @@ const I18N = {
     coffeeTitle: "개발자에게 커피 후원",
     coffeeDesc: "앱이 도움이 되었다면,\n커피 한 잔 후원으로 개발을 응원해 주세요 🙏",
     coffeeFeatures: ["광고 없이 계속 사용","새 기능 개발 지원","개발자가 커피를 마실 수 있어요☕"],
-    coffeeBuy: "커피 후원 ☕ ₩1,500",
+    coffeeBuy: "커피 후원 ☕ ¥120",
     coffeeThankTitle: "감사합니다!",
     coffeeThankMsg: "커피 후원 정말 감사합니다.\n개발의 큰 힘이 됩니다 ✨",
 
@@ -1309,7 +1306,6 @@ const I18N = {
     deletePhoto: "删除照片",
     deletePhotoConfirm: "确定删除此照片？",
     noPhotos: "暂无照片",
-    offlineNotice: "本应用为离线设计。\n相册中的照片仅保存在您的设备上，\n开发者及任何第三方均无法查看您的照片。",
     shotMode: "拍摄部位",
 
     statsTitle: "统计",
@@ -1391,7 +1387,7 @@ const I18N = {
     coffeeTitle: "请开发者喝咖啡",
     coffeeDesc: "如果这个应用对您有帮助，\n一杯咖啡的支持是开发的最大动力 🙏",
     coffeeFeatures: ["继续无广告使用","支持新功能开发","开发者喝到咖啡☕"],
-    coffeeBuy: "请喝咖啡 ☕ ¥6",
+    coffeeBuy: "请喝咖啡 ☕ ¥120",
     coffeeThankTitle: "非常感谢！",
     coffeeThankMsg: "您的支持对我意义重大。\n这是继续开发的动力 ✨",
 
@@ -1698,7 +1694,6 @@ const I18N = {
     deletePhoto: "Foto löschen",
     deletePhotoConfirm: "Dieses Foto löschen?",
     noPhotos: "Keine Fotos vorhanden",
-    offlineNotice: "Diese App ist für die Offline-Nutzung konzipiert.\nFotos im Album werden nur auf Ihrem Gerät gespeichert.\nWeder der Entwickler noch Dritte können auf Ihre Fotos zugreifen.",
     shotMode: "Aufnahme-Typ",
 
     statsTitle: "Statistik",
@@ -1780,7 +1775,7 @@ const I18N = {
     coffeeTitle: "Dem Entwickler einen Kaffee spendieren",
     coffeeDesc: "Wenn die App hilfreich war,\nfreut sich der Entwickler über einen Kaffee 🙏",
     coffeeFeatures: ["App werbefrei nutzen","Neue Funktionen unterstützen","Entwickler bekommt Kaffee☕"],
-    coffeeBuy: "Kaffee spendieren ☕ 0,99 €",
+    coffeeBuy: "Kaffee spendieren ☕ ¥120",
     coffeeThankTitle: "Vielen Dank!",
     coffeeThankMsg: "Deine Unterstützung bedeutet mir sehr viel.\nSie hält die Entwicklung am Laufen ✨",
 
@@ -2087,7 +2082,6 @@ const I18N = {
     deletePhoto: "Eliminar foto",
     deletePhotoConfirm: "¿Eliminar esta foto?",
     noPhotos: "Sin fotos aún",
-    offlineNotice: "Esta app está diseñada para uso sin conexión.\nLas fotos del álbum se guardan solo en tu dispositivo.\nNi el desarrollador ni terceros pueden acceder a tus imágenes.",
     shotMode: "Tipo de toma",
 
     statsTitle: "Estadísticas",
@@ -2169,7 +2163,7 @@ const I18N = {
     coffeeTitle: "Invita un café al desarrollador",
     coffeeDesc: "Si la app te ha sido útil,\nun café mantiene el desarrollo en marcha 🙏",
     coffeeFeatures: ["Usar la app sin anuncios","Apoyar nuevas funciones","El desarrollador toma café☕"],
-    coffeeBuy: "Invitar café ☕ $0.99",
+    coffeeBuy: "Invitar café ☕ ¥120",
     coffeeThankTitle: "¡Gracias!",
     coffeeThankMsg: "Tu apoyo significa mucho.\nMantiene vivo este proyecto ✨",
 

@@ -151,18 +151,18 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
         <div style={{fontSize:13,color:T.text+"88",marginBottom:20,lineHeight:1.7}}>
           {t("coffeeDesc").split("\n").map((l,i)=><span key={i}>{l}<br/></span>)}
         </div>
-        <button className="btn bp" style={{width:"100%",marginBottom:10,padding:"14px",fontSize:15}} onClick={()=>handlePurchase("coffee")} disabled={loading}>{loading?t("loading"):t("coffeeBuy").replace("¥120",prices.coffee||"¥120")}</button>
+        <button className="btn bp" style={{width:"100%",marginBottom:10,padding:"14px",fontSize:15}} onClick={()=>handlePurchase("coffee")} disabled={loading}>{loading?t("loading"):t("coffeeBuy").replace("¥120",prices.coffee||"---")}</button>
         <button className="btn bs" style={{width:"100%",padding:"14px",fontSize:15}} onClick={onClose}>{t("close")}</button>
       </div>
     </div>
   );
   const plans=[
-    {id:"monthly", label:t("monthlyPlan"), price:prices.monthly||t("monthlyPrice"), sub:t("monthlySubLabel"), badge:null, desc:t("monthlyDesc")},
-    {id:"yearly",  label:t("yearly"), price:prices.yearly||t("yearlyPrice"), sub:t("yearlySubLabel"), badge:t("recommended"), desc:t("yearlyDesc")},
-    {id:"lifetime",label:t("lifetime"), price:prices.lifetime||t("lifetimePrice"), sub:t("lifetimeSubLabel"), badge:null, desc:t("lifetimeDesc")},
+    {id:"monthly", label:t("monthlyPlan"), price:prices.monthly||"---", sub:t("monthlySubLabel"), badge:null, desc:t("monthlyDesc")},
+    {id:"yearly",  label:t("yearly"), price:prices.yearly||"---", sub:t("yearlySubLabel"), badge:t("recommended"), desc:t("yearlyDesc")},
+    {id:"lifetime",label:t("lifetime"), price:prices.lifetime||"---", sub:t("lifetimeSubLabel"), badge:null, desc:t("lifetimeDesc")},
   ];
   const extras=[
-    {id:"no_ads", label:t("noAds"), price:prices.no_ads||t("noAdsPrice"), desc:t("noAdsDesc")},
+    {id:"no_ads", label:t("noAds"), price:prices.no_ads||"---", desc:t("noAdsDesc")},
   ];
 
   if(thankYou) return(
