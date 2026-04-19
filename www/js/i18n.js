@@ -591,7 +591,7 @@ const I18N = {
     coffeeTitle: "Buy the Developer a Coffee",
     coffeeDesc: "If this app has been helpful,\na small coffee tip keeps development going 🙏",
     coffeeFeatures: ["Keep using the app ad-free","Support new feature development","Developer gets coffee☕"],
-    coffeeBuy: "Buy a Coffee ☕ ¥120",
+    coffeeBuy: "Buy a Coffee ☕ $0.99",
     coffeeThankTitle: "Thank you!",
     coffeeThankMsg: "Your support means a lot.\nIt keeps this app going ✨",
 
@@ -999,7 +999,7 @@ const I18N = {
     coffeeTitle: "개발자에게 커피 후원",
     coffeeDesc: "앱이 도움이 되었다면,\n커피 한 잔 후원으로 개발을 응원해 주세요 🙏",
     coffeeFeatures: ["광고 없이 계속 사용","새 기능 개발 지원","개발자가 커피를 마실 수 있어요☕"],
-    coffeeBuy: "커피 후원 ☕ ¥120",
+    coffeeBuy: "커피 후원 ☕ ₩1,500",
     coffeeThankTitle: "감사합니다!",
     coffeeThankMsg: "커피 후원 정말 감사합니다.\n개발의 큰 힘이 됩니다 ✨",
 
@@ -1387,7 +1387,7 @@ const I18N = {
     coffeeTitle: "请开发者喝咖啡",
     coffeeDesc: "如果这个应用对您有帮助，\n一杯咖啡的支持是开发的最大动力 🙏",
     coffeeFeatures: ["继续无广告使用","支持新功能开发","开发者喝到咖啡☕"],
-    coffeeBuy: "请喝咖啡 ☕ ¥120",
+    coffeeBuy: "请喝咖啡 ☕ ¥6",
     coffeeThankTitle: "非常感谢！",
     coffeeThankMsg: "您的支持对我意义重大。\n这是继续开发的动力 ✨",
 
@@ -1775,7 +1775,7 @@ const I18N = {
     coffeeTitle: "Dem Entwickler einen Kaffee spendieren",
     coffeeDesc: "Wenn die App hilfreich war,\nfreut sich der Entwickler über einen Kaffee 🙏",
     coffeeFeatures: ["App werbefrei nutzen","Neue Funktionen unterstützen","Entwickler bekommt Kaffee☕"],
-    coffeeBuy: "Kaffee spendieren ☕ ¥120",
+    coffeeBuy: "Kaffee spendieren ☕ 0,99 €",
     coffeeThankTitle: "Vielen Dank!",
     coffeeThankMsg: "Deine Unterstützung bedeutet mir sehr viel.\nSie hält die Entwicklung am Laufen ✨",
 
@@ -2163,7 +2163,7 @@ const I18N = {
     coffeeTitle: "Invita un café al desarrollador",
     coffeeDesc: "Si la app te ha sido útil,\nun café mantiene el desarrollo en marcha 🙏",
     coffeeFeatures: ["Usar la app sin anuncios","Apoyar nuevas funciones","El desarrollador toma café☕"],
-    coffeeBuy: "Invitar café ☕ ¥120",
+    coffeeBuy: "Invitar café ☕ $0.99",
     coffeeThankTitle: "¡Gracias!",
     coffeeThankMsg: "Tu apoyo significa mucho.\nMantiene vivo este proyecto ✨",
 

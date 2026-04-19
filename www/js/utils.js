@@ -147,25 +147,11 @@ function Drawer({T,open,onClose,onSection,onReset}){
 // ── AFFILIATE POPUP ──────────────────────────────────────────────────────────
 const AFFILIATE_ITEMS = [
   {
-    id:"cleaner1",
-    title:"マウスピース洗浄剤",
+    id:"goods1",
+    title:"SmileTrack 開発者愛用グッズ",
     desc:"",
-    url:"https://www.rakuten.co.jp/search/?keyword=%E3%83%9E%E3%82%A6%E3%82%B9%E3%83%94%E3%83%BC%E3%82%B9+%E6%B4%97%E6%B5%84%E5%89%A4",
-    emoji:"🧼",
-  },
-  {
-    id:"case1",
-    title:"マウスピースケース 抗菌タイプ",
-    desc:"外出先でも清潔に保管。通気口付きで乾燥しやすい。",
-    url:"https://www.rakuten.co.jp/search/?keyword=%E3%83%9E%E3%82%A6%E3%82%B9%E3%83%94%E3%83%BC%E3%82%B9+%E3%82%B1%E3%83%BC%E3%82%B9",
-    emoji:"📦",
-  },
-  {
-    id:"pick1",
-    title:"矯正用デンタルピック",
-    desc:"マウスピース着脱がラクになる専用ツール。",
-    url:"https://www.rakuten.co.jp/search/?keyword=%E3%83%9E%E3%82%A6%E3%82%B9%E3%83%94%E3%83%BC%E3%82%B9+%E3%83%84%E3%83%BC%E3%83%AB",
-    emoji:"🪥",
+    url:"https://smiletrack-goods.vercel.app",
+    emoji:"🛍️",
   },
 ];
 
@@ -190,7 +176,7 @@ function AffiliatePopup({T,type,onClose}){
         </div>
         <div style={{background:T.soft,borderRadius:12,padding:"12px 14px",marginBottom:14}}>
           <button className="btn bp" style={{width:"100%"}} onClick={()=>{window.open(item.url,"_blank");onClose();}}>
-            楽天で見る
+            SmileTrack 開発者愛用グッズを見る
           </button>
         </div>
         <button className="btn bs" style={{width:"100%"}} onClick={onClose}>{t("close")}</button>
