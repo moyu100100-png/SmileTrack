@@ -134,7 +134,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
         <div style={{display:"flex",justifyContent:"center",margin:"4px 0 10px"}}>
           <div style={{position:"relative",width:sz,height:sz,cursor:"pointer"}} onClick={onStartPress}>
             <svg width={sz} height={sz} style={{transform:"rotate(-90deg)"}}>
-              <circle cx={sz/2} cy={sz/2} r={rad} fill="none" stroke={state.themeName==="night"?"#204051":(["atrium","blushhemp"].includes(state.themeName)?T.removedColor:T.soft)} strokeWidth={stk}/>
+              <circle cx={sz/2} cy={sz/2} r={rad} fill="none" stroke={state.themeName==="night"?"#204051":T.soft} strokeWidth={stk}/>
               <circle cx={sz/2} cy={sz/2} r={rad} fill="none" stroke={cycleColor} strokeWidth={stk}
                 strokeDasharray={cir} strokeDashoffset={cir*(1-cycleProgress)} strokeLinecap="round" style={{transition:"stroke-dashoffset .5s"}}/>
             </svg>
