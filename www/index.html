@@ -16,11 +16,22 @@
   <script src="capacitor.js"></script>
   <script>
   // ── RevenueCat プラグイン登録 ─────────────────────────────────────────────
-  // registerPlugin()を呼ばないとCapacitor.Plugins.Purchasesがundefinedになる
-  if (typeof Capacitor !== "undefined" && Capacitor.registerPlugin) {
-    Capacitor.registerPlugin('Purchases');
-    console.log("[RC] Purchases plugin registered");
+  // deviceready後にCapacitorネイティブブリッジ確立を待ってから登録する
+  function _initRC() {
+    try {
+      const isNative = typeof Capacitor !== "undefined" && Capacitor.isNativePlatform && Capacitor.isNativePlatform();
+      console.log("[RC] isNativePlatform:", isNative);
+      console.log("[RC] Purchases before:", typeof Capacitor?.Plugins?.Purchases);
+      if (isNative && Capacitor.registerPlugin) {
+        Capacitor.registerPlugin('Purchases');
+        console.log("[RC] Purchases after:", typeof Capacitor?.Plugins?.Purchases);
+      }
+    } catch(e) { console.error("[RC] init error:", e); }
   }
+  // devicereadyイベント後に登録（Capacitorネイティブブリッジ確立を待つ）
+  document.addEventListener("deviceready", _initRC, { once: true });
+  // フォールバック：300ms後にも実行
+  setTimeout(_initRC, 300);
   </script>
   <script>
   // ── AdMob 設定 ────────────────────────────────────────────────────────────
@@ -111,6 +122,14 @@
       this._configuring = (async () => {
         if (!this._isNative()) { this._configured = true; return; }
         try {
+          // Capacitor.Plugins.Purchasesが存在しない場合はregisterPluginを再試行
+          if (!Capacitor.Plugins.Purchases) {
+            console.warn("[RC] Purchases plugin not found, trying registerPlugin...");
+            Capacitor.registerPlugin('Purchases');
+          }
+          if (!Capacitor.Plugins.Purchases) {
+            throw new Error("Purchases plugin still not available after registerPlugin");
+          }
           console.log("[RC] configure start");
           await Capacitor.Plugins.Purchases.configure({
             apiKey: RC_API_KEY_IOS,
@@ -120,7 +139,7 @@
           console.log("[RC] configure OK");
         } catch(e) {
           console.error("[RC] configure FAILED:", e);
-          this._configuring = null; // 失敗したらリトライ可能にする
+          this._configuring = null;
         }
       })();
       return this._configuring;
