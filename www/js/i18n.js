@@ -82,6 +82,7 @@ const I18N = {
     deletePhoto: "写真を削除",
     deletePhotoConfirm: "この写真を削除しますか？",
     noPhotos: "写真がありません",
+    offlineNotice: "本アプリはオフライン設計です。\nフォトアルバム内の写真は、端末内だけで保存されるため、\n開発者やその他の第三者に画像が見られることは\n一切ございませんのでご安心ください。",
     shotMode: "撮影部位",
 
     // 統計
@@ -510,6 +511,7 @@ const I18N = {
     deletePhoto: "Delete Photo",
     deletePhotoConfirm: "Delete this photo?",
     noPhotos: "No photos yet",
+    offlineNotice: "This app is designed for offline use.\nPhotos in the album are stored only on your device.\nNeither the developer nor any third party\ncan ever access your images.",
     shotMode: "Shot Type",
 
     statsTitle: "Statistics",
@@ -918,6 +920,7 @@ const I18N = {
     deletePhoto: "사진 삭제",
     deletePhotoConfirm: "이 사진을 삭제하시겠습니까?",
     noPhotos: "사진이 없습니다",
+    offlineNotice: "이 앱은 오프라인 전용으로 설계되었습니다.\n앨범 내 사진은 기기에만 저장되며,\n개발자 및 제3자는 사진에 접근할 수 없습니다.",
     shotMode: "촬영 부위",
 
     statsTitle: "통계",
@@ -1306,6 +1309,7 @@ const I18N = {
     deletePhoto: "删除照片",
     deletePhotoConfirm: "确定删除此照片？",
     noPhotos: "暂无照片",
+    offlineNotice: "本应用为离线设计。\n相册中的照片仅保存在您的设备上，\n开发者及任何第三方均无法查看您的照片。",
     shotMode: "拍摄部位",
 
     statsTitle: "统计",
@@ -1694,6 +1698,7 @@ const I18N = {
     deletePhoto: "Foto löschen",
     deletePhotoConfirm: "Dieses Foto löschen?",
     noPhotos: "Keine Fotos vorhanden",
+    offlineNotice: "Diese App ist für die Offline-Nutzung konzipiert.\nFotos im Album werden nur auf Ihrem Gerät gespeichert.\nWeder der Entwickler noch Dritte können auf Ihre Fotos zugreifen.",
     shotMode: "Aufnahme-Typ",
 
     statsTitle: "Statistik",
@@ -2082,6 +2087,7 @@ const I18N = {
     deletePhoto: "Eliminar foto",
     deletePhotoConfirm: "¿Eliminar esta foto?",
     noPhotos: "Sin fotos aún",
+    offlineNotice: "Esta app está diseñada para uso sin conexión.\nLas fotos del álbum se guardan solo en tu dispositivo.\nNi el desarrollador ni terceros pueden acceder a tus imágenes.",
     shotMode: "Tipo de toma",
 
     statsTitle: "Estadísticas",
