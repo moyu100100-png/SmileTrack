@@ -1,4 +1,4 @@
-const IS_PREMIUM = true;
+const IS_PREMIUM = false;
 
 const THEMES = {
   // ── S1〜S6 単色テーマ ────────────────────────────────────────────────────
