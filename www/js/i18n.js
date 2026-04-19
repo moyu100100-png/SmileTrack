@@ -87,6 +87,7 @@ const I18N = {
 
     // 統計
     statsTitle: "統計",
+    achievedLabel: "達成",
     daily: "毎日",
     weekly: "毎週",
     monthly: "毎月",
@@ -515,6 +516,7 @@ const I18N = {
     shotMode: "Shot Type",
 
     statsTitle: "Statistics",
+    achievedLabel: "Achieved",
     daily: "Daily",
     weekly: "Weekly",
     monthly: "Monthly",
