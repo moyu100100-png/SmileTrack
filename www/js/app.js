@@ -260,9 +260,14 @@ function App(){
       photos:saved.photos||[],
       cameraSettings:{...def.cameraSettings,...(saved.cameraSettings||{})},
       settings:{...def.settings,...(saved.settings||{})},
+      // isPremium/noAdsはstateに保存しない（RevenueCatから毎回取得）
       isPremium: IS_PREMIUM,
+      noAds: false,
     };
   });
+  // isPremium/noAdsはstateと分離して管理（インポートの影響を受けない）
+  const [isPremium,setIsPremium]=useState(IS_PREMIUM);
+  const [noAds,setNoAds]=useState(false);
   const [tab,setTab]=useState("home");
   const [drawerOpen,setDrawerOpen]=useState(false);
   const [drawerSection,setDrawerSection]=useState(null);
@@ -275,7 +280,7 @@ function App(){
   // AdMob初期化（オンボーディング完了後のみ）
   useEffect(()=>{
     (async()=>{
-      if(state.isPremium||state.noAds) return;
+      if(isPremium||noAds) return;
       if(!state.onboardingDone) return;
       await AdMobHelper.initialize();
       await AdMobHelper.prepareInterstitial();
@@ -289,9 +294,10 @@ function App(){
       try{
         await Purchases.configure({apiKey:"appl_HrDpuICDgfGShogHiNmlmBubJSJ"});
         const premium=await Purchases.isPremiumUser();
-        const noAds=await Purchases.hasNoAds();
-        setState(s=>({...s,isPremium:premium,noAds:noAds}));
-        if(premium||noAds) AdMobHelper.removeBanner();
+        const noAdsVal=await Purchases.hasNoAds();
+        setIsPremium(IS_PREMIUM||premium);
+        setNoAds(noAdsVal);
+        if(premium||noAdsVal) AdMobHelper.removeBanner();
       }catch(e){ console.warn("[RC] init error",e); }
     })();
   },[]);
@@ -300,7 +306,7 @@ function App(){
   const [reasonPopupOpen, setReasonPopupOpen] = useState(false);
   const isOverlayOpen = drawerOpen || !!drawerSection || reasonPopupOpen;
   useEffect(()=>{
-    if(state.isPremium||state.noAds) return;
+    if(isPremium||noAds) return;
     if(isOverlayOpen){
       AdMobHelper.hideBanner();
     } else {
@@ -574,21 +580,21 @@ function App(){
       <style>{makeCSS(T)}</style>
       <div className="app">
         <div className="hdr">
-          <button className="ham" onClick={()=>{setDrawerOpen(true);if(!state.isPremium&&!state.noAds)AdMobHelper.hideBanner();}}>{Icons.menu(T.primary,18)}</button>
+          <button className="ham" onClick={()=>{setDrawerOpen(true);if(!isPremium&&!noAds)AdMobHelper.hideBanner();}}>{Icons.menu(T.primary,18)}</button>
           <div style={{textAlign:"center"}}><div className="htitle" style={{fontSize:18}}>SmileTrack</div></div>
           <div style={{width:32}}/>
         </div>
         <div className="content">
-          {tab==="home"    &&<HomePage T={T} state={state} update={update} todayStr={todayStr} todayDayStartMs={todayDayStartMs} onGoTimer={()=>setTab("timer")}/>}
-          {tab==="calendar"&&<CalendarPage T={T} state={state} update={update} todayStr={todayStr} todayDayStartMs={todayDayStartMs}/>}
-          {tab==="photo"   &&<PhotoPage T={T} state={state} update={update} todayStr={todayStr}/>}
-          {tab==="timer"   &&<TimerPage T={T} state={state} update={update} handleRemoveButton={handleRemoveButton} todayStr={todayStr} todayDayStartMs={todayDayStartMs} snoozedUntil={snoozedUntil} setSnoozedUntil={setSnoozedUntil} alarmStopped={alarmStopped} setAlarmStopped={setAlarmStopped} onReasonPopup={setReasonPopupOpen}/>}
-          {tab==="stats"   &&<StatsPage T={T} state={state} update={update} todayStr={todayStr} todayDayStartMs={todayDayStartMs}/>}
+          {tab==="home"    &&<HomePage T={T} state={{...state,isPremium,noAds}} update={update} todayStr={todayStr} todayDayStartMs={todayDayStartMs} onGoTimer={()=>setTab("timer")}/>}
+          {tab==="calendar"&&<CalendarPage T={T} state={{...state,isPremium,noAds}} update={update} todayStr={todayStr} todayDayStartMs={todayDayStartMs}/>}
+          {tab==="photo"   &&<PhotoPage T={T} state={{...state,isPremium,noAds}} update={update} todayStr={todayStr}/>}
+          {tab==="timer"   &&<TimerPage T={T} state={{...state,isPremium,noAds}} update={update} handleRemoveButton={handleRemoveButton} todayStr={todayStr} todayDayStartMs={todayDayStartMs} snoozedUntil={snoozedUntil} setSnoozedUntil={setSnoozedUntil} alarmStopped={alarmStopped} setAlarmStopped={setAlarmStopped} onReasonPopup={setReasonPopupOpen}/>}
+          {tab==="stats"   &&<StatsPage T={T} state={{...state,isPremium,noAds}} update={update} todayStr={todayStr} todayDayStartMs={todayDayStartMs}/>}
         </div>
-        <div className="nav" style={(!state.isPremium&&!state.noAds)?{paddingBottom:`calc(env(safe-area-inset-bottom, 0px) + 35px)`}:{}}>
+        <div className="nav" style={{paddingBottom:(!isPremium&&!noAds)?`calc(env(safe-area-inset-bottom, 0px) + 35px)`:`0px`}}>
           {tabs.map(t=>{const active=tab===t.id;return(<button key={t.id} className={`nb${active?" on":""}`} onClick={()=>{
   setTab(t.id);
-  if(!state.isPremium&&!state.noAds&&["calendar","stats","photo"].includes(t.id)&&t.id!==tab){
+  if(!isPremium&&!noAds&&["calendar","stats","photo"].includes(t.id)&&t.id!==tab){
     AdMobHelper.showInterstitialIfReady();
   }
 }}>{t.icon(active?T.primary:T.text+"44")}<span className="nb-lbl">{t.label}</span></button>);})}
@@ -598,7 +604,7 @@ function App(){
       {drawerSection==="color"        &&<ColorModal T={T} themeName={state.themeName} onPick={k=>update({themeName:k})} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="settings"     &&<SettingsModal T={T} state={state} onSave={(sf,th,sd,tp)=>update({settings:sf,targetWearHours:th,startDate:sd,totalPieces:tp})} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="schedule"     &&<ScheduleModal T={T} state={state} update={update} onClose={()=>setDrawerSection(null)}/>}
-      {drawerSection==="backup"       &&<BackupModal T={T} state={state} onImport={s=>setState(s)} onClose={()=>setDrawerSection(null)}/>}
+      {drawerSection==="backup"       &&<BackupModal T={T} state={state} onImport={s=>setState(prev=>({...s,isPremium:prev.isPremium,noAds:prev.noAds}))} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="notify"       &&<NotifyModal T={T} state={state} onSave={f=>{
         update(f);
         const list=buildPieceList(state);
@@ -615,9 +621,9 @@ function App(){
       }} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="timerSettings"&&<TimerSettingsModal T={T} state={state} onSave={f=>update(f)} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="cameraSettings"&&<CameraSettingsModal T={T} state={state} onSave={f=>update(f)} onClose={()=>setDrawerSection(null)}/>}
-      {drawerSection==="premium"&&<PremiumModal T={T} state={state} onClose={()=>setDrawerSection(null)} onPurchased={({isPremium,noAds})=>update({isPremium,noAds})}/>}
+      {drawerSection==="premium"&&<PremiumModal T={T} state={{...state,isPremium,noAds}} onClose={()=>setDrawerSection(null)} onPurchased={({isPremium:p,noAds:n})=>{setIsPremium(p);setNoAds(n);if(p||n)AdMobHelper.removeBanner();}}/>}
       {drawerSection==="about"&&<AboutModal T={T} onClose={()=>setDrawerSection(null)}/>}
-      {drawerSection==="coffee"&&<PremiumModal T={T} state={state} onClose={()=>setDrawerSection(null)} showCoffee={true} onPurchased={({isPremium,noAds})=>update({isPremium,noAds})}/>}
+      {drawerSection==="coffee"&&<PremiumModal T={T} state={{...state,isPremium,noAds}} onClose={()=>setDrawerSection(null)} showCoffee={true} onPurchased={({isPremium:p,noAds:n})=>{setIsPremium(p);setNoAds(n);if(p||n)AdMobHelper.removeBanner();}}/>}
       {showAffiliatePopup&&<AffiliatePopup T={T} type={showAffiliatePopup} onClose={()=>setShowAffiliatePopup(false)}/>}
       {showResetConfirm&&<ResetConfirmModal T={T} onConfirm={()=>{
         localStorage.removeItem(LS_KEY);
