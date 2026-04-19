@@ -1,6 +1,7 @@
 import UIKit
 import Capacitor
 import UserNotifications
+import RevenueCat
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -8,8 +9,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     static var pendingAlarmAction: String? = nil
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        UNUserNotificationCenter.current().delegate = self
 
+        // ── RevenueCat 初期化 ──────────────────────────────────────────────
+        Purchases.logLevel = .debug
+        Purchases.configure(withAPIKey: "appl_HrDpuICDgfGShogHiNmlmBubJSJ")
+        // ────────────────────────────────────────────────────────────────────
+
+        UNUserNotificationCenter.current().delegate = self
         let stopAction = UNNotificationAction(
             identifier: "ALARM_STOP",
             title: "アラーム停止",
@@ -27,12 +33,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             options: []
         )
         UNUserNotificationCenter.current().setNotificationCategories([alarmCategory])
-
         return true
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
-        // アプリがアクティブになったとき、保留中のアクションを処理
         if let action = AppDelegate.pendingAlarmAction {
             AppDelegate.pendingAlarmAction = nil
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
@@ -73,9 +77,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void) {
         let actionId = response.actionIdentifier
-
         if actionId == "ALARM_STOP" {
-            // アプリがフォアグラウンドになってから処理
             AppDelegate.pendingAlarmAction = "stop"
         } else if actionId == "ALARM_SNOOZE" {
             AppDelegate.pendingAlarmAction = "snooze"
