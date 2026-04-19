@@ -130,7 +130,7 @@
         }
       }
       if (!pkg) throw new Error("product not found: " + productId);
-      return await Capacitor.Plugins.Purchases.purchasePackage({ aPackage: pkg });
+      return await Capacitor.Plugins.Purchases.purchasePackage({ aPackage: pkg, packageToPurchase: pkg });
     },
     async restorePurchases() {
       if (!this._isNative()) throw new Error("native only");
