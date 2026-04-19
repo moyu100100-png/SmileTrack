@@ -120,7 +120,15 @@
     async purchaseProduct(productId) {
       if (!this._isNative()) throw new Error("native only");
       const offerings = await Capacitor.Plugins.Purchases.getOfferings();
-      const pkg = offerings?.current?.availablePackages?.find(p => p.product?.identifier === productId);
+      // currentだけでなく全offeringsから検索
+      let pkg = offerings?.current?.availablePackages?.find(p => p.product?.identifier === productId);
+      if (!pkg) {
+        const allOfferings = Object.values(offerings?.all || {});
+        for (const o of allOfferings) {
+          pkg = (o.availablePackages||[]).find(p => p.product?.identifier === productId);
+          if (pkg) break;
+        }
+      }
       if (!pkg) throw new Error("product not found: " + productId);
       return await Capacitor.Plugins.Purchases.purchasePackage({ aPackage: pkg });
     },

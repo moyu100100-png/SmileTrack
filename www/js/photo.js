@@ -281,9 +281,7 @@ function PhotoPage({T,state,update,todayStr}){
           {filtered.length===0
             ?<div style={{textAlign:"center",color:T.text+"66",padding:"28px 16px",fontSize:13,lineHeight:1.8}}>
               <div style={{fontSize:15,fontWeight:700,color:T.text+"88",marginBottom:10}}>{t("noPhotos")}</div>
-              <div style={{fontSize:12,color:T.text+"55",lineHeight:1.9,whiteSpace:"pre-line"}}>
-                {t("offlineNotice")}
-              </div>
+              <div style={{fontSize:12,color:T.text+"55",lineHeight:1.9,whiteSpace:"pre-line"}}>{t("offlineNotice")}</div>
             </div>
             :<div className="pgrid">{(()=>{
               // 比較モード時：1枚目が選択済みなら同じshotModeのみ表示
