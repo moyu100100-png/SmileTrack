@@ -17,6 +17,6 @@
     "@capacitor/ios": "^8.2.0",
     "@capacitor/local-notifications": "^8.0.2",
     "@capacitor/splash-screen": "^8.0.0",
-    "@revenuecat/purchases-capacitor": "^11.3.2"
+    "@revenuecat/purchases-capacitor": "^13.0.0"
   }
 }
