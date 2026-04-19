@@ -89,27 +89,63 @@
     coffee:   "app.smiletrack.app.coffee",
   };
   window.Purchases = {
+    _configured: false,
+    _configuring: null,
+
     _isNative() {
       return typeof Capacitor !== "undefined" && Capacitor.isNativePlatform?.();
     },
+
+    // configure()は何度呼んでも1回だけ実行、完了まで待てる
     async configure() {
-      if (!this._isNative()) return;
-      try {
-        await Capacitor.Plugins.Purchases.configure({
-          apiKey: RC_API_KEY_IOS,
-          appUserID: null,
-        });
-      } catch(e) { console.warn("[RC] configure error", e); }
+      if (this._configured) return;
+      if (this._configuring) return this._configuring;
+      this._configuring = (async () => {
+        if (!this._isNative()) { this._configured = true; return; }
+        try {
+          console.log("[RC] configure start");
+          await Capacitor.Plugins.Purchases.configure({
+            apiKey: RC_API_KEY_IOS,
+            appUserID: null,
+          });
+          this._configured = true;
+          console.log("[RC] configure OK");
+        } catch(e) {
+          console.error("[RC] configure FAILED:", e);
+          this._configuring = null; // 失敗したらリトライ可能にする
+        }
+      })();
+      return this._configuring;
     },
+
+    // getOfferings: configure完了を必ず待ってから呼ぶ
+    async getOfferings() {
+      await this.configure();
+      if (!this._isNative()) return { current: null, all: {} };
+      try {
+        const result = await Capacitor.Plugins.Purchases.getOfferings();
+        console.log("[RC] getOfferings OK, current packages:",
+          result?.current?.availablePackages?.length ?? 0);
+        return result;
+      } catch(e) {
+        console.error("[RC] getOfferings FAILED:", e);
+        return { current: null, all: {} };
+      }
+    },
+
     async isPremiumUser() {
+      await this.configure();
       if (!this._isNative()) return false;
       try {
         const info = await Capacitor.Plugins.Purchases.getCustomerInfo();
         const entitlements = info?.customerInfo?.entitlements?.active || {};
+        console.log("[RC] entitlements active:", Object.keys(entitlements));
         return RC_ENTITLEMENT in entitlements;
-      } catch(e) { return false; }
+      } catch(e) { console.warn("[RC] isPremiumUser error", e); return false; }
     },
+
     async hasNoAds() {
+      await this.configure();
       if (!this._isNative()) return false;
       try {
         const info = await Capacitor.Plugins.Purchases.getCustomerInfo();
@@ -117,9 +153,10 @@
         return "no_ads" in entitlements;
       } catch(e) { return false; }
     },
+
     async purchaseProduct(productId) {
       if (!this._isNative()) throw new Error("native only");
-      const offerings = await Capacitor.Plugins.Purchases.getOfferings();
+      const offerings = await this.getOfferings(); // configure保証済み
       // currentだけでなく全offeringsから検索
       let pkg = offerings?.current?.availablePackages?.find(p => p.product?.identifier === productId);
       if (!pkg) {
@@ -129,10 +166,17 @@
           if (pkg) break;
         }
       }
-      if (!pkg) throw new Error("product not found: " + productId);
+      if (!pkg) {
+        console.error("[RC] product not found:", productId,
+          "available:", offerings?.current?.availablePackages?.map(p=>p.product?.identifier));
+        throw new Error("product not found: " + productId);
+      }
+      console.log("[RC] purchasePackage:", productId);
       return await Capacitor.Plugins.Purchases.purchasePackage({ aPackage: pkg, packageToPurchase: pkg });
     },
+
     async restorePurchases() {
+      await this.configure();
       if (!this._isNative()) throw new Error("native only");
       return await Capacitor.Plugins.Purchases.restorePurchases();
     },

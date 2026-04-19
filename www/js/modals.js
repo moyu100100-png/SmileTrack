@@ -93,7 +93,8 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
     (async()=>{
       try{
         if(!Purchases._isNative()) return;
-        const offerings=await Capacitor.Plugins.Purchases.getOfferings();
+        const offerings=await Purchases.getOfferings();
+        console.log("[RC] PremiumModal: packages:", offerings?.current?.availablePackages?.length ?? 0);
         // currentだけでなく全offeringsから価格を取得
         const seen=new Set();
         const allPkgs=[];
