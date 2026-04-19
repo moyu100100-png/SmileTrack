@@ -15,6 +15,14 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="capacitor.js"></script>
   <script>
+  // ── RevenueCat プラグイン登録 ─────────────────────────────────────────────
+  // registerPlugin()を呼ばないとCapacitor.Plugins.Purchasesがundefinedになる
+  if (typeof Capacitor !== "undefined" && Capacitor.registerPlugin) {
+    Capacitor.registerPlugin('Purchases');
+    console.log("[RC] Purchases plugin registered");
+  }
+  </script>
+  <script>
   // ── AdMob 設定 ────────────────────────────────────────────────────────────
   const ADMOB_APP_ID    = "ca-app-pub-5456814091467820~1944092541";
   const ADMOB_BANNER_ID = "ca-app-pub-3940256099942544/2934735716";
