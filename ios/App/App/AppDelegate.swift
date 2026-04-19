@@ -5,6 +5,7 @@ import UserNotifications
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
+    static var pendingAlarmAction: String? = nil
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         UNUserNotificationCenter.current().delegate = self
@@ -17,7 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let snoozeAction = UNNotificationAction(
             identifier: "ALARM_SNOOZE",
             title: "スヌーズ",
-            options: []
+            options: [.foreground]
         )
         let alarmCategory = UNNotificationCategory(
             identifier: "ALARM_CATEGORY",
@@ -30,10 +31,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
 
+    func applicationDidBecomeActive(_ application: UIApplication) {
+        // アプリがアクティブになったとき、保留中のアクションを処理
+        if let action = AppDelegate.pendingAlarmAction {
+            AppDelegate.pendingAlarmAction = nil
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                self.sendAlarmActionToJS(action: action)
+            }
+        }
+    }
+
     func applicationWillResignActive(_ application: UIApplication) {}
     func applicationDidEnterBackground(_ application: UIApplication) {}
     func applicationWillEnterForeground(_ application: UIApplication) {}
-    func applicationDidBecomeActive(_ application: UIApplication) {}
     func applicationWillTerminate(_ application: UIApplication) {}
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
@@ -42,6 +52,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         return ApplicationDelegateProxy.shared.application(application, continue: userActivity, restorationHandler: restorationHandler)
+    }
+
+    func sendAlarmActionToJS(action: String) {
+        if let webView = (self.window?.rootViewController as? CAPBridgeViewController)?.webView {
+            let js = "window.dispatchEvent(new CustomEvent('AlarmAction', {detail: {action: '\(action)'}}))"
+            webView.evaluateJavaScript(js, completionHandler: nil)
+        }
     }
 }
 
@@ -57,14 +74,11 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         withCompletionHandler completionHandler: @escaping () -> Void) {
         let actionId = response.actionIdentifier
 
-        if actionId == "ALARM_STOP" || actionId == "ALARM_SNOOZE" {
-            let action = actionId == "ALARM_STOP" ? "stop" : "snooze"
-            DispatchQueue.main.async {
-                if let webView = (self.window?.rootViewController as? CAPBridgeViewController)?.webView {
-                    let js = "window.dispatchEvent(new CustomEvent('AlarmAction', {detail: {action: '\(action)'}}))"
-                    webView.evaluateJavaScript(js, completionHandler: nil)
-                }
-            }
+        if actionId == "ALARM_STOP" {
+            // アプリがフォアグラウンドになってから処理
+            AppDelegate.pendingAlarmAction = "stop"
+        } else if actionId == "ALARM_SNOOZE" {
+            AppDelegate.pendingAlarmAction = "snooze"
         }
         completionHandler()
     }
