@@ -108,104 +108,69 @@
     coffee:   "app.smiletrack.app.coffee",
   };
   window.Purchases = {
-    _configured: false,
-    _configuring: null,
-
     _isNative() {
       return typeof Capacitor !== "undefined" && Capacitor.isNativePlatform?.();
     },
 
-    // configure()は何度呼んでも1回だけ実行、完了まで待てる
-    async configure() {
-      if (this._configured) return;
-      if (this._configuring) return this._configuring;
-      this._configuring = (async () => {
-        if (!this._isNative()) { this._configured = true; return; }
-        try {
-          // Capacitor.Plugins.Purchasesが存在しない場合はregisterPluginを再試行
-          if (!Capacitor.Plugins.Purchases) {
-            console.warn("[RC] Purchases plugin not found, trying registerPlugin...");
-            Capacitor.registerPlugin('Purchases');
-          }
-          if (!Capacitor.Plugins.Purchases) {
-            throw new Error("Purchases plugin still not available after registerPlugin");
-          }
-          console.log("[RC] configure start");
-          await Capacitor.Plugins.Purchases.configure({
-            apiKey: RC_API_KEY_IOS,
-            appUserID: null,
-          });
-          this._configured = true;
-          console.log("[RC] configure OK");
-        } catch(e) {
-          console.error("[RC] configure FAILED:", e);
-          this._configuring = null;
-        }
-      })();
-      return this._configuring;
+    // Swift側のRCBridgeプラグインを取得
+    _plugin() {
+      return Capacitor?.Plugins?.RCBridge;
     },
 
-    // getOfferings: configure完了を必ず待ってから呼ぶ
+    async configure() {
+      // Swift側AppDelegateで初期化済みなので何もしない
+      return;
+    },
+
     async getOfferings() {
-      await this.configure();
       if (!this._isNative()) return { current: null, all: {} };
+      const plugin = this._plugin();
+      if (!plugin) { console.error("[RC] RCBridge plugin not found"); return { current: null, all: {} }; }
       try {
-        const result = await Capacitor.Plugins.Purchases.getOfferings();
-        console.log("[RC] getOfferings OK, current packages:",
-          result?.current?.availablePackages?.length ?? 0);
-        return result;
-      } catch(e) {
-        console.error("[RC] getOfferings FAILED:", e);
-        return { current: null, all: {} };
-      }
+        const result = await plugin.getOfferings();
+        console.log("[RC] getOfferings raw:", JSON.stringify(result));
+        // packagesリストをcurrent.availablePackages形式に変換
+        const pkgs = (result.packages || []).map(p => ({
+          identifier: p.packageIdentifier,
+          product: { identifier: p.identifier, priceString: p.priceString },
+        }));
+        return { current: { availablePackages: pkgs }, all: {} };
+      } catch(e) { console.error("[RC] getOfferings error:", e); return { current: null, all: {} }; }
     },
 
     async isPremiumUser() {
-      await this.configure();
       if (!this._isNative()) return false;
+      const plugin = this._plugin();
+      if (!plugin) return false;
       try {
-        const info = await Capacitor.Plugins.Purchases.getCustomerInfo();
-        const entitlements = info?.customerInfo?.entitlements?.active || {};
-        console.log("[RC] entitlements active:", Object.keys(entitlements));
-        return RC_ENTITLEMENT in entitlements;
-      } catch(e) { console.warn("[RC] isPremiumUser error", e); return false; }
+        const result = await plugin.getCustomerInfo();
+        return result.isPremium === true;
+      } catch(e) { return false; }
     },
 
     async hasNoAds() {
-      await this.configure();
       if (!this._isNative()) return false;
+      const plugin = this._plugin();
+      if (!plugin) return false;
       try {
-        const info = await Capacitor.Plugins.Purchases.getCustomerInfo();
-        const entitlements = info?.customerInfo?.entitlements?.active || {};
-        return "no_ads" in entitlements;
+        const result = await plugin.getCustomerInfo();
+        return result.noAds === true;
       } catch(e) { return false; }
     },
 
     async purchaseProduct(productId) {
       if (!this._isNative()) throw new Error("native only");
-      const offerings = await this.getOfferings(); // configure保証済み
-      // currentだけでなく全offeringsから検索
-      let pkg = offerings?.current?.availablePackages?.find(p => p.product?.identifier === productId);
-      if (!pkg) {
-        const allOfferings = Object.values(offerings?.all || {});
-        for (const o of allOfferings) {
-          pkg = (o.availablePackages||[]).find(p => p.product?.identifier === productId);
-          if (pkg) break;
-        }
-      }
-      if (!pkg) {
-        console.error("[RC] product not found:", productId,
-          "available:", offerings?.current?.availablePackages?.map(p=>p.product?.identifier));
-        throw new Error("product not found: " + productId);
-      }
-      console.log("[RC] purchasePackage:", productId);
-      return await Capacitor.Plugins.Purchases.purchasePackage({ aPackage: pkg, packageToPurchase: pkg });
+      const plugin = this._plugin();
+      if (!plugin) throw new Error("RCBridge plugin not found");
+      const result = await plugin.purchasePackage({ productId });
+      return result;
     },
 
     async restorePurchases() {
-      await this.configure();
       if (!this._isNative()) throw new Error("native only");
-      return await Capacitor.Plugins.Purchases.restorePurchases();
+      const plugin = this._plugin();
+      if (!plugin) throw new Error("RCBridge plugin not found");
+      return await plugin.restorePurchases();
     },
   };
   </script>

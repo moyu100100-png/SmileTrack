@@ -13,25 +13,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // ── RevenueCat 初期化 ──────────────────────────────────────────────
         Purchases.logLevel = .debug
         Purchases.configure(withAPIKey: "appl_HrDpuICDgfGShogHiNmlmBubJSJ")
+        print("[RC] Purchases configured")
         // ────────────────────────────────────────────────────────────────────
 
         UNUserNotificationCenter.current().delegate = self
-        let stopAction = UNNotificationAction(
-            identifier: "ALARM_STOP",
-            title: "アラーム停止",
-            options: [.foreground]
-        )
-        let snoozeAction = UNNotificationAction(
-            identifier: "ALARM_SNOOZE",
-            title: "スヌーズ",
-            options: [.foreground]
-        )
-        let alarmCategory = UNNotificationCategory(
-            identifier: "ALARM_CATEGORY",
-            actions: [stopAction, snoozeAction],
-            intentIdentifiers: [],
-            options: []
-        )
+        let stopAction = UNNotificationAction(identifier: "ALARM_STOP", title: "アラーム停止", options: [.foreground])
+        let snoozeAction = UNNotificationAction(identifier: "ALARM_SNOOZE", title: "スヌーズ", options: [.foreground])
+        let alarmCategory = UNNotificationCategory(identifier: "ALARM_CATEGORY", actions: [stopAction, snoozeAction], intentIdentifiers: [], options: [])
         UNUserNotificationCenter.current().setNotificationCategories([alarmCategory])
         return true
     }
@@ -39,9 +27,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidBecomeActive(_ application: UIApplication) {
         if let action = AppDelegate.pendingAlarmAction {
             AppDelegate.pendingAlarmAction = nil
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                self.sendAlarmActionToJS(action: action)
-            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { self.sendAlarmActionToJS(action: action) }
         }
     }
 
@@ -67,21 +53,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
-    func userNotificationCenter(_ center: UNUserNotificationCenter,
-        willPresent notification: UNNotification,
-        withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler([.banner, .sound, .badge])
     }
-
-    func userNotificationCenter(_ center: UNUserNotificationCenter,
-        didReceive response: UNNotificationResponse,
-        withCompletionHandler completionHandler: @escaping () -> Void) {
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         let actionId = response.actionIdentifier
-        if actionId == "ALARM_STOP" {
-            AppDelegate.pendingAlarmAction = "stop"
-        } else if actionId == "ALARM_SNOOZE" {
-            AppDelegate.pendingAlarmAction = "snooze"
-        }
+        if actionId == "ALARM_STOP" { AppDelegate.pendingAlarmAction = "stop" }
+        else if actionId == "ALARM_SNOOZE" { AppDelegate.pendingAlarmAction = "snooze" }
         completionHandler()
     }
 }
