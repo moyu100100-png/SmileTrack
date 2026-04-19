@@ -121,35 +121,32 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
   // 選択されたバーに対応するセッション集計
   const getBreakdownForBar=(bar)=>{
     if(!bar) return {};
-    try{
-      const sessions=state.timerSessions||[];
-      let filtered=[];
-      if(period==="daily"){
-        const dayMs=new Date(bar.key+"T00:00:00").getTime();
-        filtered=sessions.filter(s=>sessInDay(s,dayMs,bar.key));
-      } else if(period==="weekly"){
-        filtered=sessions.filter(s=>{
-          const ds=s.start?dsFromDate(new Date(s.start)):s.day;
-          return ds&&ds>=bar.key&&ds<=(bar.endKey||bar.key);
-        });
-      } else {
-        // monthly: bar.key="YYYY-M" 形式、月番号で比較
-        const parts=bar.key.split("-");
-        const y=parseInt(parts[0]),m=parseInt(parts[1]);
-        filtered=sessions.filter(s=>{
-          if(s.start){const d=new Date(s.start);return d.getFullYear()===y&&d.getMonth()===m;}
-          if(s.day){const d=new Date(s.day+"T00:00:00");return d.getFullYear()===y&&d.getMonth()===m;}
-          return false;
-        });
-      }
-      if(state.timerRunning&&state._pendingReason&&period==="daily"&&bar.key===todayStr){
-        const rMs=state.timerElapsed+(Date.now()-(state.timerStart||Date.now()));
-        filtered=[...filtered,{ms:rMs,reason:state._pendingReason||t("others")}];
-      }
-      const totals={};
-      filtered.forEach(s=>{const r=(!s.noReason&&s.reason)?s.reason:t("reasonNone");totals[r]=(totals[r]||0)+Math.floor(s.ms/1000);});
-      return totals;
-    }catch(e){console.warn("breakdown error",e);return {};}
+    const sessions=state.timerSessions||[];
+    let filtered=[];
+    if(period==="daily"){
+      const dayMs=new Date(bar.key+"T00:00:00").getTime();
+      filtered=sessions.filter(s=>sessInDay(s,dayMs,bar.key));
+    } else if(period==="weekly"){
+      filtered=sessions.filter(s=>{
+        const ds=s.start?dsFromDate(new Date(s.start)):s.day;
+        return ds&&ds>=bar.key&&ds<=bar.endKey;
+      });
+    } else {
+      const parts=bar.key.split("-");
+      const y=parseInt(parts[0]),m=parseInt(parts[1]);
+      filtered=sessions.filter(s=>{
+        if(s.start){const d=new Date(s.start);return d.getFullYear()===y&&d.getMonth()===m;}
+        if(s.day){const d=new Date(s.day+"T00:00:00");return d.getFullYear()===y&&d.getMonth()===m;}
+        return false;
+      });
+    }
+    if(state.timerRunning&&state._pendingReason&&period==="daily"&&bar.key===todayStr){
+      const rMs=state.timerElapsed+(Date.now()-(state.timerStart||Date.now()));
+      filtered=[...filtered,{ms:rMs,reason:state._pendingReason||t("others")}];
+    }
+    const totals={};
+    filtered.forEach(s=>{const r=(!s.noReason&&s.reason)?s.reason:t("reasonNone");totals[r]=(totals[r]||0)+Math.floor(s.ms/1000);});
+    return totals;
   };
 
   const reasonTotal=bar=>Object.values(getBreakdownForBar(bar)).reduce((a,v)=>a+v,0)||1;
@@ -317,7 +314,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
                   const achieved=total>0&&total>=target*(period==="weekly"?7:new Date(parseInt(b.key.split("-")[0]),parseInt(b.key.split("-")[1])+1,0).getDate());
                   const weekLabel=period==="weekly"?b.label.replace(/–?\n/,"–"):"";
                   return(
-                    <div key={b.key} className="wr" style={{background:isSelected?T.soft:"transparent",borderRadius:8,cursor:"pointer"}} onClick={()=>setSelectedBar(isSelected?null:b)}>
+                    <div key={b.key} className="wr" style={{background:isSelected?T.soft:"transparent",borderRadius:isSelected?8:0,cursor:"pointer",borderBottom:`1px solid ${T.text}07`}} onClick={()=>setSelectedBar(isSelected?null:b)}>
                       <span style={{fontSize:13,fontWeight:isSelected?700:400,color:isSelected?T.primary:T.text,whiteSpace:"nowrap",lineHeight:1.4,flex:1}}>{period==="weekly"?weekLabel:`${parseInt(b.key.split("-")[1])+1}${t("monthLabel")}`}</span>
                       <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,color:total===0?T.text+"44":achieved?T.primary:failCol,fontSize:14,flexShrink:0}}>{total===0?t("noRecord"):fmt(total)}</span>
                     </div>

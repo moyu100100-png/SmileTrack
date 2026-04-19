@@ -2,7 +2,6 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
   // タイマーページは常に毎秒更新（メインのタイマー表示）
   useTick(1000);
 
-
   const todayDayEndMs=todayDayStartMs+86400000;
   const todaySavedMs=(state.timerSessions||[]).filter(s=>sessInDay(s,todayDayStartMs,todayStr)).reduce((a,s)=>a+s.ms,0);
   const runningMs=state.timerRunning?state.timerElapsed+(Date.now()-(state.timerStart||Date.now())):state.timerElapsed;
@@ -34,7 +33,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
   },[isAlarmNow,snoozeJustEnded]);
   const cycleCount=Math.floor(currentSec/CYCLE);
   const cycleProgress=(currentSec%CYCLE)/CYCLE;
-  const cycleColor=cycleCount%2===0?T.primary:T.accent;
+  const cycleColor=(["atrium","blushhemp"].includes(state.themeName))?T.primary:(cycleCount%2===0?T.primary:T.accent);
   const isAlarm=state.alarmEnabled&&timerRunning&&!alarmStopped&&!isSnoozed&&currentSec>=alarmSecs;
   const showBreakdown=state.showReasonBreakdown!==false;
   const todaySess=(state.timerSessions||[]).filter(s=>
@@ -135,7 +134,7 @@ function TimerPage({T,state,update,handleRemoveButton,todayStr,todayDayStartMs,s
         <div style={{display:"flex",justifyContent:"center",margin:"4px 0 10px"}}>
           <div style={{position:"relative",width:sz,height:sz,cursor:"pointer"}} onClick={onStartPress}>
             <svg width={sz} height={sz} style={{transform:"rotate(-90deg)"}}>
-              <circle cx={sz/2} cy={sz/2} r={rad} fill="none" stroke={state.themeName==="night"?"#204051":T.soft} strokeWidth={stk}/>
+              <circle cx={sz/2} cy={sz/2} r={rad} fill="none" stroke={state.themeName==="night"?"#204051":(["atrium","blushhemp"].includes(state.themeName)?T.removedColor:T.soft)} strokeWidth={stk}/>
               <circle cx={sz/2} cy={sz/2} r={rad} fill="none" stroke={cycleColor} strokeWidth={stk}
                 strokeDasharray={cir} strokeDashoffset={cir*(1-cycleProgress)} strokeLinecap="round" style={{transition:"stroke-dashoffset .5s"}}/>
             </svg>

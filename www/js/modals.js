@@ -151,18 +151,18 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
         <div style={{fontSize:13,color:T.text+"88",marginBottom:20,lineHeight:1.7}}>
           {t("coffeeDesc").split("\n").map((l,i)=><span key={i}>{l}<br/></span>)}
         </div>
-        <button className="btn bp" style={{width:"100%",marginBottom:10,padding:"14px",fontSize:15}} onClick={()=>handlePurchase("coffee")} disabled={loading}>{loading?t("loading"):t("coffeeBuy").replace("¥120",prices.coffee||"---")}</button>
+        <button className="btn bp" style={{width:"100%",marginBottom:10,padding:"14px",fontSize:15}} onClick={()=>handlePurchase("coffee")} disabled={loading}>{loading?t("loading"):t("coffeeBuy").replace("¥120",prices.coffee||"¥120")}</button>
         <button className="btn bs" style={{width:"100%",padding:"14px",fontSize:15}} onClick={onClose}>{t("close")}</button>
       </div>
     </div>
   );
   const plans=[
-    {id:"monthly", label:t("monthlyPlan"), price:prices.monthly||"---", sub:t("monthlySubLabel"), badge:null, desc:t("monthlyDesc")},
-    {id:"yearly",  label:t("yearly"), price:prices.yearly||"---", sub:t("yearlySubLabel"), badge:t("recommended"), desc:t("yearlyDesc")},
-    {id:"lifetime",label:t("lifetime"), price:prices.lifetime||"---", sub:t("lifetimeSubLabel"), badge:null, desc:t("lifetimeDesc")},
+    {id:"monthly", label:t("monthlyPlan"), price:prices.monthly||t("monthlyPrice"), sub:t("monthlySubLabel"), badge:null, desc:t("monthlyDesc")},
+    {id:"yearly",  label:t("yearly"), price:prices.yearly||t("yearlyPrice"), sub:t("yearlySubLabel"), badge:t("recommended"), desc:t("yearlyDesc")},
+    {id:"lifetime",label:t("lifetime"), price:prices.lifetime||t("lifetimePrice"), sub:t("lifetimeSubLabel"), badge:null, desc:t("lifetimeDesc")},
   ];
   const extras=[
-    {id:"no_ads", label:t("noAds"), price:prices.no_ads||"---", desc:t("noAdsDesc")},
+    {id:"no_ads", label:t("noAds"), price:prices.no_ads||t("noAdsPrice"), desc:t("noAdsDesc")},
   ];
 
   if(thankYou) return(
@@ -187,10 +187,19 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
         </div>
 
         {/* 機能一覧 */}
-        <div style={{background:T.soft,borderRadius:12,padding:"10px 14px",marginBottom:16}}>
+        {(()=>{
+          const isEarthy=["atrium","blushhemp"].includes(state.themeName);
+          const featureBg=isEarthy?T.primary:T.soft;
+          const checkColor=isEarthy?"#fff":T.primary;
+          const featureTextColor=isEarthy?"#fff":T.text;
+          const selectedBg=isEarthy?T.primary:T.soft;
+          const selectedPriceColor=isEarthy?"#fff":T.primary;
+          const selectedTextColor=isEarthy?"#fff":T.text;
+          return(<>
+        <div style={{background:featureBg,borderRadius:12,padding:"10px 14px",marginBottom:16}}>
           {t("premiumFeatureList").map((f,i)=>(
-            <div key={i} style={{display:"flex",alignItems:"center",gap:8,padding:"4px 0",fontSize:13,color:T.text}}>
-              <span style={{color:T.primary,fontWeight:700,flexShrink:0}}>✓</span>{f}
+            <div key={i} style={{display:"flex",alignItems:"center",gap:8,padding:"4px 0",fontSize:13,color:featureTextColor}}>
+              <span style={{color:checkColor,fontWeight:700,flexShrink:0}}>✓</span>{f}
             </div>
           ))}
         </div>
@@ -198,17 +207,17 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
         {/* プラン */}
         <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:14}}>
           {plans.map(p=>(
-            <div key={p.id} style={{position:"relative",border:`2px solid ${selectedPlan===p.id?T.primary:T.soft}`,borderRadius:12,padding:"12px 14px",cursor:"pointer",background:selectedPlan===p.id?T.soft:"transparent"}}
+            <div key={p.id} style={{position:"relative",border:`2px solid ${selectedPlan===p.id?T.primary:T.soft}`,borderRadius:12,padding:"12px 14px",cursor:"pointer",background:selectedPlan===p.id?selectedBg:"transparent"}}
               onClick={()=>{setSelectedPlan(p.id);!loading&&handlePurchase(p.id);}}>
               {p.badge&&<div style={{position:"absolute",top:-10,left:14,background:T.primary,color:"#fff",fontSize:10,fontWeight:700,padding:"2px 10px",borderRadius:20}}>{p.badge}</div>}
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                 <div>
-                  <div style={{fontSize:14,fontWeight:700,color:T.text}}>{p.label}</div>
-                  <div style={{fontSize:11,color:T.text+"66",marginTop:2}}>{p.desc}</div>
+                  <div style={{fontSize:14,fontWeight:700,color:selectedPlan===p.id?selectedTextColor:T.text}}>{p.label}</div>
+                  <div style={{fontSize:11,color:selectedPlan===p.id?(selectedTextColor+"bb"):T.text+"66",marginTop:2}}>{p.desc}</div>
                 </div>
                 <div style={{textAlign:"right",flexShrink:0}}>
-                  <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:700,color:selectedPlan===p.id?T.primary:T.text}}>{p.price}</div>
-                  <div style={{fontSize:10,color:T.text+"55"}}>{p.sub}</div>
+                  <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:18,fontWeight:700,color:selectedPlan===p.id?selectedPriceColor:T.text}}>{p.price}</div>
+                  <div style={{fontSize:10,color:selectedPlan===p.id?(selectedTextColor+"99"):T.text+"55"}}>{p.sub}</div>
                 </div>
               </div>
             </div>
@@ -219,16 +228,17 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
         <div style={{borderTop:`1px solid ${T.soft}`,paddingTop:12,marginBottom:12}}>
           <div style={{fontSize:11,fontWeight:700,color:T.text+"66",marginBottom:8}}>{t("singlePurchaseLabel")}</div>
           {extras.map(p=>(
-            <div key={p.id} style={{border:`2px solid ${selectedPlan===p.id?T.primary:T.soft}`,borderRadius:12,padding:"10px 14px",cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center",background:selectedPlan===p.id?T.soft:"transparent"}}
+            <div key={p.id} style={{border:`2px solid ${selectedPlan===p.id?T.primary:T.soft}`,borderRadius:12,padding:"10px 14px",cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center",background:selectedPlan===p.id?selectedBg:"transparent"}}
               onClick={()=>{setSelectedPlan(p.id);!loading&&handlePurchase(p.id);}}>
               <div>
-                <div style={{fontSize:14,fontWeight:600,color:T.text}}>{p.label}</div>
-                <div style={{fontSize:11,color:T.text+"66",marginTop:2}}>{p.desc}</div>
+                <div style={{fontSize:14,fontWeight:600,color:selectedPlan===p.id?selectedTextColor:T.text}}>{p.label}</div>
+                <div style={{fontSize:11,color:selectedPlan===p.id?(selectedTextColor+"bb"):T.text+"66",marginTop:2}}>{p.desc}</div>
               </div>
-              <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16,fontWeight:700,color:T.text,flexShrink:0}}>{p.price}</div>
+              <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16,fontWeight:700,color:selectedPlan===p.id?selectedPriceColor:T.text,flexShrink:0}}>{p.price}</div>
             </div>
           ))}
         </div>
+        </>);})()}
 
         <button className="btn bs" style={{width:"100%",marginTop:8}} onClick={onClose}>{t("close")}</button>
       </div>
