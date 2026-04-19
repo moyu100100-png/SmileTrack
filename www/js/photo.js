@@ -13,15 +13,10 @@ function PhotoPage({T,state,update,todayStr}){
   // 写真が存在するshotModeを収集
   const existingModes = new Set((state.photos||[]).map(p=>p.shotMode||"face_front"));
   // タブ名：歯正面→「歯」、顔正面→「顔」、それ以外はlabelJPそのまま
-  const getShotLabel = (modeInfo) => {
-    if(!modeInfo) return "";
-    return t(modeInfo.labelKey) || modeInfo.labelJP;
-  };
   const tabLabel = id => {
     if(id==="teeth_front") return t("shotTeeth");
     if(id==="face_front") return t("shotFace");
-    const m = SHOT_MODES.find(x=>x.id===id);
-    return m ? (t(m.labelKey)||m.labelJP) : id;
+    return (SHOT_MODES.find(x=>x.id===id)||{labelJP:id}).labelJP;
   };
   // タブに出すmode一覧（重複なし・順番制御）
   const tabModeIds = [];
@@ -202,11 +197,11 @@ function PhotoPage({T,state,update,todayStr}){
         <div className="ct" style={{marginBottom:8,fontSize:14}}>{t("takePhoto")}</div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9}}>
           <button className="btn bp" onClick={()=>openCam(slot1Id)} style={{padding:"12px 8px",flexDirection:"column"}}>
-            <div style={{display:"flex",alignItems:"center",gap:4}}>{Icons.camera("#fff",14)}<span style={{fontSize:14}}>{getShotLabel(slot1Info)}</span></div>
+            <div style={{display:"flex",alignItems:"center",gap:4}}>{Icons.camera("#fff",14)}<span style={{fontSize:14}}>{slot1Info.labelJP}</span></div>
             {getOverlayPhoto(slot1Id)&&<div style={{fontSize:11,opacity:.7,marginTop:2}}>{t("prevExists")}</div>}
           </button>
           <button className="btn bp" onClick={()=>{if(!isPremium){setShowSlot2Gate(true);return;}openCam(slot2Id);}} style={{padding:"12px 8px",flexDirection:"column",opacity:isPremium?1:0.55}}>
-            <div style={{display:"flex",alignItems:"center",gap:4}}>{isPremium?Icons.camera("#fff",14):<span style={{fontSize:14}}>🔒</span>}<span style={{fontSize:14}}>{getShotLabel(slot2Info)}</span></div>
+            <div style={{display:"flex",alignItems:"center",gap:4}}>{isPremium?Icons.camera("#fff",14):<span style={{fontSize:14}}>🔒</span>}<span style={{fontSize:14}}>{slot2Info.labelJP}</span></div>
             {isPremium&&getOverlayPhoto(slot2Id)&&<div style={{fontSize:11,opacity:.7,marginTop:2}}>{t("prevExists")}</div>}
           </button>
         </div>
@@ -237,16 +232,16 @@ function PhotoPage({T,state,update,todayStr}){
       {showSlot2Gate&&(
         <div className="card" style={{textAlign:"center",padding:"16px 14px"}}>
           <div style={{fontSize:22,marginBottom:6}}>🔒</div>
-          <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4}}>{t("slot2GateTitle")}</div>
-          <div style={{fontSize:12,color:T.accent,marginBottom:12}}>{t("slot2GateMsg")}</div>
+          <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4}}>プレミアム限定です</div>
+          <div style={{fontSize:12,color:T.accent,marginBottom:12}}>2つ目の撮影スロットでより多くの角度を記録できます。</div>
           <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowSlot2Gate(false)}>{t("close")}</button>
         </div>
       )}
       {showPinGate&&(
         <div className="card" style={{textAlign:"center",padding:"16px 14px"}}>
           <div style={{fontSize:22,marginBottom:6}}>🔒</div>
-          <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4}}>{t("pinGateTitle")}</div>
-          <div style={{fontSize:12,color:T.accent,marginBottom:12}}>{t("pinGateMsg")}</div>
+          <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4}}>PINロックはプレミアム限定です</div>
+          <div style={{fontSize:12,color:T.accent,marginBottom:12}}>写真アルバムをPINで保護できます。</div>
           <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowPinGate(false)}>{t("close")}</button>
         </div>
       )}
@@ -269,7 +264,7 @@ function PhotoPage({T,state,update,todayStr}){
             </button>
           ):(
             <button onClick={()=>setShowPinGate(true)} style={{display:"flex",alignItems:"center",gap:5,padding:"5px 10px",border:`1.5px solid ${T.soft}`,borderRadius:8,background:T.soft,cursor:"pointer",color:T.primary,fontSize:13,fontWeight:600,fontFamily:"'M PLUS Rounded 1c',sans-serif",opacity:0.6}}>
-              <span style={{fontSize:13}}>🔒</span><span>{t("lockBtn")}</span>
+              <span style={{fontSize:13}}>🔒</span><span>ロック</span>
             </button>
           )}
         </div>
@@ -284,7 +279,12 @@ function PhotoPage({T,state,update,todayStr}){
             {comparePick.length===0?t("selectFirst"):comparePick.length===1?t("selectSecond"):""}
           </div>}
           {filtered.length===0
-            ?<div style={{textAlign:"center",color:T.text+"55",padding:"22px 0",fontSize:14}}>{t("noPhotos")}</div>
+            ?<div style={{textAlign:"center",color:T.text+"66",padding:"28px 16px",fontSize:13,lineHeight:1.8}}>
+              <div style={{fontSize:15,fontWeight:700,color:T.text+"88",marginBottom:10}}>{t("noPhotos")}</div>
+              <div style={{fontSize:12,color:T.text+"55",lineHeight:1.9,whiteSpace:"pre-line"}}>
+                {t("offlineNotice")}
+              </div>
+            </div>
             :<div className="pgrid">{(()=>{
               // 比較モード時：1枚目が選択済みなら同じshotModeのみ表示
               const compareFiltered = compareMode && comparePick.length===1
@@ -310,7 +310,7 @@ function PhotoPage({T,state,update,todayStr}){
                       <rect width="100%" height="100%" fill="url(#wm-grid)"/>
                     </svg>}
                     <div style={{position:"absolute",bottom:0,left:0,right:0,background:"linear-gradient(transparent,rgba(0,0,0,0.72))",padding:"14px 8px 8px",pointerEvents:"none"}}>
-                      <div style={{color:"#fff",fontSize:11}}>{p.piece?"#"+p.piece:"ー"} · {(()=>{const m=SHOT_MODES.find(x=>x.id===(p.shotMode||"face_front"));return m?(t(m.labelKey)||m.labelJP):(p.shotLabel||p.mode);})()}</div>
+                      <div style={{color:"#fff",fontSize:11}}>{p.piece?"#"+p.piece:"ー"} · {p.shotLabel||p.mode}</div>
                       <div style={{color:"#ffffffbb",fontSize:11}}>{p.date}</div>
                       {p.comment&&<div style={{color:"#ffffffaa",fontSize:11,marginTop:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p.comment}</div>}
                     </div>
@@ -340,7 +340,7 @@ function PhotoPage({T,state,update,todayStr}){
           {/* Header */}
           <div style={{padding:"10px 16px",paddingTop:"75px",display:"flex",alignItems:"center",justifyContent:"space-between",background:"rgba(0,0,0,0.7)",flexShrink:0}}>
             <button onClick={closeCam} style={{background:"rgba(255,255,255,0.18)",border:"none",color:"#fff",padding:"6px 14px",borderRadius:13,cursor:"pointer",fontSize:14}}>✕</button>
-            <span style={{color:"#fff",fontWeight:700,fontSize:15}}>{getShotLabel(currentModeInfo)}</span>
+            <span style={{color:"#fff",fontWeight:700,fontSize:15}}>{currentModeInfo.labelJP}</span>
             <button onClick={()=>setShowColorPanel(v=>!v)} style={{background:showColorPanel?"rgba(255,255,255,0.35)":"rgba(255,255,255,0.18)",border:"none",color:"#fff",padding:"6px 10px",borderRadius:13,cursor:"pointer",display:"flex",alignItems:"center",gap:4,fontSize:12}}>
               {Icons.sun("#fff",14)} 調整
             </button>
@@ -639,8 +639,8 @@ function PhotoPage({T,state,update,todayStr}){
                 <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
               </svg>
             </div>
-            <div className="mdtitle" style={{marginBottom:8}}>{t("deletePhotoConfirm")}</div>
-            <div style={{fontSize:14,color:T.text+"88",marginBottom:20}}>{t("deletePhotoConfirm")}<br/></div>
+            <div className="mdtitle" style={{marginBottom:8}}>写真を削除</div>
+            <div style={{fontSize:14,color:T.text+"88",marginBottom:20}}>この写真を削除しますか？<br/>削除すると元に戻せません。</div>
             <div style={{display:"flex",gap:8}}>
               <button className="btn bs" style={{flex:1}} onClick={()=>setDeleteConfirmId(null)}>{t("cancel")}</button>
               <button style={{flex:1,padding:"10px",border:"none",borderRadius:12,background:"#E74C3C",color:"#fff",fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16}}
@@ -650,7 +650,6 @@ function PhotoPage({T,state,update,todayStr}){
         </div>
       )}
       {showComparePreview&&<ComparePreviewModal T={T} onClose={()=>setShowComparePreview(false)}/>}
-      {compareView&&<PhotoCompare T={T} a={compareView.a} b={compareView.b} onClose={()=>setCompareView(null)}/>}
       {showSetPin&&(<div className="mo" onClick={()=>setShowSetPin(false)}><div className="md" onClick={e=>e.stopPropagation()}><div className="mdtitle">{t("pinLock")}</div>{state.photoLockEnabled?<><div style={{fontSize:14,color:T.text+"88",marginBottom:12}}>{t("pinUnlock")}</div><PinPad T={T} title={t("pinInput")} onDone={p=>{if(p===state.photoLock){update({photoLockEnabled:false,photoLock:null});setUnlocked(false);setShowSetPin(false);}else return false;}}/></>:<PinPad T={T} title={t("pinSet")} onDone={p=>{update({photoLock:p,photoLockEnabled:true});alert(t("pinSetDone"));setShowSetPin(false);}}/>}<button className="btn bs" style={{width:"100%",marginTop:10}} onClick={()=>setShowSetPin(false)}>{t("cancel")}</button></div></div>)}
     </div>
   );
@@ -911,12 +910,6 @@ function buildReportHTML(state, y, m) {
 }
 
 function ReportModal({T,state,onClose}){
-  const MONTHS_SHORT=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  const fmtMonthLabel=(y,m)=>{
-    const lang=typeof LANG!=="undefined"?LANG:"ja";
-    if(lang==="ja") return `${y}${t("yearLabel")}${m+1}${t("monthLabel")}`;
-    return `${MONTHS_SHORT[m]} ${y}`;
-  };
   const today=new Date();
   const months=[];
   const start=state.startDate?new Date(state.startDate+"T00:00:00"):new Date(today.getFullYear(),today.getMonth(),1);
@@ -926,57 +919,21 @@ function ReportModal({T,state,onClose}){
   const [sel,setSel]=React.useState(months[0]||{year:today.getFullYear(),month:today.getMonth()+1});
   const openReport=()=>{
     const html=buildReportHTML(state,sel.year,sel.month);
-    try {
-      // iOSのWKWebViewではwindow.open("","_blank")がブロックされるためBlob URLを使用
-      const blob=new Blob([html],{type:"text/html;charset=utf-8"});
-      if(navigator.share){
-        const file=new File([blob],`smiletrack_report_${sel.year}_${String(sel.month).padStart(2,"0")}.html`,{type:"text/html"});
-        navigator.share({files:[file],title:t("reportPreviewTitle")}).catch(()=>{
-          // シェアに失敗した場合はダウンロードリンクで対応
-          const url=URL.createObjectURL(blob);
-          const a=document.createElement("a");
-          a.href=url;
-          a.download=`smiletrack_report_${sel.year}_${String(sel.month).padStart(2,"0")}.html`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          setTimeout(()=>URL.revokeObjectURL(url),60000);
-        });
-      } else {
-        const url=URL.createObjectURL(blob);
-        const a=document.createElement("a");
-        a.href=url;
-        a.download=`smiletrack_report_${sel.year}_${String(sel.month).padStart(2,"0")}.html`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        setTimeout(()=>URL.revokeObjectURL(url),60000);
-      }
-    } catch(e){
-      // フォールバック: ダウンロードリンク
-      const blob2=new Blob([html],{type:"text/html;charset=utf-8"});
-      const url2=URL.createObjectURL(blob2);
-      const a2=document.createElement("a");
-      a2.href=url2;
-      a2.download=`smiletrack_report_${sel.year}_${String(sel.month).padStart(2,"0")}.html`;
-      document.body.appendChild(a2);
-      a2.click();
-      document.body.removeChild(a2);
-      setTimeout(()=>URL.revokeObjectURL(url2),60000);
-    }
+    const w=window.open("","_blank");
+    if(w){w.document.write(html);w.document.close();}
     onClose();
   };
   return(
     <div className="mo" onClick={onClose}>
       <div className="md" onClick={e=>e.stopPropagation()}>
-        <div className="mdtitle">{t("reportPreviewTitle")}</div>
-        <div style={{fontSize:13,color:T.text+"88",marginBottom:14}}>{t("sampleDataMsg")}</div>
+        <div className="mdtitle">レポート出力</div>
+        <div style={{fontSize:13,color:T.text+"88",marginBottom:14}}>出力する月を選択してください</div>
         <select value={sel.year+"-"+sel.month} onChange={e=>{const[y,m]=e.target.value.split("-");setSel({year:parseInt(y),month:parseInt(m)});}} style={{marginBottom:20}}>
-          {months.map(({year,month})=>(<option key={year+"-"+month} value={year+"-"+month}>{fmtMonthLabel?fmtMonthLabel(year,month-1):`${year}/${month}`}</option>))}
+          {months.map(({year,month})=>(<option key={year+"-"+month} value={year+"-"+month}>{year}年{month}月</option>))}
         </select>
         <div style={{display:"flex",gap:8}}>
           <button className="btn bs" style={{flex:1}} onClick={onClose}>{t("cancel")}</button>
-          <button className="btn bp" style={{flex:1}} onClick={openReport}>{t("export")}</button>
+          <button className="btn bp" style={{flex:1}} onClick={openReport}>PDF出力</button>
         </div>
       </div>
     </div>

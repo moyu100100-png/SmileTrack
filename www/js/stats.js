@@ -1,44 +1,13 @@
 function StatsPage({T,state,update,todayStr,todayDayStartMs}){
   const isPremium=IS_PREMIUM;
   useTick(1000, state.timerRunning);
-
-  const MONTHS_SHORT = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const fmtShort = ds => {
     if(!ds) return "—";
     const d = new Date(ds+"T00:00:00");
     const lang = typeof LANG !== "undefined" ? LANG : "ja";
     if(lang === "ja") return `${d.getMonth()+1}/${d.getDate()}`;
-    return `${MONTHS_SHORT[d.getMonth()]} ${d.getDate()}`;
-  };
-  // Daily bar label: ja→ M/D, en→ Apr 18
-  const fmtDayLabel = ds => {
-    if(!ds) return "—";
-    const d = new Date(ds+"T00:00:00");
-    const lang = typeof LANG !== "undefined" ? LANG : "ja";
-    if(lang === "ja") return `${d.getMonth()+1}/${d.getDate()}`;
-    return `${MONTHS_SHORT[d.getMonth()]} ${d.getDate()}`;
-  };
-  // Weekly range label: ja→ M/D –\n M/D, en→ Apr 4 –\n Apr 10
-  const fmtWeekLabel = (start, end) => {
-    const lang = typeof LANG !== "undefined" ? LANG : "ja";
-    if(lang === "ja") return `${start.getMonth()+1}/${start.getDate()} –\n${end.getMonth()+1}/${end.getDate()}`;
-    return `${MONTHS_SHORT[start.getMonth()]} ${start.getDate()} –\n${MONTHS_SHORT[end.getMonth()]} ${end.getDate()}`;
-  };
-  // Monthly bar label: ja→ {y}年{m}月, en→ Apr 2026
-  const fmtMonthLabel = (y, m) => {
-    const lang = typeof LANG !== "undefined" ? LANG : "ja";
-    if(lang === "ja") return `${y}${t("yearLabel")}${m+1}${t("monthLabel")}`;
-    return `${MONTHS_SHORT[m]} ${y}`;
-  };
-  // Breakdown title label for selected bar
-  const fmtBarLabel = (bar) => {
-    if(!bar) return null;
-    const lang = typeof LANG !== "undefined" ? LANG : "ja";
-    if(period === "daily") return fmtDayLabel(bar.key);
-    if(period === "weekly") return bar.label.replace(/–?\n/, "–");
-    // monthly
-    if(lang === "ja") return `${bar.year}${t("yearLabel")}${bar.month+1}${t("monthLabel")}`;
-    return `${MONTHS_SHORT[bar.month]} ${bar.year}`;
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    return `${months[d.getMonth()]} ${d.getDate()}`;
   };
   const accentFailThemes=["atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"];
   const greyFailThemes=["blush","wisteria","powder","glacier","amber"];
@@ -86,7 +55,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
       for(let d=new Date(startD);d<=today;d.setDate(d.getDate()+1)){
         const ds=dsFromDate(new Date(d));
         const beforeStart=state.startDate&&ds<state.startDate;
-        bars.push({key:ds,label:fmtDayLabel(ds),secs:beforeStart?0:(effectiveLog[ds]||0),isPast:ds<=todayDs,isToday:ds===todayDs});
+        bars.push({key:ds,label:`${d.getMonth()+1}/${d.getDate()}`,secs:beforeStart?0:(effectiveLog[ds]||0),isPast:ds<=todayDs,isToday:ds===todayDs});
       }
       return bars;
     } else if(period==="weekly"){
@@ -105,7 +74,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
         const startDs=dsFromDate(start);
         const endDs=dsFromDate(end);
         const year=start.getFullYear();
-        const rangeLabel=fmtWeekLabel(start, end);
+        const rangeLabel=`${start.getMonth()+1}/${start.getDate()} –\n${end.getMonth()+1}/${end.getDate()}`;
         bars.push({key:startDs,endKey:endDs,label:rangeLabel,yearLabel:`${year}`,secs:avgSecs,totalSecs:total,days:7,isPast:true,isToday:startDs===thisWeekDs});
       }
       return bars;
@@ -121,7 +90,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
           if(effectiveLog[ds]){total+=effectiveLog[ds];cnt++;}
         }
         const avgSecs=cnt>0?Math.floor(total/cnt):0;
-        bars.push({key:`${y}-${m}`,endKey:`${y}-${m}`,label:fmtMonthLabel(y,m),secs:avgSecs,totalSecs:total,days:daysInMonth,isPast:true,isToday:(y===ty&&m===tm),year:y,month:m});
+        bars.push({key:`${y}-${m}`,endKey:`${y}-${m}`,label:`${y}${t("yearLabel")}${m+1}${t("monthLabel")}`,secs:avgSecs,totalSecs:total,days:daysInMonth,isPast:true,isToday:(y===ty&&m===tm),year:y,month:m});
         if(y===ty&&m===tm) break;
         m++;if(m>11){m=0;y++;}
       }
@@ -152,32 +121,35 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
   // 選択されたバーに対応するセッション集計
   const getBreakdownForBar=(bar)=>{
     if(!bar) return {};
-    const sessions=state.timerSessions||[];
-    let filtered=[];
-    if(period==="daily"){
-      const dayMs=new Date(bar.key+"T00:00:00").getTime();
-      filtered=sessions.filter(s=>sessInDay(s,dayMs,bar.key));
-    } else if(period==="weekly"){
-      filtered=sessions.filter(s=>{
-        const ds=s.start?dsFromDate(new Date(s.start)):s.day;
-        return ds&&ds>=bar.key&&ds<=bar.endKey;
-      });
-    } else {
-      const parts=bar.key.split("-");
-      const y=parseInt(parts[0]),m=parseInt(parts[1]);
-      filtered=sessions.filter(s=>{
-        if(s.start){const d=new Date(s.start);return d.getFullYear()===y&&d.getMonth()===m;}
-        if(s.day){const d=new Date(s.day+"T00:00:00");return d.getFullYear()===y&&d.getMonth()===m;}
-        return false;
-      });
-    }
-    if(state.timerRunning&&state._pendingReason&&period==="daily"&&bar.key===todayStr){
-      const rMs=state.timerElapsed+(Date.now()-(state.timerStart||Date.now()));
-      filtered=[...filtered,{ms:rMs,reason:state._pendingReason||t("others")}];
-    }
-    const totals={};
-    filtered.forEach(s=>{const r=(!s.noReason&&s.reason)?localizeReason(s.reason):t("reasonNone");totals[r]=(totals[r]||0)+Math.floor(s.ms/1000);});
-    return totals;
+    try{
+      const sessions=state.timerSessions||[];
+      let filtered=[];
+      if(period==="daily"){
+        const dayMs=new Date(bar.key+"T00:00:00").getTime();
+        filtered=sessions.filter(s=>sessInDay(s,dayMs,bar.key));
+      } else if(period==="weekly"){
+        filtered=sessions.filter(s=>{
+          const ds=s.start?dsFromDate(new Date(s.start)):s.day;
+          return ds&&ds>=bar.key&&ds<=(bar.endKey||bar.key);
+        });
+      } else {
+        // monthly: bar.key="YYYY-M" 形式、月番号で比較
+        const parts=bar.key.split("-");
+        const y=parseInt(parts[0]),m=parseInt(parts[1]);
+        filtered=sessions.filter(s=>{
+          if(s.start){const d=new Date(s.start);return d.getFullYear()===y&&d.getMonth()===m;}
+          if(s.day){const d=new Date(s.day+"T00:00:00");return d.getFullYear()===y&&d.getMonth()===m;}
+          return false;
+        });
+      }
+      if(state.timerRunning&&state._pendingReason&&period==="daily"&&bar.key===todayStr){
+        const rMs=state.timerElapsed+(Date.now()-(state.timerStart||Date.now()));
+        filtered=[...filtered,{ms:rMs,reason:state._pendingReason||t("others")}];
+      }
+      const totals={};
+      filtered.forEach(s=>{const r=(!s.noReason&&s.reason)?s.reason:t("reasonNone");totals[r]=(totals[r]||0)+Math.floor(s.ms/1000);});
+      return totals;
+    }catch(e){console.warn("breakdown error",e);return {};}
   };
 
   const reasonTotal=bar=>Object.values(getBreakdownForBar(bar)).reduce((a,v)=>a+v,0)||1;
@@ -208,7 +180,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
     const dayMs=new Date(selectedDay+"T00:00:00").getTime();
     return sessInDay(s,dayMs,selectedDay);
   }):[];
-  const dayReasons={};dayDetail.forEach(s=>{const r=s.reason?localizeReason(s.reason):t("others");dayReasons[r]=(dayReasons[r]||0)+Math.floor(s.ms/1000);});
+  const dayReasons={};dayDetail.forEach(s=>{const r=s.reason||t("others");dayReasons[r]=(dayReasons[r]||0)+Math.floor(s.ms/1000);});
 
   const [tooltip,setTooltip]=useState(null);
 
@@ -243,16 +215,8 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
                   <div style={{marginTop:3,textAlign:"center",lineHeight:1.3,maxWidth:barW}}>
                     {period==="monthly" ? (
                       <>
-                        {(()=>{const lang=typeof LANG!=="undefined"?LANG:"ja";
-                          if(lang==="ja") return <>
-                            <div style={{fontSize:11,color:isSelected?T.accent:T.text+"55",fontWeight:isSelected?700:400}}>{b.year}{t("yearLabel")}</div>
-                            <div style={{fontSize:12,color:labelColor,fontWeight:labelWeight}}>{b.month+1}{t("monthLabel")}</div>
-                          </>;
-                          return <>
-                            <div style={{fontSize:12,color:labelColor,fontWeight:labelWeight}}>{MONTHS_SHORT[b.month]}</div>
-                            <div style={{fontSize:10,color:isSelected?T.accent:T.text+"55",fontWeight:isSelected?700:400}}>{b.year}</div>
-                          </>;
-                        })()}
+                        <div style={{fontSize:11,color:isSelected?T.accent:T.text+"55",fontWeight:isSelected?700:400}}>{b.year}{t("yearLabel")}</div>
+                        <div style={{fontSize:12,color:labelColor,fontWeight:labelWeight}}>{b.month+1}{t("monthLabel")}</div>
                       </>
                     ) : period==="weekly" ? (
                       <>
@@ -290,7 +254,9 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
             const isDefault = !selectedBar;
             const bd = getBreakdownForBar(activeBar);
             const rt = (24*3600) - target; // 24時間－目標時間を100%とする
-            const labelStr = activeBar ? fmtBarLabel(activeBar) : null;
+            const labelStr = activeBar
+              ? (period==="daily" ? activeBar.key : period==="weekly" ? activeBar.label : `${activeBar.year}${t("yearLabel")}${activeBar.month+1}${t("monthLabel")}`)
+              : null;
             const titleStr = isDefault && period==="daily"
               ? t("todayBreakdown")
               : labelStr ? `${t("breakdown")} (${labelStr})` : t("breakdownTab");
@@ -298,7 +264,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
               <div>
                 {period==="daily"&&selectedBar&&(
                   <div className="card" style={{marginBottom:10,textAlign:"center"}}>
-                    <div style={{fontSize:12,color:T.text+"66",marginBottom:4}}>{fmtDayLabel(selectedBar.key)} {t("wearTimeTab")}</div>
+                    <div style={{fontSize:12,color:T.text+"66",marginBottom:4}}>{selectedBar.key} {t("wearTimeTab")}</div>
                     <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:24,fontWeight:700,color:(effectiveLog[selectedBar.key]||0)>=target?T.primary:failCol}}>
                       {effectiveLog[selectedBar.key]?fmt(effectiveLog[selectedBar.key]):t("noRecord")}
                     </div>
@@ -330,7 +296,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
                   return(
                     <div key={n} className="wr" style={{opacity:(total===0&&!isAct)?0.45:1}}>
                       <div style={{display:"flex",alignItems:"center",gap:8,flex:1,minWidth:0}}>
-                        <div style={{width:22,height:22,borderRadius:"50%",background:isAct?T.primary:(["atrium","blushhemp"].includes(state.themeName)?T.accent:T.soft),color:isAct?"#fff":(["atrium","blushhemp"].includes(state.themeName)?"#fff":T.text),display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,flexShrink:0}}>{label}</div>
+                        <div style={{width:22,height:22,borderRadius:"50%",background:isAct?T.primary:T.soft,color:isAct?"#fff":T.text,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,flexShrink:0}}>{label}</div>
                         <span style={{fontSize:12,color:T.text+"99",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:160}}>{rangeLabel}</span>
                       </div>
                       <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,color:isAct?T.primary:T.text+"88",fontSize:14,flexShrink:0}}>{fmt(total)}</span>
@@ -351,8 +317,8 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
                   const achieved=total>0&&total>=target*(period==="weekly"?7:new Date(parseInt(b.key.split("-")[0]),parseInt(b.key.split("-")[1])+1,0).getDate());
                   const weekLabel=period==="weekly"?b.label.replace(/–?\n/,"–"):"";
                   return(
-                    <div key={b.key} className="wr" style={{background:isSelected?T.soft:"transparent",borderRadius:8,cursor:"pointer",borderBottom:`1px solid ${T.text}07`}} onClick={()=>setSelectedBar(isSelected?null:b)}>
-                      <span style={{fontSize:13,fontWeight:isSelected?700:400,color:isSelected?T.primary:T.text,whiteSpace:"nowrap",lineHeight:1.4,flex:1}}>{period==="weekly"?weekLabel:fmtMonthLabel(parseInt(b.key.split("-")[0]),parseInt(b.key.split("-")[1]))}</span>
+                    <div key={b.key} className="wr" style={{background:isSelected?T.soft:"transparent",borderRadius:8,cursor:"pointer"}} onClick={()=>setSelectedBar(isSelected?null:b)}>
+                      <span style={{fontSize:13,fontWeight:isSelected?700:400,color:isSelected?T.primary:T.text,whiteSpace:"nowrap",lineHeight:1.4,flex:1}}>{period==="weekly"?weekLabel:`${parseInt(b.key.split("-")[1])+1}${t("monthLabel")}`}</span>
                       <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,color:total===0?T.text+"44":achieved?T.primary:failCol,fontSize:14,flexShrink:0}}>{total===0?t("noRecord"):fmt(total)}</span>
                     </div>
                   );

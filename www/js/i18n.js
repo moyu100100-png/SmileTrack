@@ -31,7 +31,7 @@ const I18N = {
     target: "目標",
     exchange: "交換",
     daysToEx: "日後に交換",
-    todayEx: "交換日",
+    todayEx: "今日交換日！",
     tomorrowEx: "明日交換！",
     treatmentEnd: "治療終了予定",
     avg7: "7日平均",
@@ -82,6 +82,7 @@ const I18N = {
     deletePhoto: "写真を削除",
     deletePhotoConfirm: "この写真を削除しますか？",
     noPhotos: "写真がありません",
+    offlineNotice: "本アプリはオフライン設計です。\nフォトアルバム内の写真は、端末内だけで保存されるため、\n開発者やその他の第三者に画像が見られることは\n一切ございませんのでご安心ください。",
     shotMode: "撮影部位",
 
     // 統計
@@ -116,7 +117,6 @@ const I18N = {
     schedule: "交換スケジュール",
     colorTheme: "カラーテーマ",
     premium: "プレミアム",
-    premiumMenu: "プレミアム機能",
     coffee: "コーヒーを差し入れ",
     backup: "バックアップ",
     about: "このアプリについて",
@@ -269,19 +269,10 @@ const I18N = {
     tapAfterChange: "交換後タップ",
     progressEndDate: "治療終了予定日",
 
-    // photo.js ゲートカード
-    slot2GateTitle: "プレミアム限定です",
-    slot2GateMsg: "2つ目の撮影スロットでより多くの角度を記録できます。",
-    pinGateTitle: "PINロックはプレミアム限定です",
-    pinGateMsg: "写真アルバムをPINで保護できます。",
-    lockBtn: "ロック",
-
     // 追加: カレンダー
     yearMonth: "{y}年 {m}月",
     months: ["1","2","3","4","5","6","7","8","9","10","11","12"],
     failedLabel: "未達",
-    achievedLabel: "達成",
-    pieceUnit: "枚目",
     exchangeDayLabel: "交換日",
     noPlanLabel: "この日の予定はありません",
     addEventTitle: "予定を追加",
@@ -441,14 +432,6 @@ const I18N = {
     mirrorSaveBtn: "↔ 左右反転して保存",
     shotModeRequired: "部位 *必須",
     pieceNoLabel: "マウスピース番号",
-
-    // 取り外し理由デフォルトリスト
-    reasonBreakfast: "朝食",
-    reasonLunch: "昼食",
-    reasonDinner: "夕食",
-    reasonSnack: "間食",
-    reasonCleaning: "洗浄",
-    reasonOther: "その他",
   },
 
   en: {
@@ -479,7 +462,7 @@ const I18N = {
     target: "Target",
     exchange: "Change",
     daysToEx: "days to change",
-    todayEx: "Change Day",
+    todayEx: "Change today!",
     tomorrowEx: "Change tomorrow!",
     treatmentEnd: "Est. End Date",
     avg7: "7-day avg",
@@ -528,6 +511,7 @@ const I18N = {
     deletePhoto: "Delete Photo",
     deletePhotoConfirm: "Delete this photo?",
     noPhotos: "No photos yet",
+    offlineNotice: "This app is designed for offline use.\nPhotos in the album are stored only on your device.\nNeither the developer nor any third party\ncan ever access your images.",
     shotMode: "Shot Type",
 
     statsTitle: "Statistics",
@@ -559,7 +543,6 @@ const I18N = {
     schedule: "Schedule",
     colorTheme: "Color Theme",
     premium: "Premium",
-    premiumMenu: "Premium Features",
     coffee: "Buy Me a Coffee",
     backup: "Backup",
     about: "About",
@@ -700,18 +683,9 @@ const I18N = {
     tapAfterChange: "Tap after",
     progressEndDate: "Est. End Date",
 
-    // photo.js gate cards
-    slot2GateTitle: "Premium Feature",
-    slot2GateMsg: "The 2nd shot slot lets you capture more angles.",
-    pinGateTitle: "PIN Lock is a Premium Feature",
-    pinGateMsg: "Protect your photo album with a PIN.",
-    lockBtn: "Lock",
-
     yearMonth: "{mon} {y}",
     months: ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
     failedLabel: "Missed",
-    achievedLabel: "Achieved",
-    pieceUnit: "",
     exchangeDayLabel: "Change Day",
     noPlanLabel: "No events for this day",
     addEventTitle: "Add Event",
@@ -867,14 +841,6 @@ const I18N = {
     mirrorSaveBtn: "↔ Save mirrored",
     shotModeRequired: "Shot type *required",
     pieceNoLabel: "Aligner No.",
-
-    // default removal reasons
-    reasonBreakfast: "Breakfast",
-    reasonLunch: "Lunch",
-    reasonDinner: "Dinner",
-    reasonSnack: "Snack",
-    reasonCleaning: "Cleaning",
-    reasonOther: "Other",
   },
 
   ko: {
@@ -954,6 +920,7 @@ const I18N = {
     deletePhoto: "사진 삭제",
     deletePhotoConfirm: "이 사진을 삭제하시겠습니까?",
     noPhotos: "사진이 없습니다",
+    offlineNotice: "이 앱은 오프라인 전용으로 설계되었습니다.\n앨범 내 사진은 기기에만 저장되며,\n개발자 및 제3자는 사진에 접근할 수 없습니다.",
     shotMode: "촬영 부위",
 
     statsTitle: "통계",
@@ -985,7 +952,6 @@ const I18N = {
     schedule: "교체 일정",
     colorTheme: "색상 테마",
     premium: "프리미엄",
-    premiumMenu: "프리미엄 기능",
     coffee: "커피 후원",
     backup: "백업",
     about: "앱 정보",
@@ -1125,16 +1091,9 @@ const I18N = {
     lastDay: "마지막 날 ✨",
     tapAfterChange: "교체 후 탭",
     progressEndDate: "치료 종료 예정일",
-
-    slot2GateTitle: "프리미엄 전용",
-    slot2GateMsg: "두 번째 촬영 슬롯으로 더 많은 각도를 기록할 수 있습니다.",
-    pinGateTitle: "PIN 잠금은 프리미엄 전용입니다",
-    pinGateMsg: "PIN으로 사진 앨범을 보호할 수 있습니다.",
-    lockBtn: "잠금",
     yearMonth: "{y}년 {m}월",
     months: ["1","2","3","4","5","6","7","8","9","10","11","12"],
     achievedLabel: "달성",
-    pieceUnit: "번째",
     failedLabel: "미달",
     exchangeDayLabel: "교체일",
     noPlanLabel: "이 날의 일정이 없습니다",
@@ -1271,13 +1230,6 @@ const I18N = {
     alarmFromTimer: "제거 후 {min}분이 경과했습니다",
     removalExceeded: "제거 타이머가 {h}시간을 초과했습니다",
     shareAppText: "투명교정 관리 앱 SmileTrack을 사용해 보세요!",
-
-    reasonBreakfast: "아침식사",
-    reasonLunch: "점심식사",
-    reasonDinner: "저녁식사",
-    reasonSnack: "간식",
-    reasonCleaning: "세정",
-    reasonOther: "기타",
   },
 
   zh: {
@@ -1357,6 +1309,7 @@ const I18N = {
     deletePhoto: "删除照片",
     deletePhotoConfirm: "确定删除此照片？",
     noPhotos: "暂无照片",
+    offlineNotice: "本应用为离线设计。\n相册中的照片仅保存在您的设备上，\n开发者及任何第三方均无法查看您的照片。",
     shotMode: "拍摄部位",
 
     statsTitle: "统计",
@@ -1388,7 +1341,6 @@ const I18N = {
     schedule: "更换计划",
     colorTheme: "颜色主题",
     premium: "高级版",
-    premiumMenu: "高级功能",
     coffee: "请开发者喝咖啡",
     backup: "备份",
     about: "关于",
@@ -1528,16 +1480,9 @@ const I18N = {
     lastDay: "最后一天 ✨",
     tapAfterChange: "更换后点击",
     progressEndDate: "预计治疗结束日",
-
-    slot2GateTitle: "高级专属功能",
-    slot2GateMsg: "第二拍摄槽位可记录更多角度。",
-    pinGateTitle: "PIN锁定是高级专属功能",
-    pinGateMsg: "可用PIN保护相册。",
-    lockBtn: "锁定",
     yearMonth: "{y}年{m}月",
     months: ["1","2","3","4","5","6","7","8","9","10","11","12"],
     achievedLabel: "达成",
-    pieceUnit: "副",
     failedLabel: "未达",
     exchangeDayLabel: "更换日",
     noPlanLabel: "今天没有日程",
@@ -1674,13 +1619,6 @@ const I18N = {
     alarmFromTimer: "摘除后{min}分钟已过",
     removalExceeded: "摘除计时器已超过{h}小时",
     shareAppText: "推荐使用隐形矫正管理应用SmileTrack！",
-
-    reasonBreakfast: "早餐",
-    reasonLunch: "午餐",
-    reasonDinner: "晚餐",
-    reasonSnack: "零食",
-    reasonCleaning: "清洗",
-    reasonOther: "其他",
   },
 
   de: {
@@ -1760,6 +1698,7 @@ const I18N = {
     deletePhoto: "Foto löschen",
     deletePhotoConfirm: "Dieses Foto löschen?",
     noPhotos: "Keine Fotos vorhanden",
+    offlineNotice: "Diese App ist für die Offline-Nutzung konzipiert.\nFotos im Album werden nur auf Ihrem Gerät gespeichert.\nWeder der Entwickler noch Dritte können auf Ihre Fotos zugreifen.",
     shotMode: "Aufnahme-Typ",
 
     statsTitle: "Statistik",
@@ -1791,7 +1730,6 @@ const I18N = {
     schedule: "Wechselplan",
     colorTheme: "Farbthema",
     premium: "Premium",
-    premiumMenu: "Premium-Funktionen",
     coffee: "Kaffee spendieren",
     backup: "Backup",
     about: "Über die App",
@@ -1931,16 +1869,9 @@ const I18N = {
     lastDay: "Letzter Tag ✨",
     tapAfterChange: "Nach Wechsel tippen",
     progressEndDate: "Voraus. Behandlungsende",
-
-    slot2GateTitle: "Premium-Funktion",
-    slot2GateMsg: "Mit dem 2. Aufnahmeslot kannst du mehr Winkel festhalten.",
-    pinGateTitle: "PIN-Sperre ist eine Premium-Funktion",
-    pinGateMsg: "Schütze dein Fotoalbum mit einem PIN.",
-    lockBtn: "Sperren",
     yearMonth: "{mon} {y}",
     months: ["Jan","Feb","Mär","Apr","Mai","Jun","Jul","Aug","Sep","Okt","Nov","Dez"],
     achievedLabel: "Erreicht",
-    pieceUnit: "",
     failedLabel: "Nicht erreicht",
     exchangeDayLabel: "Wechseltag",
     noPlanLabel: "Keine Termine für diesen Tag",
@@ -2077,13 +2008,6 @@ const I18N = {
     alarmFromTimer: "{min} Min. vergangen",
     removalExceeded: "Entnahme-Timer hat {h}Std. überschritten",
     shareAppText: "Probier SmileTrack – den Aligner-Tracker!",
-
-    reasonBreakfast: "Frühstück",
-    reasonLunch: "Mittagessen",
-    reasonDinner: "Abendessen",
-    reasonSnack: "Snack",
-    reasonCleaning: "Reinigung",
-    reasonOther: "Sonstiges",
   },
 
   es: {
@@ -2163,6 +2087,7 @@ const I18N = {
     deletePhoto: "Eliminar foto",
     deletePhotoConfirm: "¿Eliminar esta foto?",
     noPhotos: "Sin fotos aún",
+    offlineNotice: "Esta app está diseñada para uso sin conexión.\nLas fotos del álbum se guardan solo en tu dispositivo.\nNi el desarrollador ni terceros pueden acceder a tus imágenes.",
     shotMode: "Tipo de toma",
 
     statsTitle: "Estadísticas",
@@ -2194,7 +2119,6 @@ const I18N = {
     schedule: "Calendario de cambios",
     colorTheme: "Tema de color",
     premium: "Premium",
-    premiumMenu: "Funciones Premium",
     coffee: "Invitar un café",
     backup: "Copia de seguridad",
     about: "Acerca de",
@@ -2334,16 +2258,9 @@ const I18N = {
     lastDay: "Último día ✨",
     tapAfterChange: "Tap después",
     progressEndDate: "Fin estimado del tratamiento",
-
-    slot2GateTitle: "Función Premium",
-    slot2GateMsg: "El 2.º slot de disparo permite capturar más ángulos.",
-    pinGateTitle: "El bloqueo PIN es una función Premium",
-    pinGateMsg: "Protege tu álbum de fotos con un PIN.",
-    lockBtn: "Bloquear",
     yearMonth: "{mon} {y}",
     months: ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"],
     achievedLabel: "Logrado",
-    pieceUnit: "",
     failedLabel: "No logrado",
     exchangeDayLabel: "Día de cambio",
     noPlanLabel: "No hay eventos para este día",
@@ -2480,13 +2397,6 @@ const I18N = {
     alarmFromTimer: "{min} min transcurridos",
     removalExceeded: "Temporizador de retirada supera {h}h",
     shareAppText: "¡Prueba SmileTrack, el seguidor de alineadores!",
-
-    reasonBreakfast: "Desayuno",
-    reasonLunch: "Almuerzo",
-    reasonDinner: "Cena",
-    reasonSnack: "Snack",
-    reasonCleaning: "Limpieza",
-    reasonOther: "Otro",
   },
 };
 
