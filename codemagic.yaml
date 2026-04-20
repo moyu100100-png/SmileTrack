@@ -48,7 +48,11 @@ workflows:
         script: |
           xcode-project build-ipa \
             --project "ios/App/$XCODE_PROJECT" \
-            --scheme "$XCODE_SCHEME"
+            --scheme "$XCODE_SCHEME" \
+            --xcargs "OTHER_SWIFT_FLAGS='-v'" \
+            2>&1 | tee /tmp/xcode_build.log
+          echo "=== ERRORS ==="
+          grep -E "error:|warning:|fatal" /tmp/xcode_build.log | head -50
     artifacts:
       - build/ios/ipa/*.ipa
     publishing:
