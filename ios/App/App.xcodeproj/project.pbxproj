@@ -22,7 +22,6 @@
 		AA000000000000000000AAA5 /* tone5.caf in Resources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000BBB5 /* tone5.caf */; };
 		BB000000000000000000AAA1 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BBB1 /* ViewController.swift */; };
 		CC000000000000000000AAA1 /* RCBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC000000000000000000BBB1 /* RCBridge.swift */; };
-		DD000000000000000000AAA1 /* RevenuecatPurchasesCapacitor in Frameworks */ = {isa = PBXBuildFile; productRef = DD000000000000000000BBB1 /* RevenuecatPurchasesCapacitor */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -51,7 +50,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D22ABE92AF431CB00220026 /* CapApp-SPM in Frameworks */,
-				DD000000000000000000AAA1 /* RevenuecatPurchasesCapacitor in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -115,7 +113,6 @@
 			name = App;
 			packageProductDependencies = (
 				4D22ABE82AF431CB00220026 /* CapApp-SPM */,
-				DD000000000000000000BBB1 /* RevenuecatPurchasesCapacitor */,
 			);
 			productName = App;
 			productReference = 504EC3041FED79650016851F /* App.app */;
@@ -400,11 +397,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = D4C12C0A2AAA248700AAC8A2 /* XCLocalSwiftPackageReference "CapApp-SPM" */;
 			productName = "CapApp-SPM";
-		};
-		DD000000000000000000BBB1 /* RevenuecatPurchasesCapacitor */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = D4C12C0A2AAA248700AAC8A2 /* XCLocalSwiftPackageReference "CapApp-SPM" */;
-			productName = "RevenuecatPurchasesCapacitor";
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
