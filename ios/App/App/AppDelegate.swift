@@ -1,7 +1,7 @@
 import UIKit
 import Capacitor
 import UserNotifications
-import RevenueCat
+import RevenuecatPurchasesCapacitor
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {

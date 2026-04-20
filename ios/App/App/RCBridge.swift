@@ -1,6 +1,6 @@
 import Foundation
 import Capacitor
-import RevenueCat
+import RevenuecatPurchasesCapacitor
 
 @objc(RCBridge)
 public class RCBridge: CAPPlugin, CAPBridgedPlugin {
@@ -13,7 +13,6 @@ public class RCBridge: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "getCustomerInfo", returnType: CAPPluginReturnPromise),
     ]
 
-    // ── Offerings取得 ─────────────────────────────────────────────────────
     @objc func getOfferings(_ call: CAPPluginCall) {
         Purchases.shared.getOfferings { offerings, error in
             if let error = error {
@@ -24,11 +23,8 @@ public class RCBridge: CAPPlugin, CAPBridgedPlugin {
                 call.reject("No offerings returned")
                 return
             }
-
             var result: [[String: Any]] = []
-            let allOfferings = offerings.all
-
-            for (_, offering) in allOfferings {
+            for (_, offering) in offerings.all {
                 for package in offering.availablePackages {
                     let product = package.storeProduct
                     result.append([
@@ -39,25 +35,20 @@ public class RCBridge: CAPPlugin, CAPBridgedPlugin {
                     ])
                 }
             }
-
             call.resolve(["packages": result])
         }
     }
 
-    // ── パッケージ購入 ────────────────────────────────────────────────────
     @objc func purchasePackage(_ call: CAPPluginCall) {
         guard let productId = call.getString("productId") else {
             call.reject("productId is required")
             return
         }
-
         Purchases.shared.getOfferings { offerings, error in
             if let error = error {
                 call.reject("getOfferings failed: \(error.localizedDescription)")
                 return
             }
-
-            // 全Offeringから該当パッケージを検索
             var targetPackage: Package? = nil
             if let allOfferings = offerings?.all {
                 outer: for (_, offering) in allOfferings {
@@ -69,12 +60,10 @@ public class RCBridge: CAPPlugin, CAPBridgedPlugin {
                     }
                 }
             }
-
             guard let pkg = targetPackage else {
                 call.reject("Product not found: \(productId)")
                 return
             }
-
             Purchases.shared.purchase(package: pkg) { transaction, customerInfo, error, userCancelled in
                 if userCancelled {
                     call.reject("PURCHASE_CANCELLED")
@@ -86,15 +75,11 @@ public class RCBridge: CAPPlugin, CAPBridgedPlugin {
                 }
                 let isPremium = customerInfo?.entitlements["premium"]?.isActive == true
                 let noAds = customerInfo?.entitlements["no_ads"]?.isActive == true
-                call.resolve([
-                    "isPremium": isPremium,
-                    "noAds": noAds,
-                ])
+                call.resolve(["isPremium": isPremium, "noAds": noAds])
             }
         }
     }
 
-    // ── 購入復元 ──────────────────────────────────────────────────────────
     @objc func restorePurchases(_ call: CAPPluginCall) {
         Purchases.shared.restorePurchases { customerInfo, error in
             if let error = error {
@@ -103,14 +88,10 @@ public class RCBridge: CAPPlugin, CAPBridgedPlugin {
             }
             let isPremium = customerInfo?.entitlements["premium"]?.isActive == true
             let noAds = customerInfo?.entitlements["no_ads"]?.isActive == true
-            call.resolve([
-                "isPremium": isPremium,
-                "noAds": noAds,
-            ])
+            call.resolve(["isPremium": isPremium, "noAds": noAds])
         }
     }
 
-    // ── 顧客情報取得 ──────────────────────────────────────────────────────
     @objc func getCustomerInfo(_ call: CAPPluginCall) {
         Purchases.shared.getCustomerInfo { customerInfo, error in
             if let error = error {
@@ -119,10 +100,7 @@ public class RCBridge: CAPPlugin, CAPBridgedPlugin {
             }
             let isPremium = customerInfo?.entitlements["premium"]?.isActive == true
             let noAds = customerInfo?.entitlements["no_ads"]?.isActive == true
-            call.resolve([
-                "isPremium": isPremium,
-                "noAds": noAds,
-            ])
+            call.resolve(["isPremium": isPremium, "noAds": noAds])
         }
     }
 }
