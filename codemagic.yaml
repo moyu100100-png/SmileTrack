@@ -28,7 +28,7 @@ workflows:
           done
       - name: Set build number
         script: |
-          BUILD_NUMBER=81
+          BUILD_NUMBER=85
           echo "Setting build number to: $BUILD_NUMBER"
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" ios/App/App/Info.plist
       - name: Set up keychain
@@ -44,6 +44,19 @@ workflows:
             --create
       - name: Set up code signing
         script: xcode-project use-profiles
+      - name: Debug xcodebuild errors
+        script: |
+          set +e
+          xcodebuild \
+            -project "ios/App/$XCODE_PROJECT" \
+            -scheme "$XCODE_SCHEME" \
+            -destination "generic/platform=iOS" \
+            clean build \
+            DEVELOPMENT_TEAM=ZR6V257AVF \
+            CODE_SIGN_IDENTITY="Apple Distribution" \
+            CODE_SIGN_STYLE=Manual \
+            2>&1 | grep -E "^(error:|fatal error:|warning:.*error|.*Build.*error)" | head -30
+          set -e
       - name: Build iOS
         script: |
           xcode-project build-ipa \
