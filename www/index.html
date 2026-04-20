@@ -21,10 +21,10 @@
     try {
       const isNative = typeof Capacitor !== "undefined" && Capacitor.isNativePlatform && Capacitor.isNativePlatform();
       console.log("[RC] isNativePlatform:", isNative);
-      console.log("[RC] Purchases before:", typeof Capacitor?.Plugins?.Purchases);
+      console.log("[RC] RCBridge before:", typeof Capacitor?.Plugins?.RCBridge);
       if (isNative && Capacitor.registerPlugin) {
-        Capacitor.registerPlugin('Purchases');
-        console.log("[RC] Purchases after:", typeof Capacitor?.Plugins?.Purchases);
+        Capacitor.registerPlugin('RCBridge');
+        console.log("[RC] RCBridge after:", typeof Capacitor?.Plugins?.RCBridge);
       }
     } catch(e) { console.error("[RC] init error:", e); }
   }
