@@ -16,22 +16,23 @@
   <script src="capacitor.js"></script>
   <script>
   // ── RevenueCat プラグイン登録 ─────────────────────────────────────────────
-  // deviceready後にCapacitorネイティブブリッジ確立を待ってから登録する
+  // Capacitorはdevicereadyを待たず即時登録でOK（Cordova時代の概念は不要）
   function _initRC() {
     try {
-      const isNative = typeof Capacitor !== "undefined" && Capacitor.isNativePlatform && Capacitor.isNativePlatform();
+      const isNative = typeof Capacitor !== "undefined"
+        && Capacitor.isNativePlatform
+        && Capacitor.isNativePlatform();
       console.log("[RC] isNativePlatform:", isNative);
-      console.log("[RC] RCBridge before:", typeof Capacitor?.Plugins?.RCBridge);
       if (isNative && Capacitor.registerPlugin) {
         Capacitor.registerPlugin('RCBridge');
-        console.log("[RC] RCBridge after:", typeof Capacitor?.Plugins?.RCBridge);
+        console.log("[RC] RCBridge registered:", typeof Capacitor?.Plugins?.RCBridge);
       }
     } catch(e) { console.error("[RC] init error:", e); }
   }
-  // devicereadyイベント後に登録（Capacitorネイティブブリッジ確立を待つ）
-  document.addEventListener("deviceready", _initRC, { once: true });
-  // フォールバック：300ms後にも実行
-  setTimeout(_initRC, 300);
+  // capacitor.js読み込み直後に即時実行
+  _initRC();
+  // 念のためDOMContentLoaded後にも再実行
+  document.addEventListener("DOMContentLoaded", _initRC);
   </script>
   <script>
   // ── AdMob 設定 ────────────────────────────────────────────────────────────
