@@ -28,7 +28,7 @@ workflows:
           done
       - name: Set build number
         script: |
-          BUILD_NUMBER=83
+          BUILD_NUMBER=81
           echo "Setting build number to: $BUILD_NUMBER"
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" ios/App/App/Info.plist
       - name: Set up keychain
@@ -48,11 +48,7 @@ workflows:
         script: |
           xcode-project build-ipa \
             --project "ios/App/$XCODE_PROJECT" \
-            --scheme "$XCODE_SCHEME" \
-            --xcargs "OTHER_SWIFT_FLAGS='-v'" \
-            2>&1 | tee /tmp/xcode_build.log
-          echo "=== ERRORS ==="
-          grep -E "error:|warning:|fatal" /tmp/xcode_build.log | head -50
+            --scheme "$XCODE_SCHEME"
     artifacts:
       - build/ios/ipa/*.ipa
     publishing:
