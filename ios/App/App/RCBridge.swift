@@ -1,6 +1,6 @@
 import Foundation
 import Capacitor
-import RevenuecatPurchasesCapacitor
+import RevenueCat
 
 @objc(RCBridge)
 public class RCBridge: CAPPlugin, CAPBridgedPlugin {
