@@ -20,38 +20,7 @@ workflows:
       - name: Capacitor sync
         script: npx cap sync ios
       - name: Restore Package.swift with RevenueCat
-        script: |
-          cat > ios/App/CapApp-SPM/Package.swift << 'PKGEOF'
-// swift-tools-version: 5.9
-import PackageDescription
-let package = Package(
-    name: "CapApp-SPM",
-    platforms: [.iOS(.v15)],
-    products: [
-        .library(name: "CapApp-SPM", targets: ["CapApp-SPM"])
-    ],
-    dependencies: [
-        .package(url: "https://github.com/ionic-team/capacitor-swift-pm.git", exact: "8.3.1"),
-        .package(name: "CapacitorCommunityAdmob", path: "../../../node_modules/@capacitor-community/admob"),
-        .package(name: "CapacitorLocalNotifications", path: "../../../node_modules/@capacitor/local-notifications"),
-        .package(name: "CapacitorSplashScreen", path: "../../../node_modules/@capacitor/splash-screen"),
-        .package(name: "RevenuecatPurchasesCapacitor", path: "../../../node_modules/@revenuecat/purchases-capacitor"),
-    ],
-    targets: [
-        .target(
-            name: "CapApp-SPM",
-            dependencies: [
-                .product(name: "Capacitor", package: "capacitor-swift-pm"),
-                .product(name: "Cordova", package: "capacitor-swift-pm"),
-                .product(name: "CapacitorCommunityAdmob", package: "CapacitorCommunityAdmob"),
-                .product(name: "CapacitorLocalNotifications", package: "CapacitorLocalNotifications"),
-                .product(name: "CapacitorSplashScreen", package: "CapacitorSplashScreen"),
-                .product(name: "RevenuecatPurchasesCapacitor", package: "RevenuecatPurchasesCapacitor"),
-            ]
-        )
-    ]
-)
-PKGEOF
+        script: echo "Ly8gc3dpZnQtdG9vbHMtdmVyc2lvbjogNS45CmltcG9ydCBQYWNrYWdlRGVzY3JpcHRpb24KbGV0IHBhY2thZ2UgPSBQYWNrYWdlKAogICAgbmFtZTogIkNhcEFwcC1TUE0iLAogICAgcGxhdGZvcm1zOiBbLmlPUygudjE1KV0sCiAgICBwcm9kdWN0czogWwogICAgICAgIC5saWJyYXJ5KG5hbWU6ICJDYXBBcHAtU1BNIiwgdGFyZ2V0czogWyJDYXBBcHAtU1BNIl0pCiAgICBdLAogICAgZGVwZW5kZW5jaWVzOiBbCiAgICAgICAgLnBhY2thZ2UodXJsOiAiaHR0cHM6Ly9naXRodWIuY29tL2lvbmljLXRlYW0vY2FwYWNpdG9yLXN3aWZ0LXBtLmdpdCIsIGV4YWN0OiAiOC4zLjEiKSwKICAgICAgICAucGFja2FnZShuYW1lOiAiQ2FwYWNpdG9yQ29tbXVuaXR5QWRtb2IiLCBwYXRoOiAiLi4vLi4vLi4vbm9kZV9tb2R1bGVzL0BjYXBhY2l0b3ItY29tbXVuaXR5L2FkbW9iIiksCiAgICAgICAgLnBhY2thZ2UobmFtZTogIkNhcGFjaXRvckxvY2FsTm90aWZpY2F0aW9ucyIsIHBhdGg6ICIuLi8uLi8uLi9ub2RlX21vZHVsZXMvQGNhcGFjaXRvci9sb2NhbC1ub3RpZmljYXRpb25zIiksCiAgICAgICAgLnBhY2thZ2UobmFtZTogIkNhcGFjaXRvclNwbGFzaFNjcmVlbiIsIHBhdGg6ICIuLi8uLi8uLi9ub2RlX21vZHVsZXMvQGNhcGFjaXRvci9zcGxhc2gtc2NyZWVuIiksCiAgICAgICAgLnBhY2thZ2UobmFtZTogIlJldmVudWVjYXRQdXJjaGFzZXNDYXBhY2l0b3IiLCBwYXRoOiAiLi4vLi4vLi4vbm9kZV9tb2R1bGVzL0ByZXZlbnVlY2F0L3B1cmNoYXNlcy1jYXBhY2l0b3IiKSwKICAgIF0sCiAgICB0YXJnZXRzOiBbCiAgICAgICAgLnRhcmdldCgKICAgICAgICAgICAgbmFtZTogIkNhcEFwcC1TUE0iLAogICAgICAgICAgICBkZXBlbmRlbmNpZXM6IFsKICAgICAgICAgICAgICAgIC5wcm9kdWN0KG5hbWU6ICJDYXBhY2l0b3IiLCBwYWNrYWdlOiAiY2FwYWNpdG9yLXN3aWZ0LXBtIiksCiAgICAgICAgICAgICAgICAucHJvZHVjdChuYW1lOiAiQ29yZG92YSIsIHBhY2thZ2U6ICJjYXBhY2l0b3Itc3dpZnQtcG0iKSwKICAgICAgICAgICAgICAgIC5wcm9kdWN0KG5hbWU6ICJDYXBhY2l0b3JDb21tdW5pdHlBZG1vYiIsIHBhY2thZ2U6ICJDYXBhY2l0b3JDb21tdW5pdHlBZG1vYiIpLAogICAgICAgICAgICAgICAgLnByb2R1Y3QobmFtZTogIkNhcGFjaXRvckxvY2FsTm90aWZpY2F0aW9ucyIsIHBhY2thZ2U6ICJDYXBhY2l0b3JMb2NhbE5vdGlmaWNhdGlvbnMiKSwKICAgICAgICAgICAgICAgIC5wcm9kdWN0KG5hbWU6ICJDYXBhY2l0b3JTcGxhc2hTY3JlZW4iLCBwYWNrYWdlOiAiQ2FwYWNpdG9yU3BsYXNoU2NyZWVuIiksCiAgICAgICAgICAgICAgICAucHJvZHVjdChuYW1lOiAiUmV2ZW51ZWNhdFB1cmNoYXNlc0NhcGFjaXRvciIsIHBhY2thZ2U6ICJSZXZlbnVlY2F0UHVyY2hhc2VzQ2FwYWNpdG9yIiksCiAgICAgICAgICAgIF0KICAgICAgICApCiAgICBdCikK" | base64 --decode > ios/App/CapApp-SPM/Package.swift
       - name: Convert alarm sounds to caf
         script: |
           for i in 1 2 3 4 5; do
