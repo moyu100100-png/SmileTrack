@@ -1,6 +1,7 @@
 import UIKit
 import Capacitor
 import UserNotifications
+import RevenueCat
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -13,6 +14,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Purchases.logLevel = .debug
         Purchases.configure(withAPIKey: "appl_HrDpuICDgfGShogHiNmlmBubJSJ")
         print("[RC] Purchases configured")
+
+        // ── RCBridge をCapacitorに登録 ────────────────────────────────────
+        CAPBridge.registerPlugin(RCBridge.self)
+        print("[RC] RCBridge registered")
         // ────────────────────────────────────────────────────────────────────
 
         UNUserNotificationCenter.current().delegate = self
