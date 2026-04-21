@@ -87,32 +87,50 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
   const [errorMsg,setErrorMsg]=React.useState(null);
   const [selectedPlan,setSelectedPlan]=React.useState("yearly");
   const [prices,setPrices]=React.useState({});
+  const [debugLog,setDebugLog]=React.useState([]);
+  const [showDebug,setShowDebug]=React.useState(false);
+
+  const dbg=(msg)=>{
+    console.log("[RC-DEBUG]",msg);
+    setDebugLog(prev=>[...prev, msg]);
+  };
 
   // RevenueCatから実際の価格を取得
   React.useEffect(()=>{
     (async()=>{
       try{
-        if(!Purchases._isNative()) return;
+        dbg("① isNative: "+Purchases._isNative());
+        dbg("② plugin: "+(typeof Purchases._plugin()));
+        if(!Purchases._isNative()){ dbg("→ ネイティブでないため終了"); return; }
+        dbg("③ getOfferings 呼び出し中...");
         const offerings=await Purchases.getOfferings();
-        console.log("[RC] PremiumModal: packages:", offerings?.current?.availablePackages?.length ?? 0);
+        dbg("④ offerings取得: "+JSON.stringify(offerings).slice(0,200));
+        const pkgCount=offerings?.current?.availablePackages?.length ?? 0;
+        dbg("⑤ packages数: "+pkgCount);
         // currentだけでなく全offeringsから価格を取得
         const seen=new Set();
         const allPkgs=[];
         const addPkgs=(pkgs)=>{(pkgs||[]).forEach(pkg=>{const id=pkg.product?.identifier;if(id&&!seen.has(id)){seen.add(id);allPkgs.push(pkg);}});};
         addPkgs(offerings?.current?.availablePackages);
         Object.values(offerings?.all||{}).forEach(o=>addPkgs(o.availablePackages));
+        dbg("⑥ 全pkg数: "+allPkgs.length);
         const p={};
         allPkgs.forEach(pkg=>{
           const id=pkg.product?.identifier;
           const price=pkg.product?.priceString;
+          dbg("  pkg: "+id+" → "+price);
           if(id&&price){
             Object.entries(RC_PRODUCTS).forEach(([key,val])=>{
               if(val===id) p[key]=price;
             });
           }
         });
+        dbg("⑦ prices: "+JSON.stringify(p));
         if(Object.keys(p).length>0) setPrices(p);
-      }catch(e){ console.warn("[RC] getOfferings error",e); }
+      }catch(e){
+        dbg("❌ エラー: "+e?.message+" / code:"+e?.code);
+        console.warn("[RC] getOfferings error",e);
+      }
     })();
   },[]);
 
@@ -234,6 +252,24 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
               <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16,fontWeight:700,color:T.text,flexShrink:0}}>{p.price}</div>
             </div>
           ))}
+        </div>
+
+        {/* 🔧 デバッグエリア（審査前に削除） */}
+        <div style={{marginTop:8}}>
+          <button onClick={()=>setShowDebug(v=>!v)}
+            style={{width:"100%",padding:"6px",fontSize:11,background:"#222",color:"#0f0",border:"none",borderRadius:6,cursor:"pointer",fontFamily:"monospace"}}>
+            {showDebug?"▲ デバッグ非表示":"▼ RCデバッグログを表示"}
+          </button>
+          {showDebug&&(
+            <div style={{background:"#111",borderRadius:6,padding:"8px",marginTop:4,maxHeight:180,overflowY:"auto"}}>
+              {debugLog.length===0
+                ? <div style={{color:"#888",fontSize:11,fontFamily:"monospace"}}>ログなし</div>
+                : debugLog.map((l,i)=>(
+                    <div key={i} style={{color:l.startsWith("❌")?"#f66":"#0f0",fontSize:11,fontFamily:"monospace",marginBottom:2,wordBreak:"break-all"}}>{l}</div>
+                  ))
+              }
+            </div>
+          )}
         </div>
 
         <button className="btn bs" style={{width:"100%",marginTop:8}} onClick={onClose}>{t("close")}</button>
