@@ -30,7 +30,7 @@ workflows:
           done
       - name: Set build number
         script: |
-          BUILD_NUMBER=87
+          BUILD_NUMBER=88
           echo "Setting build number to: $BUILD_NUMBER"
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" ios/App/App/Info.plist
       - name: Set up keychain
