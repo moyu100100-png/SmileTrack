@@ -15,30 +15,23 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="capacitor.js"></script>
   <script>
-  // ── RevenueCat プラグイン登録 ─────────────────────────────────────────────
-  // Capacitorはdevicereadyを待たず即時登録でOK（Cordova時代の概念は不要）
   function _initRC() {
     try {
       const isNative = typeof Capacitor !== "undefined"
         && Capacitor.isNativePlatform
         && Capacitor.isNativePlatform();
-      console.log("[RC] isNativePlatform:", isNative);
       if (isNative && Capacitor.registerPlugin) {
         Capacitor.registerPlugin('RCBridge');
-        console.log("[RC] RCBridge registered:", typeof Capacitor?.Plugins?.RCBridge);
       }
-    } catch(e) { console.error("[RC] init error:", e); }
+    } catch(e) {}
   }
-  // capacitor.js読み込み直後に即時実行
   _initRC();
-  // 念のためDOMContentLoaded後にも再実行
   document.addEventListener("DOMContentLoaded", _initRC);
   </script>
   <script>
-  // ── AdMob 設定 ────────────────────────────────────────────────────────────
   const ADMOB_APP_ID    = "ca-app-pub-5456814091467820~1944092541";
-  const ADMOB_BANNER_ID = "ca-app-pub-3940256099942544/2934735716";
-  const ADMOB_INTER_ID  = "ca-app-pub-3940256099942544/4411468910";
+  const ADMOB_BANNER_ID = "ca-app-pub-5456814091467820/6020940488";
+  const ADMOB_INTER_ID  = "ca-app-pub-5456814091467820/6669903678";
 
   window.AdMobHelper = {
     _interCount: 0,
@@ -51,7 +44,7 @@
         await Capacitor.Plugins.AdMob.initialize({
           requestTrackingAuthorization: true,
           testingDevices: [],
-          initializeForTesting: true,
+          initializeForTesting: false,
         });
       } catch(e) { console.warn("[AdMob] initialize error", e); }
     },
@@ -64,7 +57,7 @@
           adSize: "BANNER",
           position: "BOTTOM_CENTER",
           margin: 0,
-          isTesting: true,
+          isTesting: false,
         });
       } catch(e) { console.warn("[AdMob] showBanner error", e); }
     },
@@ -81,7 +74,7 @@
       try {
         await Capacitor.Plugins.AdMob.prepareInterstitial({
           adId: ADMOB_INTER_ID,
-          isTesting: true,
+          isTesting: false,
         });
       } catch(e) { console.warn("[AdMob] prepareInterstitial error", e); }
     },
@@ -98,7 +91,7 @@
       }
     },
   };
-  // ── RevenueCat ラッパー ───────────────────────────────────────────────────
+
   window.RC_API_KEY_IOS = "appl_HrDpuICDgfGShogHiNmlmBubJSJ";
   window.RC_ENTITLEMENT = "premium";
   window.RC_PRODUCTS = {
@@ -112,33 +105,23 @@
     _isNative() {
       return typeof Capacitor !== "undefined" && Capacitor.isNativePlatform?.();
     },
-
-    // Swift側のRCBridgeプラグインを取得
     _plugin() {
       return Capacitor?.Plugins?.RCBridge;
     },
-
-    async configure() {
-      // Swift側AppDelegateで初期化済みなので何もしない
-      return;
-    },
-
+    async configure() { return; },
     async getOfferings() {
       if (!this._isNative()) return { current: null, all: {} };
       const plugin = this._plugin();
-      if (!plugin) { console.error("[RC] RCBridge plugin not found"); return { current: null, all: {} }; }
+      if (!plugin) return { current: null, all: {} };
       try {
         const result = await plugin.getOfferings();
-        console.log("[RC] getOfferings raw:", JSON.stringify(result));
-        // packagesリストをcurrent.availablePackages形式に変換
         const pkgs = (result.packages || []).map(p => ({
           identifier: p.packageIdentifier,
           product: { identifier: p.identifier, priceString: p.priceString },
         }));
         return { current: { availablePackages: pkgs }, all: {} };
-      } catch(e) { console.error("[RC] getOfferings error:", e); return { current: null, all: {} }; }
+      } catch(e) { return { current: null, all: {} }; }
     },
-
     async isPremiumUser() {
       if (!this._isNative()) return false;
       const plugin = this._plugin();
@@ -148,7 +131,6 @@
         return result.isPremium === true;
       } catch(e) { return false; }
     },
-
     async hasNoAds() {
       if (!this._isNative()) return false;
       const plugin = this._plugin();
@@ -158,15 +140,12 @@
         return result.noAds === true;
       } catch(e) { return false; }
     },
-
     async purchaseProduct(productId) {
       if (!this._isNative()) throw new Error("native only");
       const plugin = this._plugin();
       if (!plugin) throw new Error("RCBridge plugin not found");
-      const result = await plugin.purchasePackage({ productId });
-      return result;
+      return await plugin.purchasePackage({ productId });
     },
-
     async restorePurchases() {
       if (!this._isNative()) throw new Error("native only");
       const plugin = this._plugin();
@@ -187,10 +166,7 @@
     async schedule(id,title,body,atMs,sound=null,isAlarm=false){
       try{
         const {LocalNotifications}=Capacitor.Plugins;
-        const notif={
-          id,title,body,
-          schedule:{at:new Date(atMs)},
-        };
+        const notif={id,title,body,schedule:{at:new Date(atMs)}};
         if(sound) notif.sound=sound;
         if(isAlarm) notif.actionTypeId="ALARM_CATEGORY";
         await LocalNotifications.schedule({notifications:[notif]});
