@@ -102,7 +102,14 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
         ];
         setDebugLogs(initLogs);
         if(!isNative){ setDebugLogs([...initLogs,"非ネイティブのためスキップ"]); return; }
-        if(!plugin){ setDebugLogs([...initLogs,"❌ Purchases pluginが見つからない"]); return; }
+        if(!plugin){
+          const keys = Object.keys(Capacitor?.Plugins || {}).join(", ");
+          setDebugLogs([...initLogs,
+            "pluginKeys: " + keys,
+            "❌ Purchases pluginが見つからない"
+          ]);
+          return;
+        }
 
         const offerings=await Purchases.getOfferings();
         const swiftLogs=window._rcDebugLogs||[];
