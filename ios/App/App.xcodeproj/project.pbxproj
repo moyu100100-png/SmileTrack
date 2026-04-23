@@ -22,6 +22,7 @@
 		AA000000000000000000AAA5 /* tone5.caf in Resources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000BBB5 /* tone5.caf */; };
 		BB000000000000000000AAA1 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB000000000000000000BBB1 /* ViewController.swift */; };
 		CC000000000000000000AAA1 /* RCBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC000000000000000000BBB1 /* RCBridge.swift */; };
+		CC000000000000000000AAA2 /* RCBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = CC000000000000000000BBB2 /* RCBridge.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +43,7 @@
 		AA000000000000000000BBB5 /* tone5.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = tone5.caf; sourceTree = "<group>"; };
 		BB000000000000000000BBB1 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		CC000000000000000000BBB1 /* RCBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCBridge.swift; sourceTree = "<group>"; };
+		CC000000000000000000BBB2 /* RCBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCBridge.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,6 +82,7 @@
 				504EC3071FED79650016851F /* AppDelegate.swift */,
 				BB000000000000000000BBB1 /* ViewController.swift */,
 				CC000000000000000000BBB1 /* RCBridge.swift */,
+				CC000000000000000000BBB2 /* RCBridge.m */,
 				504EC30B1FED79650016851F /* Main.storyboard */,
 				504EC30E1FED79650016851F /* Assets.xcassets */,
 				504EC3101FED79650016851F /* LaunchScreen.storyboard */,
@@ -184,6 +187,7 @@
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
 				BB000000000000000000AAA1 /* ViewController.swift in Sources */,
 				CC000000000000000000AAA1 /* RCBridge.swift in Sources */,
+				CC000000000000000000AAA2 /* RCBridge.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
