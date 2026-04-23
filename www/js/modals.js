@@ -90,11 +90,10 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
 
   const [debugLogs,setDebugLogs]=React.useState([]);
 
-  // RevenueCatから実際の価格を取得
+  // RevenueCatから実際の価格を取得（公式プラグイン版）
   React.useEffect(()=>{
     (async()=>{
       try{
-        // plugin存在チェックをログに記録
         const isNative=Purchases._isNative();
         const plugin=Purchases._plugin();
         const initLogs=[
@@ -102,16 +101,14 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
           "plugin: "+(plugin?"OK":"undefined"),
         ];
         setDebugLogs(initLogs);
-
         if(!isNative){ setDebugLogs([...initLogs,"非ネイティブのためスキップ"]); return; }
+        if(!plugin){ setDebugLogs([...initLogs,"❌ Purchases pluginが見つからない"]); return; }
 
         const offerings=await Purchases.getOfferings();
-
-        // Swift側ログを画面に反映
         const swiftLogs=window._rcDebugLogs||[];
         setDebugLogs([...initLogs,...swiftLogs]);
 
-        console.log("[RC] PremiumModal: packages:", offerings?.current?.availablePackages?.length ?? 0);
+        console.log("[RC] PremiumModal packages:", offerings?.current?.availablePackages?.length ?? 0);
         const seen=new Set();
         const allPkgs=[];
         const addPkgs=(pkgs)=>{(pkgs||[]).forEach(pkg=>{const id=pkg.product?.identifier;if(id&&!seen.has(id)){seen.add(id);allPkgs.push(pkg);}});};
@@ -120,7 +117,7 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
         const p={};
         allPkgs.forEach(pkg=>{
           const id=pkg.product?.identifier;
-          const price=pkg.product?.priceString;
+          const price=pkg.product?.priceString||pkg.product?.localizedPriceString;
           if(id&&price){
             Object.entries(RC_PRODUCTS).forEach(([key,val])=>{
               if(val===id) p[key]=price;
@@ -257,7 +254,7 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
 
         <button className="btn bs" style={{width:"100%",marginTop:8}} onClick={onClose}>{t("close")}</button>
 
-        {/* ── デバッグボックス（開発用・確認後に削除） ── */}
+        {/* デバッグボックス（確認後に削除） */}
         {debugLogs.length>0&&(
           <div style={{
             marginTop:12,background:"#000",color:"#0f0",

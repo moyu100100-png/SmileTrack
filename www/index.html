@@ -14,20 +14,7 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="capacitor.js"></script>
-  <script>
-  function _initRC() {
-    try {
-      const isNative = typeof Capacitor !== "undefined"
-        && Capacitor.isNativePlatform
-        && Capacitor.isNativePlatform();
-      if (isNative && Capacitor.registerPlugin) {
-        Capacitor.registerPlugin('RCBridge');
-      }
-    } catch(e) {}
-  }
-  _initRC();
-  document.addEventListener("DOMContentLoaded", _initRC);
-  </script>
+
   <script>
   const ADMOB_APP_ID    = "ca-app-pub-5456814091467820~1944092541";
   const ADMOB_BANNER_ID = "ca-app-pub-5456814091467820/6020940488";
@@ -101,33 +88,38 @@
     no_ads:   "app.smiletrack.app.no_ads",
     coffee:   "app.smiletrack.app.coffee",
   };
+
+  // 公式 @revenuecat/purchases-capacitor ラッパー
   window.Purchases = {
     _isNative() {
       return typeof Capacitor !== "undefined" && Capacitor.isNativePlatform?.();
     },
     _plugin() {
-      return Capacitor?.Plugins?.RCBridge;
+      return Capacitor?.Plugins?.Purchases;
     },
-    async configure() { return; },
+    async configure() {
+      if (!this._isNative()) return;
+      const plugin = this._plugin();
+      if (!plugin) return;
+      try {
+        await plugin.configure({ apiKey: window.RC_API_KEY_IOS });
+      } catch(e) { console.warn("[RC] configure error", e); }
+    },
     async getOfferings() {
       if (!this._isNative()) return { current: null, all: {}, _debugLogs: ["非ネイティブ環境"] };
       const plugin = this._plugin();
       if (!plugin) {
-        window._rcDebugLogs = ["❌ plugin undefined（Capacitor.Plugins.RCBridgeが見つからない）"];
+        window._rcDebugLogs = ["❌ plugin undefined（Capacitor.Plugins.Purchasesが見つからない）"];
         return { current: null, all: {} };
       }
       try {
+        window._rcDebugLogs = ["plugin: OK", "getOfferings呼び出し中..."];
         const result = await plugin.getOfferings();
-        // Swift側のデバッグログをグローバルに保存（画面表示用）
-        window._rcDebugLogs = result.debugLogs || [];
-        const pkgs = (result.packages || []).map(p => ({
-          identifier: p.packageIdentifier,
-          product: { identifier: p.identifier, priceString: p.priceString },
-        }));
-        return {
-          current: pkgs.length > 0 ? { availablePackages: pkgs } : null,
-          all: {}
-        };
+        const current = result?.current ?? null;
+        const pkgCount = current?.availablePackages?.length ?? 0;
+        window._rcDebugLogs.push("packages: " + pkgCount);
+        if (pkgCount === 0) window._rcDebugLogs.push("⚠️ packagesが空");
+        return result ?? { current: null, all: {} };
       } catch(e) {
         window._rcDebugLogs = [
           "❌ JS catch: " + (e?.message || "不明なエラー"),
@@ -141,8 +133,8 @@
       const plugin = this._plugin();
       if (!plugin) return false;
       try {
-        const result = await plugin.getCustomerInfo();
-        return result.isPremium === true;
+        const info = await plugin.getCustomerInfo();
+        return info?.customerInfo?.entitlements?.active?.["premium"] != null;
       } catch(e) { return false; }
     },
     async hasNoAds() {
@@ -150,20 +142,26 @@
       const plugin = this._plugin();
       if (!plugin) return false;
       try {
-        const result = await plugin.getCustomerInfo();
-        return result.noAds === true;
+        const info = await plugin.getCustomerInfo();
+        return info?.customerInfo?.entitlements?.active?.["no_ads"] != null;
       } catch(e) { return false; }
     },
     async purchaseProduct(productId) {
       if (!this._isNative()) throw new Error("native only");
       const plugin = this._plugin();
-      if (!plugin) throw new Error("RCBridge plugin not found");
-      return await plugin.purchasePackage({ productId });
+      if (!plugin) throw new Error("Purchases plugin not found");
+      // 公式プラグインはpackage単位で購入するためofferingsから探す
+      const offerings = await plugin.getOfferings();
+      const allPkgs = offerings?.current?.availablePackages ?? [];
+      const pkg = allPkgs.find(p => p.product?.identifier === productId);
+      if (!pkg) throw new Error("Product not found: " + productId);
+      const result = await plugin.purchasePackage({ aPackage: pkg });
+      return result;
     },
     async restorePurchases() {
       if (!this._isNative()) throw new Error("native only");
       const plugin = this._plugin();
-      if (!plugin) throw new Error("RCBridge plugin not found");
+      if (!plugin) throw new Error("Purchases plugin not found");
       return await plugin.restorePurchases();
     },
   };

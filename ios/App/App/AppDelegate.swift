@@ -1,7 +1,6 @@
 import UIKit
 import Capacitor
 import UserNotifications
-import RevenueCat
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -9,16 +8,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     static var pendingAlarmAction: String? = nil
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-
-        // ── RevenueCat 初期化 ──────────────────────────────────────────────
-        Purchases.logLevel = .debug
-        Purchases.configure(withAPIKey: "appl_HrDpuICDgfGShogHiNmlmBubJSJ")
-        print("[RC] Purchases configured")
-
-        // ── RCBridge をCapacitorに登録 ────────────────────────────────────
-        CAPBridge.registerPlugin(RCBridge.self)
-        print("[RC] RCBridge registered")
-        // ────────────────────────────────────────────────────────────────────
 
         UNUserNotificationCenter.current().delegate = self
         let stopAction = UNNotificationAction(identifier: "ALARM_STOP", title: "アラーム停止", options: [.foreground])
