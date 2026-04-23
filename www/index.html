@@ -90,34 +90,50 @@
   };
 
   // 公式 @revenuecat/purchases-capacitor ラッパー
+  // Babelスタンドアロン環境ではCapacitor.Plugins.CapacitorPurchasesで登録される
   window.Purchases = {
     _isNative() {
       return typeof Capacitor !== "undefined" && Capacitor.isNativePlatform?.();
     },
     _plugin() {
-      return Capacitor?.Plugins?.Purchases;
+      // 公式プラグインの登録名を順番に試す
+      return Capacitor?.Plugins?.CapacitorPurchases
+          || Capacitor?.Plugins?.Purchases
+          || null;
     },
+    _configured: false,
     async configure() {
       if (!this._isNative()) return;
+      if (this._configured) return;
       const plugin = this._plugin();
-      if (!plugin) return;
+      if (!plugin) {
+        console.warn("[RC] configure: plugin not found");
+        return;
+      }
       try {
         await plugin.configure({ apiKey: window.RC_API_KEY_IOS });
+        this._configured = true;
+        console.log("[RC] configured OK");
       } catch(e) { console.warn("[RC] configure error", e); }
     },
     async getOfferings() {
       if (!this._isNative()) return { current: null, all: {}, _debugLogs: ["非ネイティブ環境"] };
+      await this.configure();
       const plugin = this._plugin();
       if (!plugin) {
-        window._rcDebugLogs = ["❌ plugin undefined（Capacitor.Plugins.Purchasesが見つからない）"];
+        window._rcDebugLogs = [
+          "pluginKeys: " + Object.keys(Capacitor?.Plugins || {}).join(", "),
+          "❌ plugin undefined（CapacitorPurchasesもPurchasesも見つからない）"
+        ];
         return { current: null, all: {} };
       }
       try {
-        window._rcDebugLogs = ["plugin: OK", "getOfferings呼び出し中..."];
+        window._rcDebugLogs = ["plugin: OK (" + (Capacitor?.Plugins?.CapacitorPurchases ? "CapacitorPurchases" : "Purchases") + ")", "getOfferings呼び出し中..."];
         const result = await plugin.getOfferings();
         const current = result?.current ?? null;
         const pkgCount = current?.availablePackages?.length ?? 0;
         window._rcDebugLogs.push("packages: " + pkgCount);
+        window._rcDebugLogs.push("raw: " + JSON.stringify(result).slice(0, 300));
         if (pkgCount === 0) window._rcDebugLogs.push("⚠️ packagesが空");
         return result ?? { current: null, all: {} };
       } catch(e) {
@@ -130,6 +146,7 @@
     },
     async isPremiumUser() {
       if (!this._isNative()) return false;
+      await this.configure();
       const plugin = this._plugin();
       if (!plugin) return false;
       try {
@@ -139,6 +156,7 @@
     },
     async hasNoAds() {
       if (!this._isNative()) return false;
+      await this.configure();
       const plugin = this._plugin();
       if (!plugin) return false;
       try {
@@ -148,11 +166,11 @@
     },
     async purchaseProduct(productId) {
       if (!this._isNative()) throw new Error("native only");
+      await this.configure();
       const plugin = this._plugin();
       if (!plugin) throw new Error("Purchases plugin not found");
-      // 公式プラグインはpackage単位で購入するためofferingsから探す
-      const offerings = await plugin.getOfferings();
-      const allPkgs = offerings?.current?.availablePackages ?? [];
+      const offeringsResult = await plugin.getOfferings();
+      const allPkgs = offeringsResult?.current?.availablePackages ?? [];
       const pkg = allPkgs.find(p => p.product?.identifier === productId);
       if (!pkg) throw new Error("Product not found: " + productId);
       const result = await plugin.purchasePackage({ aPackage: pkg });
@@ -160,6 +178,7 @@
     },
     async restorePurchases() {
       if (!this._isNative()) throw new Error("native only");
+      await this.configure();
       const plugin = this._plugin();
       if (!plugin) throw new Error("Purchases plugin not found");
       return await plugin.restorePurchases();
