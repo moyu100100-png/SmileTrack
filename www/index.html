@@ -110,17 +110,31 @@
     },
     async configure() { return; },
     async getOfferings() {
-      if (!this._isNative()) return { current: null, all: {} };
+      if (!this._isNative()) return { current: null, all: {}, _debugLogs: ["非ネイティブ環境"] };
       const plugin = this._plugin();
-      if (!plugin) return { current: null, all: {} };
+      if (!plugin) {
+        window._rcDebugLogs = ["❌ plugin undefined（Capacitor.Plugins.RCBridgeが見つからない）"];
+        return { current: null, all: {} };
+      }
       try {
         const result = await plugin.getOfferings();
+        // Swift側のデバッグログをグローバルに保存（画面表示用）
+        window._rcDebugLogs = result.debugLogs || [];
         const pkgs = (result.packages || []).map(p => ({
           identifier: p.packageIdentifier,
           product: { identifier: p.identifier, priceString: p.priceString },
         }));
-        return { current: { availablePackages: pkgs }, all: {} };
-      } catch(e) { return { current: null, all: {} }; }
+        return {
+          current: pkgs.length > 0 ? { availablePackages: pkgs } : null,
+          all: {}
+        };
+      } catch(e) {
+        window._rcDebugLogs = [
+          "❌ JS catch: " + (e?.message || "不明なエラー"),
+          "code: " + (e?.code || "なし"),
+        ];
+        return { current: null, all: {} };
+      }
     },
     async isPremiumUser() {
       if (!this._isNative()) return false;
