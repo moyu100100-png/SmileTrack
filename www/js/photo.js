@@ -197,11 +197,11 @@ function PhotoPage({T,state,update,todayStr}){
         <div className="ct" style={{marginBottom:8,fontSize:14}}>{t("takePhoto")}</div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9}}>
           <button className="btn bp" onClick={()=>openCam(slot1Id)} style={{padding:"12px 8px",flexDirection:"column"}}>
-            <div style={{display:"flex",alignItems:"center",gap:4}}>{Icons.camera("#fff",14)}<span style={{fontSize:14}}>{slot1Info.labelJP}</span></div>
+            <div style={{display:"flex",alignItems:"center",gap:4}}>{Icons.camera("#fff",14)}<span style={{fontSize:14}}>{t(slot1Info.labelKey)||slot1Info.labelJP}</span></div>
             {getOverlayPhoto(slot1Id)&&<div style={{fontSize:11,opacity:.7,marginTop:2}}>{t("prevExists")}</div>}
           </button>
           <button className="btn bp" onClick={()=>{if(!isPremium){setShowSlot2Gate(true);return;}openCam(slot2Id);}} style={{padding:"12px 8px",flexDirection:"column",opacity:isPremium?1:0.55}}>
-            <div style={{display:"flex",alignItems:"center",gap:4}}>{isPremium?Icons.camera("#fff",14):<span style={{fontSize:14}}>🔒</span>}<span style={{fontSize:14}}>{slot2Info.labelJP}</span></div>
+            <div style={{display:"flex",alignItems:"center",gap:4}}>{isPremium?Icons.camera("#fff",14):<span style={{fontSize:14}}>🔒</span>}<span style={{fontSize:14}}>{t(slot2Info.labelKey)||slot2Info.labelJP}</span></div>
             {isPremium&&getOverlayPhoto(slot2Id)&&<div style={{fontSize:11,opacity:.7,marginTop:2}}>{t("prevExists")}</div>}
           </button>
         </div>
@@ -232,16 +232,16 @@ function PhotoPage({T,state,update,todayStr}){
       {showSlot2Gate&&(
         <div className="card" style={{textAlign:"center",padding:"16px 14px"}}>
           <div style={{fontSize:22,marginBottom:6}}>🔒</div>
-          <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4}}>プレミアム限定です</div>
-          <div style={{fontSize:12,color:T.accent,marginBottom:12}}>2つ目の撮影スロットでより多くの角度を記録できます。</div>
+          <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4}}>{t("slot2PremiumTitle")||"Premium Only"}</div>
+          <div style={{fontSize:12,color:T.accent,marginBottom:12}}>{t("slot2PremiumDesc")||"Unlock a second photo slot for more angles."}</div>
           <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowSlot2Gate(false)}>{t("close")}</button>
         </div>
       )}
       {showPinGate&&(
         <div className="card" style={{textAlign:"center",padding:"16px 14px"}}>
           <div style={{fontSize:22,marginBottom:6}}>🔒</div>
-          <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4}}>PINロックはプレミアム限定です</div>
-          <div style={{fontSize:12,color:T.accent,marginBottom:12}}>写真アルバムをPINで保護できます。</div>
+          <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4}}>{t("pinLockPremiumTitle")||"PIN Lock is Premium Only"}</div>
+          <div style={{fontSize:12,color:T.accent,marginBottom:12}}>{t("pinLockPremiumDesc")||"Protect your photo album with a PIN."}</div>
           <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowPinGate(false)}>{t("close")}</button>
         </div>
       )}
@@ -335,7 +335,7 @@ function PhotoPage({T,state,update,todayStr}){
           {/* Header */}
           <div style={{padding:"10px 16px",paddingTop:"75px",display:"flex",alignItems:"center",justifyContent:"space-between",background:"rgba(0,0,0,0.7)",flexShrink:0}}>
             <button onClick={closeCam} style={{background:"rgba(255,255,255,0.18)",border:"none",color:"#fff",padding:"6px 14px",borderRadius:13,cursor:"pointer",fontSize:14}}>✕</button>
-            <span style={{color:"#fff",fontWeight:700,fontSize:15}}>{currentModeInfo.labelJP}</span>
+            <span style={{color:"#fff",fontWeight:700,fontSize:15}}>{t(currentModeInfo.labelKey)||currentModeInfo.labelJP}</span>
             <button onClick={()=>setShowColorPanel(v=>!v)} style={{background:showColorPanel?"rgba(255,255,255,0.35)":"rgba(255,255,255,0.18)",border:"none",color:"#fff",padding:"6px 10px",borderRadius:13,cursor:"pointer",display:"flex",alignItems:"center",gap:4,fontSize:12}}>
               {Icons.sun("#fff",14)} 調整
             </button>
@@ -953,8 +953,8 @@ function ComparePreviewModal({T,onClose}){
   return(
     <div className="mo" onClick={onClose} style={{alignItems:"center",justifyContent:"center"}}>
       <div className="md" onClick={e=>e.stopPropagation()} style={{padding:"16px 16px 20px",borderRadius:20,maxHeight:"80dvh",width:"90%",maxWidth:400}}>
-        <div style={{fontFamily:"'Outfit',sans-serif",fontSize:15,fontWeight:700,color:T.primary,marginBottom:4,textAlign:"center"}}>写真比較プレビュー</div>
-        <div style={{fontSize:12,color:T.text+"88",marginBottom:10,textAlign:"center"}}>🔒 比較機能はプレミアムでご利用いただけます</div>
+        <div style={{fontFamily:"'Outfit',sans-serif",fontSize:15,fontWeight:700,color:T.primary,marginBottom:4,textAlign:"center"}}>{t("comparePreviewTitle")||"Compare Preview"}</div>
+        <div style={{fontSize:12,color:T.text+"88",marginBottom:10,textAlign:"center"}}>🔒 {t("comparePremiumHint")||"Compare feature is premium only"}</div>
         <div ref={containerRef} style={{position:"relative",width:"100%",borderRadius:10,overflow:"hidden",userSelect:"none",cursor:"ew-resize",aspectRatio:"4/3"}}
           onMouseMove={e=>handleMove(e.clientX)}
           onTouchMove={e=>{e.preventDefault();handleMove(e.touches[0].clientX);}}
