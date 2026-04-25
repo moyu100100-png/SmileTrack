@@ -6,8 +6,6 @@ class ViewController: CAPBridgeViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         webView?.uiDelegate = self
-        // RCBridgeプラグインを登録
-        bridge?.registerPluginInstance(RCBridge())
     }
 }
 
