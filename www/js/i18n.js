@@ -173,12 +173,12 @@ const I18N = {
     coffeeTitle: "開発者にコーヒーを差し入れ",
     coffeeDesc: "このアプリが役に立っていたら、\nコーヒー1杯分のサポートをいただけると\n開発の大きな励みになります 🙏",
     coffeeFeatures: ["広告なしで使い続けられます","新機能の開発が続きます","開発者がコーヒーを飲めます☕"],
-    coffeeBuy: "差し入れる ☕"
+    coffeeBuy: "差し入れる ☕",
     slot2PremiumTitle: "プレミアム限定です",
     slot2PremiumDesc: "2つ目の撮影スロットでより多くの角度を記録できます。",
     pinLockPremiumTitle: "PINロックはプレミアム限定です",
     pinLockPremiumDesc: "写真アルバムをPINで保護できます。",
-    comparePremiumHint: "比較機能はプレミアムでご利用いただけます",,
+    comparePremiumHint: "比較機能はプレミアムでご利用いただけます",
     coffeeThankTitle: "ありがとうございます！",
     coffeeThankMsg: "コーヒーの差し入れ、とても嬉しいです。\n開発の大きな励みになります✨",
 
@@ -600,12 +600,12 @@ const I18N = {
     coffeeTitle: "Buy the Developer a Coffee",
     coffeeDesc: "If this app has been helpful,\na small coffee tip keeps development going 🙏",
     coffeeFeatures: ["Keep using the app ad-free","Support new feature development","Developer gets coffee☕"],
-    coffeeBuy: "Buy a Coffee ☕"
+    coffeeBuy: "Buy a Coffee ☕",
     slot2PremiumTitle: "Premium Only",
     slot2PremiumDesc: "Unlock a second photo slot for more angles.",
     pinLockPremiumTitle: "PIN Lock is Premium Only",
     pinLockPremiumDesc: "Protect your photo album with a PIN.",
-    comparePremiumHint: "Compare feature is available with Premium",,
+    comparePremiumHint: "Compare feature is available with Premium",
     coffeeThankTitle: "Thank you!",
     coffeeThankMsg: "Your support means a lot.\nIt keeps this app going ✨",
 
@@ -1014,12 +1014,12 @@ const I18N = {
     coffeeTitle: "개발자에게 커피 후원",
     coffeeDesc: "앱이 도움이 되었다면,\n커피 한 잔 후원으로 개발을 응원해 주세요 🙏",
     coffeeFeatures: ["광고 없이 계속 사용","새 기능 개발 지원","개발자가 커피를 마실 수 있어요☕"],
-    coffeeBuy: "커피 후원 ☕"
+    coffeeBuy: "커피 후원 ☕",
     slot2PremiumTitle: "프리미엄 전용입니다",
     slot2PremiumDesc: "두 번째 촬영 슬롯으로 더 많은 각도를 기록할 수 있습니다.",
     pinLockPremiumTitle: "PIN 잠금은 프리미엄 전용입니다",
     pinLockPremiumDesc: "PIN으로 사진 앨범을 보호할 수 있습니다.",
-    comparePremiumHint: "비교 기능은 프리미엄에서 이용 가능합니다",,
+    comparePremiumHint: "비교 기능은 프리미엄에서 이용 가능합니다",
     coffeeThankTitle: "감사합니다!",
     coffeeThankMsg: "커피 후원 정말 감사합니다.\n개발의 큰 힘이 됩니다 ✨",
 
@@ -1408,12 +1408,12 @@ const I18N = {
     coffeeTitle: "请开发者喝咖啡",
     coffeeDesc: "如果这个应用对您有帮助，\n一杯咖啡的支持是开发的最大动力 🙏",
     coffeeFeatures: ["继续无广告使用","支持新功能开发","开发者喝到咖啡☕"],
-    coffeeBuy: "请喝咖啡 ☕"
+    coffeeBuy: "请喝咖啡 ☕",
     slot2PremiumTitle: "仅限高级版",
     slot2PremiumDesc: "解锁第二个拍摄槽，记录更多角度。",
     pinLockPremiumTitle: "PIN锁定仅限高级版",
     pinLockPremiumDesc: "使用PIN保护您的相册。",
-    comparePremiumHint: "对比功能仅限高级版使用",,
+    comparePremiumHint: "对比功能仅限高级版使用",
     coffeeThankTitle: "非常感谢！",
     coffeeThankMsg: "您的支持对我意义重大。\n这是继续开发的动力 ✨",
 
@@ -1802,12 +1802,12 @@ const I18N = {
     coffeeTitle: "Dem Entwickler einen Kaffee spendieren",
     coffeeDesc: "Wenn die App hilfreich war,\nfreut sich der Entwickler über einen Kaffee 🙏",
     coffeeFeatures: ["App werbefrei nutzen","Neue Funktionen unterstützen","Entwickler bekommt Kaffee☕"],
-    coffeeBuy: "Kaffee spendieren ☕"
+    coffeeBuy: "Kaffee spendieren ☕",
     slot2PremiumTitle: "Nur für Premium",
     slot2PremiumDesc: "Schalte einen zweiten Foto-Slot für mehr Winkel frei.",
     pinLockPremiumTitle: "PIN-Sperre ist nur für Premium",
     pinLockPremiumDesc: "Schütze dein Fotoalbum mit einer PIN.",
-    comparePremiumHint: "Vergleichsfunktion ist nur mit Premium verfügbar",,
+    comparePremiumHint: "Vergleichsfunktion ist nur mit Premium verfügbar",
     coffeeThankTitle: "Vielen Dank!",
     coffeeThankMsg: "Deine Unterstützung bedeutet mir sehr viel.\nSie hält die Entwicklung am Laufen ✨",
 
@@ -2196,12 +2196,12 @@ const I18N = {
     coffeeTitle: "Invita un café al desarrollador",
     coffeeDesc: "Si la app te ha sido útil,\nun café mantiene el desarrollo en marcha 🙏",
     coffeeFeatures: ["Usar la app sin anuncios","Apoyar nuevas funciones","El desarrollador toma café☕"],
-    coffeeBuy: "Invitar café ☕"
+    coffeeBuy: "Invitar café ☕",
     slot2PremiumTitle: "Solo Premium",
     slot2PremiumDesc: "Desbloquea un segundo slot de fotos para más ángulos.",
     pinLockPremiumTitle: "El bloqueo PIN es solo Premium",
     pinLockPremiumDesc: "Protege tu álbum de fotos con un PIN.",
-    comparePremiumHint: "La función de comparación está disponible con Premium",,
+    comparePremiumHint: "La función de comparación está disponible con Premium",
     coffeeThankTitle: "¡Gracias!",
     coffeeThankMsg: "Tu apoyo significa mucho.\nMantiene vivo este proyecto ✨",
 
