@@ -88,7 +88,6 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
   const [selectedPlan,setSelectedPlan]=React.useState("yearly");
   const [prices,setPrices]=React.useState({});
 
-  const [debugLogs,setDebugLogs]=React.useState([]);
 
   // RevenueCatから実際の価格を取得（公式プラグイン版）
   React.useEffect(()=>{
@@ -96,24 +95,8 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
       try{
         const isNative=Purchases._isNative();
         const plugin=Purchases._plugin();
-        const initLogs=[
-          "isNative: "+isNative,
-          "plugin: "+(plugin?"OK":"undefined"),
-        ];
-        setDebugLogs(initLogs);
-        if(!isNative){ setDebugLogs([...initLogs,"非ネイティブのためスキップ"]); return; }
-        if(!plugin){
-          const keys = Object.keys(Capacitor?.Plugins || {}).join(", ");
-          setDebugLogs([...initLogs,
-            "pluginKeys: " + keys,
-            "❌ Purchases pluginが見つからない"
-          ]);
-          return;
-        }
 
         const offerings=await Purchases.getOfferings();
-        const swiftLogs=window._rcDebugLogs||[];
-        setDebugLogs([...initLogs,...swiftLogs]);
 
         console.log("[RC] PremiumModal packages:", offerings?.current?.availablePackages?.length ?? 0);
         const seen=new Set();
@@ -133,7 +116,6 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
         });
         if(Object.keys(p).length>0) setPrices(p);
       }catch(e){
-        setDebugLogs(prev=>[...prev,"❌ JS例外: "+(e?.message||String(e))]);
         console.warn("[RC] getOfferings error",e);
       }
     })();
@@ -261,17 +243,7 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
 
         <button className="btn bs" style={{width:"100%",marginTop:8}} onClick={onClose}>{t("close")}</button>
 
-        {/* デバッグボックス（確認後に削除） */}
-        {debugLogs.length>0&&(
-          <div style={{
-            marginTop:12,background:"#000",color:"#0f0",
-            fontSize:10,padding:"8px",borderRadius:8,
-            fontFamily:"monospace",whiteSpace:"pre-wrap",
-            maxHeight:160,overflowY:"auto",lineHeight:1.5,
-          }}>
-            {debugLogs.map((l,i)=><div key={i}>{l}</div>)}
-          </div>
-        )}
+
       </div>
     </div>
   );
