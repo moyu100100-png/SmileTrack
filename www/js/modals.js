@@ -126,9 +126,18 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
     setLoading(true);
     try{
       const productId=RC_PRODUCTS[productKey];
-      await Purchases.purchaseProduct(productId);
-      const isPremium=await Purchases.isPremiumUser();
-      const noAds=await Purchases.hasNoAds();
+      const purchaseResult=await Purchases.purchaseProduct(productId);
+      // 購入結果からentitlementsを直接取得（最も確実）
+      const active=purchaseResult?.customerInfo?.entitlements?.active
+                ?? purchaseResult?.entitlements?.active
+                ?? {};
+      let isPremium=active["premium"]!=null;
+      let noAds=active["no_ads"]!=null;
+      // フォールバック：購入結果が不明な場合はgetCustomerInfoで再確認
+      if(!isPremium&&!noAds){
+        isPremium=await Purchases.isPremiumUser();
+        noAds=await Purchases.hasNoAds();
+      }
       if(onPurchased) onPurchased({isPremium,noAds});
       if(productKey==="coffee"){ setThankYou(true); }
       else { onClose(); }
@@ -145,9 +154,9 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
     setErrorMsg(null);
     setLoading(true);
     try{
-      await Purchases.restorePurchases();
-      const isPremium=await Purchases.isPremiumUser();
-      const noAds=await Purchases.hasNoAds();
+      const result=await Purchases.restorePurchases();
+      const isPremium=result?.isPremium ?? await Purchases.isPremiumUser();
+      const noAds=result?.noAds ?? await Purchases.hasNoAds();
       if(onPurchased) onPurchased({isPremium,noAds});
       if(isPremium){ onClose(); }
       else{ setErrorMsg(t("restoreNotFound")); }

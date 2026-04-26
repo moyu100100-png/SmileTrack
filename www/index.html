@@ -128,14 +128,19 @@
         return { current: null, all: {} };
       }
     },
+    _getActive(info) {
+      // 公式プラグインのレスポンス構造を両方試す
+      return info?.customerInfo?.entitlements?.active
+          ?? info?.entitlements?.active
+          ?? {};
+    },
     async isPremiumUser() {
       if (!this._isNative()) return false;
       const plugin = this._plugin();
       if (!plugin) return false;
       try {
         const info = await plugin.getCustomerInfo();
-        const active1 = info?.customerInfo?.entitlements?.active ?? info?.entitlements?.active ?? {};
-        return active1["premium"] != null;
+        return this._getActive(info)["premium"] != null;
       } catch(e) { return false; }
     },
     async hasNoAds() {
@@ -144,8 +149,7 @@
       if (!plugin) return false;
       try {
         const info = await plugin.getCustomerInfo();
-        const active2 = info?.customerInfo?.entitlements?.active ?? info?.entitlements?.active ?? {};
-        return active2["no_ads"] != null;
+        return this._getActive(info)["no_ads"] != null;
       } catch(e) { return false; }
     },
     async purchaseProduct(productId) {
@@ -164,7 +168,13 @@
       if (!this._isNative()) throw new Error("native only");
       const plugin = this._plugin();
       if (!plugin) throw new Error("Purchases plugin not found");
-      return await plugin.restorePurchases();
+      const result = await plugin.restorePurchases();
+      const active = this._getActive(result);
+      return {
+        isPremium: active["premium"] != null,
+        noAds: active["no_ads"] != null,
+        _raw: result,
+      };
     },
   };
   </script>
