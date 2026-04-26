@@ -264,7 +264,7 @@ function PhotoPage({T,state,update,todayStr}){
             </button>
           ):(
             <button onClick={()=>setShowPinGate(true)} style={{display:"flex",alignItems:"center",gap:5,padding:"5px 10px",border:`1.5px solid ${T.soft}`,borderRadius:8,background:T.soft,cursor:"pointer",color:T.primary,fontSize:13,fontWeight:600,fontFamily:"'M PLUS Rounded 1c',sans-serif",opacity:0.6}}>
-              <span style={{fontSize:13}}>🔒</span><span>ロック</span>
+              <span style={{fontSize:13}}>🔒</span><span>{t("pinLock")||"Lock"}</span>
             </button>
           )}
         </div>
