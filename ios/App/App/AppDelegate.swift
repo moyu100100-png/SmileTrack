@@ -10,8 +10,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
         UNUserNotificationCenter.current().delegate = self
-        let stopAction = UNNotificationAction(identifier: "ALARM_STOP", title: "アラーム停止", options: [.foreground])
-        let snoozeAction = UNNotificationAction(identifier: "ALARM_SNOOZE", title: "スヌーズ", options: [.foreground])
+        let stopAction = UNNotificationAction(identifier: "ALARM_STOP", title: "Stop Alarm", options: [.foreground])
+        let snoozeAction = UNNotificationAction(identifier: "ALARM_SNOOZE", title: "Snooze", options: [.foreground])
         let alarmCategory = UNNotificationCategory(identifier: "ALARM_CATEGORY", actions: [stopAction, snoozeAction], intentIdentifiers: [], options: [])
         UNUserNotificationCenter.current().setNotificationCategories([alarmCategory])
         return true
