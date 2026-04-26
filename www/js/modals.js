@@ -87,6 +87,7 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
   const [errorMsg,setErrorMsg]=React.useState(null);
   const [selectedPlan,setSelectedPlan]=React.useState("yearly");
   const [prices,setPrices]=React.useState({});
+  const [debugText,setDebugText]=React.useState("");
 
 
   // RevenueCatから実際の価格を取得（公式プラグイン版）
@@ -127,17 +128,20 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
     try{
       const productId=RC_PRODUCTS[productKey];
       const purchaseResult=await Purchases.purchaseProduct(productId);
-      // 購入結果からentitlementsを直接取得（最も確実）
-      const active=purchaseResult?.customerInfo?.entitlements?.active
-                ?? purchaseResult?.entitlements?.active
-                ?? {};
+      // 購入後にgetCustomerInfoを呼んで最新状態を確認
+      const plugin=Purchases._plugin();
+      const info=await plugin.getCustomerInfo();
+      // デバッグ：getCustomerInfoの生データを表示
+      setDebugText("getCustomerInfo raw:\n"+JSON.stringify(info).slice(0,600));
+      // 両方のパスを試す
+      const active1=info?.customerInfo?.entitlements?.active??{};
+      const active2=info?.entitlements?.active??{};
+      setDebugText(prev=>prev+"\n\nactive1(customerInfo.entitlements.active):\n"+JSON.stringify(active1));
+      setDebugText(prev=>prev+"\n\nactive2(entitlements.active):\n"+JSON.stringify(active2));
+      const active=Object.keys(active1).length>0?active1:active2;
       let isPremium=active["premium"]!=null;
       let noAds=active["no_ads"]!=null;
-      // フォールバック：購入結果が不明な場合はgetCustomerInfoで再確認
-      if(!isPremium&&!noAds){
-        isPremium=await Purchases.isPremiumUser();
-        noAds=await Purchases.hasNoAds();
-      }
+      setDebugText(prev=>prev+"\n\nisPremium:"+isPremium+" noAds:"+noAds);
       if(onPurchased) onPurchased({isPremium,noAds});
       if(productKey==="coffee"){ setThankYou(true); }
       else { onClose(); }
