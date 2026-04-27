@@ -141,10 +141,14 @@
     _getActive(info) {
       // 公式プラグインは customerInfo層なしで直接 entitlements を返す
       const a1 = info?.entitlements?.active;
-      if (a1 && Object.keys(a1).length > 0) return a1;
       const a2 = info?.customerInfo?.entitlements?.active;
-      if (a2 && Object.keys(a2).length > 0) return a2;
-      return {};
+      const active = (a1 && Object.keys(a1).length > 0) ? a1
+                   : (a2 && Object.keys(a2).length > 0) ? a2
+                   : {};
+      // デバッグ：画面右下に表示
+      window._rcActiveDebug = "keys:" + Object.keys(active).join(",") + "\nraw:" + JSON.stringify(info).slice(0,300);
+      window._rcActiveEl && (window._rcActiveEl.textContent = window._rcActiveDebug);
+      return active;
     },
     async isPremiumUser() {
       if (!this._isNative()) return false;
@@ -233,10 +237,15 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
     #root { width: 100%; height: 100%; }
+    #rc-debug { position:fixed; bottom:0; right:0; background:rgba(0,0,0,0.8); color:#0f0;
+      font-size:9px; font-family:monospace; padding:4px; max-width:200px; max-height:100px;
+      overflow:auto; z-index:99999; white-space:pre-wrap; word-break:break-all; }
   </style>
 </head>
 <body>
+  <div id="rc-debug" id="rc-debug-el"></div>
   <div id="root"></div>
+  <script>window._rcActiveEl = document.getElementById("rc-debug-el") || document.querySelector("#rc-debug");</script>
   <script type="text/babel" data-presets="react" src="js/storage.js"></script>
   <script type="text/babel" data-presets="react" src="js/i18n.js"></script>
   <script type="text/babel" data-presets="react" src="js/constants.js"></script>
