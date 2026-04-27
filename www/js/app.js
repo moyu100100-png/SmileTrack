@@ -292,7 +292,7 @@ function App(){
   useEffect(()=>{
     (async()=>{
       try{
-        await Purchases.configure({apiKey:"appl_HrDpuICDgfGShogHiNmlmBubJSJ"});
+        await Purchases.configure(); // index.htmlのラッパー経由（固定ID付き）
         const premium=await Purchases.isPremiumUser();
         const noAdsVal=await Purchases.hasNoAds();
         setIsPremium(IS_PREMIUM||premium);
