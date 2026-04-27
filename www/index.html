@@ -139,10 +139,12 @@
       }
     },
     _getActive(info) {
-      // 公式プラグインのレスポンス構造を両方試す
-      return info?.customerInfo?.entitlements?.active
-          ?? info?.entitlements?.active
-          ?? {};
+      // 公式プラグインは customerInfo層なしで直接 entitlements を返す
+      const a1 = info?.entitlements?.active;
+      if (a1 && Object.keys(a1).length > 0) return a1;
+      const a2 = info?.customerInfo?.entitlements?.active;
+      if (a2 && Object.keys(a2).length > 0) return a2;
+      return {};
     },
     async isPremiumUser() {
       if (!this._isNative()) return false;
