@@ -139,14 +139,13 @@
       }
     },
     _getActive(info) {
-      // 公式プラグインは customerInfo層なしで直接 entitlements を返す
-      const a1 = info?.entitlements?.active;
-      const a2 = info?.customerInfo?.entitlements?.active;
-      const active = (a1 && Object.keys(a1).length > 0) ? a1
-                   : (a2 && Object.keys(a2).length > 0) ? a2
-                   : {};
+      // customerInfoでラップされている場合と直接の場合の両方に対応
+      const customerData = info?.customerInfo ?? info;
+      const active = customerData?.entitlements?.active ?? {};
       // デバッグ：画面右下に表示
-      window._rcActiveDebug = "keys:" + Object.keys(active).join(",") + "\nraw:" + JSON.stringify(info).slice(0,300);
+      const info2 = info?.customerInfo ?? info;
+      const entStr = JSON.stringify(info2?.entitlements ?? "NO_ENTITLEMENTS");
+      window._rcActiveDebug = "keys:" + Object.keys(active).join(",") + "\nentitlements:" + entStr.slice(0,400);
       window._rcActiveEl && (window._rcActiveEl.textContent = window._rcActiveDebug);
       return active;
     },
