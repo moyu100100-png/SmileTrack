@@ -268,6 +268,7 @@ function App(){
   // isPremium/noAdsはstateと分離して管理（インポートの影響を受けない）
   const [isPremium,setIsPremium]=useState(IS_PREMIUM);
   const [noAds,setNoAds]=useState(false);
+  const [rcDebug,setRcDebug]=useState("");
   const [tab,setTab]=useState("home");
   const [drawerOpen,setDrawerOpen]=useState(false);
   const [drawerSection,setDrawerSection]=useState(null);
