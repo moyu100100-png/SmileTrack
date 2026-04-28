@@ -17,8 +17,8 @@
 
   <script>
   const ADMOB_APP_ID    = "ca-app-pub-5456814091467820~1944092541";
-  const ADMOB_BANNER_ID = "ca-app-pub-5456814091467820/6020940488";
-  const ADMOB_INTER_ID  = "ca-app-pub-5456814091467820/6669903678";
+  const ADMOB_BANNER_ID = "ca-app-pub-3940256099942544/2934735716"; // テスト
+  const ADMOB_INTER_ID  = "ca-app-pub-3940256099942544/4411468910"; // テスト
 
   window.AdMobHelper = {
     _interCount: 0,
@@ -31,7 +31,7 @@
         await Capacitor.Plugins.AdMob.initialize({
           requestTrackingAuthorization: true,
           testingDevices: [],
-          initializeForTesting: false,
+          initializeForTesting: true,
         });
       } catch(e) { console.warn("[AdMob] initialize error", e); }
     },
@@ -44,7 +44,7 @@
           adSize: "BANNER",
           position: "BOTTOM_CENTER",
           margin: 0,
-          isTesting: false,
+          isTesting: true,
         });
       } catch(e) { console.warn("[AdMob] showBanner error", e); }
     },
@@ -61,7 +61,7 @@
       try {
         await Capacitor.Plugins.AdMob.prepareInterstitial({
           adId: ADMOB_INTER_ID,
-          isTesting: false,
+          isTesting: true,
         });
       } catch(e) { console.warn("[AdMob] prepareInterstitial error", e); }
     },
@@ -184,11 +184,14 @@
       const plugin = this._plugin();
       if (!plugin) throw new Error("Purchases plugin not found");
       const result = await plugin.restorePurchases();
-      const active = this._getActive(result);
+      // getCustomerInfoと同じ方法でactiveを取得
+      const customerData = result?.customerInfo ?? result;
+      const active = customerData?.entitlements?.active ?? {};
+      window._rcRestoreDebug = "restore active keys:" + Object.keys(active).join(",") + "\nresult keys:" + Object.keys(result||{}).join(",");
+      window._rcActiveEl && (window._rcActiveEl.textContent = window._rcRestoreDebug);
       return {
         isPremium: active["premium"] != null,
         noAds: active["no_ads"] != null,
-        _raw: result,
       };
     },
   };

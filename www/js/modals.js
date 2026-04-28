@@ -87,8 +87,8 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
   const [errorMsg,setErrorMsg]=React.useState(null);
   const [selectedPlan,setSelectedPlan]=React.useState("yearly");
   const [prices,setPrices]=React.useState({});
-  const [debugText,setDebugText]=React.useState("");
 
+  const [debugLogs,setDebugLogs]=React.useState([]);
 
   // RevenueCatから実際の価格を取得（公式プラグイン版）
   React.useEffect(()=>{
@@ -96,8 +96,17 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
       try{
         const isNative=Purchases._isNative();
         const plugin=Purchases._plugin();
+        const initLogs=[
+          "isNative: "+isNative,
+          "plugin: "+(plugin?"OK":"undefined"),
+        ];
+        setDebugLogs(initLogs);
+        if(!isNative){ setDebugLogs([...initLogs,"非ネイティブのためスキップ"]); return; }
+        if(!plugin){ setDebugLogs([...initLogs,"❌ Purchases pluginが見つからない"]); return; }
 
         const offerings=await Purchases.getOfferings();
+        const swiftLogs=window._rcDebugLogs||[];
+        setDebugLogs([...initLogs,...swiftLogs]);
 
         console.log("[RC] PremiumModal packages:", offerings?.current?.availablePackages?.length ?? 0);
         const seen=new Set();
@@ -117,6 +126,7 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
         });
         if(Object.keys(p).length>0) setPrices(p);
       }catch(e){
+        setDebugLogs(prev=>[...prev,"❌ JS例外: "+(e?.message||String(e))]);
         console.warn("[RC] getOfferings error",e);
       }
     })();
@@ -127,21 +137,9 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
     setLoading(true);
     try{
       const productId=RC_PRODUCTS[productKey];
-      const purchaseResult=await Purchases.purchaseProduct(productId);
-      // 購入後にgetCustomerInfoを呼んで最新状態を確認
-      const plugin=Purchases._plugin();
-      const info=await plugin.getCustomerInfo();
-      // デバッグ：getCustomerInfoの生データを表示
-      setDebugText("getCustomerInfo raw:\n"+JSON.stringify(info).slice(0,600));
-      // 両方のパスを試す
-      const active1=info?.customerInfo?.entitlements?.active??{};
-      const active2=info?.entitlements?.active??{};
-      setDebugText(prev=>prev+"\n\nactive1(customerInfo.entitlements.active):\n"+JSON.stringify(active1));
-      setDebugText(prev=>prev+"\n\nactive2(entitlements.active):\n"+JSON.stringify(active2));
-      const active=Object.keys(active1).length>0?active1:active2;
-      let isPremium=active["premium"]!=null;
-      let noAds=active["no_ads"]!=null;
-      setDebugText(prev=>prev+"\n\nisPremium:"+isPremium+" noAds:"+noAds);
+      await Purchases.purchaseProduct(productId);
+      const isPremium=await Purchases.isPremiumUser();
+      const noAds=await Purchases.hasNoAds();
       if(onPurchased) onPurchased({isPremium,noAds});
       if(productKey==="coffee"){ setThankYou(true); }
       else { onClose(); }
@@ -158,12 +156,12 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
     setErrorMsg(null);
     setLoading(true);
     try{
-      const result=await Purchases.restorePurchases();
-      const isPremium=result?.isPremium===true;
-      const noAds=result?.noAds===true;
+      await Purchases.restorePurchases();
+      const isPremium=await Purchases.isPremiumUser();
+      const noAds=await Purchases.hasNoAds();
       if(onPurchased) onPurchased({isPremium,noAds});
       if(isPremium){ onClose(); }
-      else{ setErrorMsg("restore result: isPremium="+isPremium+" noAds="+noAds+" raw="+JSON.stringify(result).slice(0,200)); }
+      else{ setErrorMsg(t("restoreNotFound")); }
     }catch(e){ setErrorMsg(t("restoreFailed")); }
     finally{ setLoading(false); }
   };
@@ -175,7 +173,7 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
         <div style={{fontSize:13,color:T.text+"88",marginBottom:20,lineHeight:1.7}}>
           {t("coffeeDesc").split("\n").map((l,i)=><span key={i}>{l}<br/></span>)}
         </div>
-        <button className="btn bp" style={{width:"100%",marginBottom:10,padding:"14px",fontSize:15}} onClick={()=>handlePurchase("coffee")} disabled={loading}>{loading?t("loading"):`${t("coffeeBuy")} ${prices.coffee||"---"}`}</button>
+        <button className="btn bp" style={{width:"100%",marginBottom:10,padding:"14px",fontSize:15}} onClick={()=>handlePurchase("coffee")} disabled={loading}>{loading?t("loading"):t("coffeeBuy").replace("¥120",prices.coffee||"---")}</button>
         <button className="btn bs" style={{width:"100%",padding:"14px",fontSize:15}} onClick={onClose}>{t("close")}</button>
       </div>
     </div>
@@ -256,15 +254,25 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
 
         <button className="btn bs" style={{width:"100%",marginTop:8}} onClick={onClose}>{t("close")}</button>
 
-
+        {/* デバッグボックス（確認後に削除） */}
+        {debugLogs.length>0&&(
+          <div style={{
+            marginTop:12,background:"#000",color:"#0f0",
+            fontSize:10,padding:"8px",borderRadius:8,
+            fontFamily:"monospace",whiteSpace:"pre-wrap",
+            maxHeight:160,overflowY:"auto",lineHeight:1.5,
+          }}>
+            {debugLogs.map((l,i)=><div key={i}>{l}</div>)}
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
 // ── COLOR MODAL ───────────────────────────────────────────────────────────────
-function ColorModal({T,themeName,onPick,onClose}){
-  const isPremium=IS_PREMIUM;
+function ColorModal({T,themeName,onPick,onClose,isPremiumProp=false}){
+  const isPremium=isPremiumProp||IS_PREMIUM;
   const FREE_THEMES=["blush","powder","night"];
   const PAID_THEMES=["wisteria","glacier","amber","atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"];
   const orderedKeys=[...FREE_THEMES,...PAID_THEMES];
@@ -342,8 +350,8 @@ function SettingsModal({T,state,onSave,onClose}){
   );
 }
 
-function TimerSettingsModal({T,state,onSave,onClose}){
-  const isPremium=IS_PREMIUM;
+function TimerSettingsModal({T,state,onSave,onClose,isPremium=false}){
+  const isPremium=state.isPremium||isPremium||IS_PREMIUM;
   const MAX_ALL=10; // ーを含む上限
   const MAX_ACTIVE=5; // 選択できる最大数
   const FIXED_DASH="ー"; // 常に最後に固定

@@ -268,7 +268,6 @@ function App(){
   // isPremium/noAdsはstateと分離して管理（インポートの影響を受けない）
   const [isPremium,setIsPremium]=useState(IS_PREMIUM);
   const [noAds,setNoAds]=useState(false);
-  const [rcDebug,setRcDebug]=useState("");
   const [tab,setTab]=useState("home");
   const [drawerOpen,setDrawerOpen]=useState(false);
   const [drawerSection,setDrawerSection]=useState(null);
@@ -293,7 +292,7 @@ function App(){
   useEffect(()=>{
     (async()=>{
       try{
-        await Purchases.configure(); // index.htmlのラッパー経由（固定ID付き）
+        await Purchases.configure({apiKey:"appl_HrDpuICDgfGShogHiNmlmBubJSJ"});
         const premium=await Purchases.isPremiumUser();
         const noAdsVal=await Purchases.hasNoAds();
         setIsPremium(IS_PREMIUM||premium);
@@ -602,7 +601,7 @@ function App(){
         </div>
       </div>
       <Drawer T={T} open={drawerOpen} onClose={()=>setDrawerOpen(false)} onSection={setDrawerSection} onReset={()=>setShowResetConfirm(true)}/>
-      {drawerSection==="color"        &&<ColorModal T={T} themeName={state.themeName} onPick={k=>update({themeName:k})} onClose={()=>setDrawerSection(null)}/>}
+      {drawerSection==="color"        &&<ColorModal T={T} themeName={state.themeName} onPick={k=>update({themeName:k})} onClose={()=>setDrawerSection(null)} isPremiumProp={isPremium}/>}
       {drawerSection==="settings"     &&<SettingsModal T={T} state={state} onSave={(sf,th,sd,tp)=>update({settings:sf,targetWearHours:th,startDate:sd,totalPieces:tp})} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="schedule"     &&<ScheduleModal T={T} state={state} update={update} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="backup"       &&<BackupModal T={T} state={state} onImport={s=>setState(prev=>({...s,isPremium:prev.isPremium,noAds:prev.noAds}))} onClose={()=>setDrawerSection(null)}/>}
@@ -620,7 +619,7 @@ function App(){
           schedulePhotoNotif(stateWithExch);
         }
       }} onClose={()=>setDrawerSection(null)}/>}
-      {drawerSection==="timerSettings"&&<TimerSettingsModal T={T} state={state} onSave={f=>update(f)} onClose={()=>setDrawerSection(null)}/>}
+      {drawerSection==="timerSettings"&&<TimerSettingsModal T={T} state={state} onSave={f=>update(f)} onClose={()=>setDrawerSection(null)} isPremium={isPremium}/>}
       {drawerSection==="cameraSettings"&&<CameraSettingsModal T={T} state={state} onSave={f=>update(f)} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="premium"&&<PremiumModal T={T} state={{...state,isPremium,noAds}} onClose={()=>setDrawerSection(null)} onPurchased={({isPremium:p,noAds:n})=>{setIsPremium(p);setNoAds(n);if(p||n)AdMobHelper.removeBanner();}}/>}
       {drawerSection==="about"&&<AboutModal T={T} onClose={()=>setDrawerSection(null)}/>}

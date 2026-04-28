@@ -1,5 +1,5 @@
 function StatsPage({T,state,update,todayStr,todayDayStartMs}){
-  const isPremium=IS_PREMIUM;
+  const isPremium=state.isPremium||IS_PREMIUM;
   useTick(1000, state.timerRunning);
   const fmtShort = ds => {
     if(!ds) return "—";

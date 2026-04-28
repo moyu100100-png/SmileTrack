@@ -1,5 +1,5 @@
 function PhotoPage({T,state,update,todayStr}){
-  const isPremium=IS_PREMIUM;
+  const isPremium=state.isPremium||IS_PREMIUM;
   const cs = state.cameraSettings||{};
   const slot1Id = cs.slot1||"face_front";
   const slot2Id = cs.slot2||"teeth_front";
@@ -1040,7 +1040,7 @@ function PhotoCompare({T,a,b,onClose}){
 
 // ── PHOTO VIEWER ─────────────────────────────────────────────────────────────
 function PhotoViewer({T,photos,initialId,onClose,onEdit,state}){
-  const isPremium=IS_PREMIUM;
+  const isPremium=state.isPremium||IS_PREMIUM;
   const cs=state?.cameraSettings||{};
   const [idx,setIdx]=useState(()=>Math.max(0,photos.findIndex(p=>p.id===initialId)));
   const [playing,setPlaying]=useState(false);
