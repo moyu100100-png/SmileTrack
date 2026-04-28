@@ -88,7 +88,6 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
   const [selectedPlan,setSelectedPlan]=React.useState("yearly");
   const [prices,setPrices]=React.useState({});
 
-  const [debugLogs,setDebugLogs]=React.useState([]);
 
   // RevenueCatから実際の価格を取得（公式プラグイン版）
   React.useEffect(()=>{
@@ -96,17 +95,9 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
       try{
         const isNative=Purchases._isNative();
         const plugin=Purchases._plugin();
-        const initLogs=[
-          "isNative: "+isNative,
-          "plugin: "+(plugin?"OK":"undefined"),
-        ];
-        setDebugLogs(initLogs);
-        if(!isNative){ setDebugLogs([...initLogs,"非ネイティブのためスキップ"]); return; }
-        if(!plugin){ setDebugLogs([...initLogs,"❌ Purchases pluginが見つからない"]); return; }
+        if(!plugin){ return; }
 
         const offerings=await Purchases.getOfferings();
-        const swiftLogs=window._rcDebugLogs||[];
-        setDebugLogs([...initLogs,...swiftLogs]);
 
         console.log("[RC] PremiumModal packages:", offerings?.current?.availablePackages?.length ?? 0);
         const seen=new Set();
@@ -126,7 +117,6 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
         });
         if(Object.keys(p).length>0) setPrices(p);
       }catch(e){
-        setDebugLogs(prev=>[...prev,"❌ JS例外: "+(e?.message||String(e))]);
         console.warn("[RC] getOfferings error",e);
       }
     })();
@@ -189,7 +179,7 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
 
   if(thankYou) return(
     <div className="mo" onClick={onClose} style={{alignItems:"center",justifyContent:"center"}}>
-      <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center",padding:"32px 20px"}}>
+      <div className="md" onClick={e=>e.stopPropagation()} style={{textAlign:"center",padding:"32px 20px",borderRadius:20,width:"90%",maxWidth:400}}>
         <div style={{fontSize:48,marginBottom:12}}>☕</div>
         <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:20,fontWeight:700,color:T.primary,marginBottom:8}}>{t("coffeeThankTitle")}</div>
         <div style={{fontSize:14,color:T.text+"88",lineHeight:1.8,marginBottom:24}}>
@@ -221,7 +211,7 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
         <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:14}}>
           {plans.map(p=>(
             <div key={p.id} style={{position:"relative",border:`2px solid ${selectedPlan===p.id?T.primary:T.soft}`,borderRadius:12,padding:"12px 14px",cursor:"pointer",background:selectedPlan===p.id?T.soft:"transparent"}}
-              onClick={()=>{setSelectedPlan(p.id);!loading&&handlePurchase(p.id);}}>
+              onClick={()=>setSelectedPlan(p.id)}>
               {p.badge&&<div style={{position:"absolute",top:-10,left:14,background:T.primary,color:"#fff",fontSize:10,fontWeight:700,padding:"2px 10px",borderRadius:20}}>{p.badge}</div>}
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                 <div>
@@ -242,7 +232,7 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
           <div style={{fontSize:11,fontWeight:700,color:T.text+"66",marginBottom:8}}>{t("singlePurchaseLabel")}</div>
           {extras.map(p=>(
             <div key={p.id} style={{border:`2px solid ${selectedPlan===p.id?T.primary:T.soft}`,borderRadius:12,padding:"10px 14px",cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center",background:selectedPlan===p.id?T.soft:"transparent"}}
-              onClick={()=>{setSelectedPlan(p.id);!loading&&handlePurchase(p.id);}}>
+              onClick={()=>setSelectedPlan(p.id)}>
               <div>
                 <div style={{fontSize:14,fontWeight:600,color:T.text}}>{p.label}</div>
                 <div style={{fontSize:11,color:T.text+"66",marginTop:2}}>{p.desc}</div>
@@ -252,19 +242,19 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
           ))}
         </div>
 
-        <button className="btn bs" style={{width:"100%",marginTop:8}} onClick={onClose}>{t("close")}</button>
-
-        {/* デバッグボックス（確認後に削除） */}
-        {debugLogs.length>0&&(
-          <div style={{
-            marginTop:12,background:"#000",color:"#0f0",
-            fontSize:10,padding:"8px",borderRadius:8,
-            fontFamily:"monospace",whiteSpace:"pre-wrap",
-            maxHeight:160,overflowY:"auto",lineHeight:1.5,
-          }}>
-            {debugLogs.map((l,i)=><div key={i}>{l}</div>)}
-          </div>
-        )}
+        {/* 購入ボタン・キャンセルボタン */}
+        <div style={{display:"flex",gap:8,marginTop:8}}>
+          <button className="btn bs" style={{flex:1,padding:"13px"}} onClick={onClose} disabled={loading}>{t("close")}</button>
+          <button className="btn bp" style={{flex:2,padding:"13px",fontSize:15}} onClick={()=>!loading&&handlePurchase(selectedPlan)} disabled={loading}>
+            {loading
+              ? <span style={{display:"flex",alignItems:"center",gap:8,justifyContent:"center"}}>
+                  <span style={{width:16,height:16,border:"2px solid rgba(255,255,255,0.3)",borderTop:"2px solid #fff",borderRadius:"50%",display:"inline-block",animation:"rcSpin 0.8s linear infinite"}}/>
+                  {t("loading")}
+                </span>
+              : `${prices[selectedPlan]||"---"} ${t("buy")||"購入する"}`
+            }
+          </button>
+        </div>
       </div>
     </div>
   );
