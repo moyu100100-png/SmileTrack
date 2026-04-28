@@ -619,7 +619,7 @@ function App(){
           schedulePhotoNotif(stateWithExch);
         }
       }} onClose={()=>setDrawerSection(null)}/>}
-      {drawerSection==="timerSettings"&&<TimerSettingsModal T={T} state={state} onSave={f=>update(f)} onClose={()=>setDrawerSection(null)} isPremium={isPremium}/>}
+      {drawerSection==="timerSettings"&&<TimerSettingsModal T={T} state={state} onSave={f=>update(f)} onClose={()=>setDrawerSection(null)} isPremiumProp={isPremium}/>}
       {drawerSection==="cameraSettings"&&<CameraSettingsModal T={T} state={state} onSave={f=>update(f)} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="premium"&&<PremiumModal T={T} state={{...state,isPremium,noAds}} onClose={()=>setDrawerSection(null)} onPurchased={({isPremium:p,noAds:n})=>{setIsPremium(p);setNoAds(n);if(p||n)AdMobHelper.removeBanner();}}/>}
       {drawerSection==="about"&&<AboutModal T={T} onClose={()=>setDrawerSection(null)}/>}

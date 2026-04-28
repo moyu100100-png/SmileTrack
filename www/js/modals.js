@@ -173,7 +173,7 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
         <div style={{fontSize:13,color:T.text+"88",marginBottom:20,lineHeight:1.7}}>
           {t("coffeeDesc").split("\n").map((l,i)=><span key={i}>{l}<br/></span>)}
         </div>
-        <button className="btn bp" style={{width:"100%",marginBottom:10,padding:"14px",fontSize:15}} onClick={()=>handlePurchase("coffee")} disabled={loading}>{loading?t("loading"):t("coffeeBuy").replace("¥120",prices.coffee||"---")}</button>
+        <button className="btn bp" style={{width:"100%",marginBottom:10,padding:"14px",fontSize:15}} onClick={()=>handlePurchase("coffee")} disabled={loading}>{loading?t("loading"):`${t("coffeeBuy")} ${prices.coffee||"---"}`}</button>
         <button className="btn bs" style={{width:"100%",padding:"14px",fontSize:15}} onClick={onClose}>{t("close")}</button>
       </div>
     </div>
@@ -350,8 +350,8 @@ function SettingsModal({T,state,onSave,onClose}){
   );
 }
 
-function TimerSettingsModal({T,state,onSave,onClose,isPremium=false}){
-  const isPremium=state.isPremium||isPremium||IS_PREMIUM;
+function TimerSettingsModal({T,state,onSave,onClose,isPremiumProp=false}){
+  const isPremium=state.isPremium||isPremiumProp||IS_PREMIUM;
   const MAX_ALL=10; // ーを含む上限
   const MAX_ACTIVE=5; // 選択できる最大数
   const FIXED_DASH="ー"; // 常に最後に固定
