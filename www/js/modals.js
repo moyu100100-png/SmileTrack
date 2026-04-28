@@ -159,11 +159,11 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
     setLoading(true);
     try{
       const result=await Purchases.restorePurchases();
-      const isPremium=result?.isPremium ?? await Purchases.isPremiumUser();
-      const noAds=result?.noAds ?? await Purchases.hasNoAds();
+      const isPremium=result?.isPremium===true;
+      const noAds=result?.noAds===true;
       if(onPurchased) onPurchased({isPremium,noAds});
       if(isPremium){ onClose(); }
-      else{ setErrorMsg(t("restoreNotFound")); }
+      else{ setErrorMsg("restore result: isPremium="+isPremium+" noAds="+noAds+" raw="+JSON.stringify(result).slice(0,200)); }
     }catch(e){ setErrorMsg(t("restoreFailed")); }
     finally{ setLoading(false); }
   };
