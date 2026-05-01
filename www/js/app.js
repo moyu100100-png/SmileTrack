@@ -293,11 +293,17 @@ function App(){
     (async()=>{
       try{
         await Purchases.configure(); // 固定ID版ラッパー経由
-        const premium=await Purchases.isPremiumUser();
-        const noAdsVal=await Purchases.hasNoAds();
-        setIsPremium(IS_PREMIUM||premium);
-        setNoAds(noAdsVal);
-        if(premium||noAdsVal) AdMobHelper.removeBanner();
+        // configure完了後に1回だけgetCustomerInfoを呼ぶ
+        const plugin=Purchases._plugin();
+        if(plugin){
+          const info=await plugin.getCustomerInfo();
+          const active=Purchases._getActive(info);
+          const premium=active["premium"]!=null;
+          const noAdsVal=active["no_ads"]!=null;
+          setIsPremium(IS_PREMIUM||premium);
+          setNoAds(noAdsVal);
+          if(premium||noAdsVal) AdMobHelper.removeBanner();
+        }
       }catch(e){ console.warn("[RC] init error",e); }
     })();
   },[]);
