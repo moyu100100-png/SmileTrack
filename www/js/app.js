@@ -268,6 +268,7 @@ function App(){
   // isPremium/noAdsはstateと分離して管理（インポートの影響を受けない）
   const [isPremium,setIsPremium]=useState(IS_PREMIUM);
   const [noAds,setNoAds]=useState(false);
+  const [rcDebug,setRcDebug]=useState(null);
   const [tab,setTab]=useState("home");
   const [drawerOpen,setDrawerOpen]=useState(false);
   const [drawerSection,setDrawerSection]=useState(null);
@@ -293,17 +294,32 @@ function App(){
     (async()=>{
       try{
         await Purchases.configure(); // 固定ID版ラッパー経由
-        // configure完了後に1回だけgetCustomerInfoを呼ぶ
+        const storedId=localStorage.getItem("rc_app_user_id");
         const plugin=Purchases._plugin();
+        const debugLines=["=== RC DEBUG ==="];
+        debugLines.push("storedId: "+storedId);
+        debugLines.push("plugin: "+(plugin?"OK":"NG"));
         if(plugin){
-          const info=await plugin.getCustomerInfo();
-          const active=Purchases._getActive(info);
-          const premium=active["premium"]!=null;
-          const noAdsVal=active["no_ads"]!=null;
-          setIsPremium(IS_PREMIUM||premium);
-          setNoAds(noAdsVal);
-          if(premium||noAdsVal) AdMobHelper.removeBanner();
+          try{
+            const info=await plugin.getCustomerInfo();
+            const customerData=info?.customerInfo??info;
+            const active=customerData?.entitlements?.active??{};
+            const activeKeys=Object.keys(active);
+            debugLines.push("originalAppUserId: "+(customerData?.originalAppUserId??"none"));
+            debugLines.push("active keys: ["+activeKeys.join(",")+"]");
+            debugLines.push("premium: "+(active["premium"]!=null));
+            debugLines.push("no_ads: "+(active["no_ads"]!=null));
+            debugLines.push("raw entitlements: "+JSON.stringify(customerData?.entitlements??{}).slice(0,300));
+            const premium=active["premium"]!=null;
+            const noAdsVal=active["no_ads"]!=null;
+            setIsPremium(IS_PREMIUM||premium);
+            setNoAds(noAdsVal);
+            if(premium||noAdsVal) AdMobHelper.removeBanner();
+          }catch(e){
+            debugLines.push("getCustomerInfo ERROR: "+e?.message);
+          }
         }
+        setRcDebug(debugLines.join("\n"));
       }catch(e){ console.warn("[RC] init error",e); }
     })();
   },[]);
