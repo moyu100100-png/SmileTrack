@@ -320,7 +320,10 @@ function App(){
           }
         }
         setRcDebug(debugLines.join("\n"));
-      }catch(e){ console.warn("[RC] init error",e); }
+      }catch(e){
+        console.warn("[RC] init error",e);
+        setRcDebug("=== RC DEBUG ===\nINIT ERROR: "+e?.message+"\nstoredId: "+localStorage.getItem("rc_app_user_id"));
+      }
     })();
   },[]);
 
