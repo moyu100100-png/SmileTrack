@@ -5,7 +5,7 @@ workflows:
     integrations:
       app_store_connect: Codemagic
     environment:
-      xcode: 16.3
+      xcode: 26.0
       ios_signing:
         distribution_type: app_store
         bundle_identifier: app.smiletrack.app
@@ -31,7 +31,7 @@ workflows:
           done
       - name: Set build number
         script: |
-          BUILD_NUMBER=114
+          BUILD_NUMBER=110
           echo "Setting build number to: $BUILD_NUMBER"
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" ios/App/App/Info.plist
       - name: Set up keychain
