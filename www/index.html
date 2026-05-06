@@ -17,8 +17,8 @@
 
   <script>
   const ADMOB_APP_ID    = "ca-app-pub-5456814091467820~1944092541";
-  const ADMOB_BANNER_ID = "ca-app-pub-3940256099942544/2934735716"; // テスト
-  const ADMOB_INTER_ID  = "ca-app-pub-3940256099942544/4411468910"; // テスト
+  const ADMOB_BANNER_ID = "ca-app-pub-5456814091467820/6020940488"; // 本番
+  const ADMOB_INTER_ID  = "ca-app-pub-5456814091467820/6669903678"; // 本番
 
   window.AdMobHelper = {
     _interCount: 0,
@@ -31,7 +31,7 @@
         await Capacitor.Plugins.AdMob.initialize({
           requestTrackingAuthorization: true,
           testingDevices: [],
-          initializeForTesting: true,
+          initializeForTesting: false,
         });
       } catch(e) { console.warn("[AdMob] initialize error", e); }
     },
@@ -44,9 +44,7 @@
           adSize: "BANNER",
           position: "BOTTOM_CENTER",
           margin: 0,
-          isTesting: true,
-        });
-      } catch(e) { console.warn("[AdMob] showBanner error", e); }
+          isTesting: false,
     },
     async hideBanner() {
       if (!this._isNative()) return;
@@ -61,9 +59,7 @@
       try {
         await Capacitor.Plugins.AdMob.prepareInterstitial({
           adId: ADMOB_INTER_ID,
-          isTesting: true,
-        });
-      } catch(e) { console.warn("[AdMob] prepareInterstitial error", e); }
+          isTesting: false,
     },
     async showInterstitialIfReady(forceShow=false) {
       if (!this._isNative()) return;
