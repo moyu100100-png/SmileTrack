@@ -146,11 +146,12 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
     setErrorMsg(null);
     setLoading(true);
     try{
-      await Purchases.restorePurchases();
-      const isPremium=await Purchases.isPremiumUser();
-      const noAds=await Purchases.hasNoAds();
+      // restorePurchasesの結果から直接判定
+      const result=await Purchases.restorePurchases();
+      const isPremium=result?.isPremium===true;
+      const noAds=result?.noAds===true;
       if(onPurchased) onPurchased({isPremium,noAds});
-      if(isPremium){ onClose(); }
+      if(isPremium||noAds){ onClose(); }
       else{ setErrorMsg(t("restoreNotFound")); }
     }catch(e){ setErrorMsg(t("restoreFailed")); }
     finally{ setLoading(false); }
