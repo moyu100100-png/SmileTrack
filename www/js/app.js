@@ -294,7 +294,9 @@ function App(){
     (async()=>{
       try{
         await Purchases.configure(); // 固定ID版ラッパー経由
-        const storedId=localStorage.getItem("rc_app_user_id");
+        const prefs=Capacitor?.Plugins?.Preferences;
+        const prefResult=prefs?await prefs.get({key:"rc_app_user_id"}):null;
+        const storedId=prefResult?.value||localStorage.getItem("rc_app_user_id");
         const plugin=Purchases._plugin();
         const debugLines=["=== RC DEBUG ==="];
         debugLines.push("storedId: "+storedId);

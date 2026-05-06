@@ -98,18 +98,33 @@
       return Capacitor?.Plugins?.Purchases;
     },
     _configured: false,
+    async _getOrCreateUserId() {
+      try {
+        // Capacitor Preferencesを使う（アンインストールしても消えない）
+        const prefs = Capacitor?.Plugins?.Preferences;
+        if (prefs) {
+          const { value } = await prefs.get({ key: "rc_app_user_id" });
+          if (value) return value;
+          const newId = "u_" + Date.now() + "_" + Math.random().toString(36).slice(2, 9);
+          await prefs.set({ key: "rc_app_user_id", value: newId });
+          return newId;
+        }
+      } catch(e) { console.warn("[RC] Preferences error", e); }
+      // フォールバック：localStorage
+      let id = localStorage.getItem("rc_app_user_id");
+      if (!id) {
+        id = "u_" + Date.now() + "_" + Math.random().toString(36).slice(2, 9);
+        localStorage.setItem("rc_app_user_id", id);
+      }
+      return id;
+    },
     async configure() {
       if (!this._isNative()) return;
       if (this._configured) return;
       const plugin = this._plugin();
       if (!plugin) return;
       try {
-        // 固定ユーザーIDを生成・保持（毎回別IDになる問題を防ぐ）
-        let appUserId = localStorage.getItem("rc_app_user_id");
-        if (!appUserId) {
-          appUserId = "u_" + Date.now() + "_" + Math.random().toString(36).slice(2, 9);
-          localStorage.setItem("rc_app_user_id", appUserId);
-        }
+        const appUserId = await this._getOrCreateUserId();
         await plugin.configure({ apiKey: window.RC_API_KEY_IOS, appUserID: appUserId });
         this._configured = true;
         console.log("[RC] configured OK, userID:", appUserId);
