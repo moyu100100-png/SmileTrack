@@ -616,6 +616,23 @@ function App(){
           {tab==="timer"   &&<TimerPage T={T} state={{...state,isPremium,noAds}} update={update} handleRemoveButton={handleRemoveButton} todayStr={todayStr} todayDayStartMs={todayDayStartMs} snoozedUntil={snoozedUntil} setSnoozedUntil={setSnoozedUntil} alarmStopped={alarmStopped} setAlarmStopped={setAlarmStopped} onReasonPopup={setReasonPopupOpen}/>}
           {tab==="stats"   &&<StatsPage T={T} state={{...state,isPremium,noAds}} update={update} todayStr={todayStr} todayDayStartMs={todayDayStartMs}/>}
         </div>
+        {rcDebug&&(
+          <div onClick={()=>{
+            if(navigator.clipboard) navigator.clipboard.writeText(rcDebug);
+            setRcDebug(null);
+          }} style={{
+            position:"fixed",top:0,left:0,right:0,bottom:0,
+            background:"rgba(0,0,0,0.92)",zIndex:99999,
+            display:"flex",alignItems:"center",justifyContent:"center",padding:20
+          }}>
+            <div style={{
+              background:"#111",color:"#0f0",fontFamily:"monospace",
+              fontSize:12,padding:20,borderRadius:12,
+              whiteSpace:"pre-wrap",wordBreak:"break-all",
+              maxHeight:"80vh",overflowY:"auto",width:"100%",maxWidth:500
+            }}>{"[タップでコピー＆閉じる]\n\n"+rcDebug}</div>
+          </div>
+        )}
         <div className="nav" style={{paddingBottom:(!isPremium&&!noAds)?`calc(env(safe-area-inset-bottom, 0px) + 35px)`:`0px`}}>
           {tabs.map(t=>{const active=tab===t.id;return(<button key={t.id} className={`nb${active?" on":""}`} onClick={()=>{
   setTab(t.id);

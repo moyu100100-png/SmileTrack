@@ -461,7 +461,7 @@ function PhotoPage({T,state,update,todayStr}){
       )}
 
       {/* 写真ビューアー（スワイプ・スライドショー・動画保存） */}
-      {viewPhoto&&<PhotoViewer T={T} photos={filtered} initialId={viewPhoto.id} onClose={()=>setViewPhoto(null)}/>}
+      {viewPhoto&&<PhotoViewer T={T} photos={filtered} initialId={viewPhoto.id} onClose={()=>setViewPhoto(null)} state={state}/>}
       {editId&&(
         <div className="mo" style={{alignItems:"center"}} onClick={()=>setEditId(null)}>
           <div className="md" style={{borderRadius:20,maxHeight:"80dvh",overflowY:"auto"}} onClick={e=>e.stopPropagation()}>
