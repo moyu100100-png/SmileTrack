@@ -45,6 +45,8 @@
           position: "BOTTOM_CENTER",
           margin: 0,
           isTesting: false,
+        });
+      } catch(e) { console.warn("[AdMob] showBanner error", e); }
     },
     async hideBanner() {
       if (!this._isNative()) return;
@@ -60,6 +62,8 @@
         await Capacitor.Plugins.AdMob.prepareInterstitial({
           adId: ADMOB_INTER_ID,
           isTesting: false,
+        });
+      } catch(e) { console.warn("[AdMob] prepareInterstitial error", e); }
     },
     async showInterstitialIfReady(forceShow=false) {
       if (!this._isNative()) return;
