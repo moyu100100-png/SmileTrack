@@ -278,26 +278,15 @@ function App(){
   const alarmStopped=state.alarmStopped||false;
   const setAlarmStopped=(v)=>update({alarmStopped:v});
 
-  // AdMob初期化（オンボーディング完了後のみ）
+  // RC初期化 → 結果確定後にAdMob初期化（競合防止）
   useEffect(()=>{
     (async()=>{
-      if(isPremium||noAds) return;
-      if(!state.onboardingDone) return;
-      await AdMobHelper.initialize();
-      await AdMobHelper.prepareInterstitial();
-      await AdMobHelper.showBanner();
-    })();
-  },[state.onboardingDone]);
-
-  // RevenueCat初期化
-  useEffect(()=>{
-    (async()=>{
+      let premium=false;
+      let noAdsVal=false;
       try{
-        await Purchases.configure(); // 固定ID版ラッパー経由
-        const storedId="(RC匿名ID管理)";
+        await Purchases.configure();
         const plugin=Purchases._plugin();
         const debugLines=["=== RC DEBUG ==="];
-        debugLines.push("storedId: "+storedId);
         debugLines.push("plugin: "+(plugin?"OK":"NG"));
         if(plugin){
           try{
@@ -310,11 +299,10 @@ function App(){
             debugLines.push("premium: "+(active["premium"]!=null));
             debugLines.push("no_ads: "+(active["no_ads"]!=null));
             debugLines.push("raw entitlements: "+JSON.stringify(customerData?.entitlements??{}).slice(0,300));
-            const premium=active["premium"]!=null;
-            const noAdsVal=active["no_ads"]!=null;
+            premium=active["premium"]!=null;
+            noAdsVal=active["no_ads"]!=null;
             setIsPremium(IS_PREMIUM||premium);
             setNoAds(noAdsVal);
-            if(premium||noAdsVal) AdMobHelper.removeBanner();
           }catch(e){
             debugLines.push("getCustomerInfo ERROR: "+e?.message);
           }
@@ -322,7 +310,16 @@ function App(){
         setRcDebug(debugLines.join("\n"));
       }catch(e){
         console.warn("[RC] init error",e);
-        setRcDebug("=== RC DEBUG ===\nINIT ERROR: "+e?.message+"\nstoredId: "+localStorage.getItem("rc_app_user_id"));
+        setRcDebug("=== RC DEBUG ===\nINIT ERROR: "+e?.message);
+      }
+      // RC確定後にAdMob初期化（noAds/premiumが判明してから広告を出す）
+      if(!state.onboardingDone) return;
+      if(IS_PREMIUM||premium||noAdsVal){
+        AdMobHelper.removeBanner();
+      } else {
+        await AdMobHelper.initialize();
+        await AdMobHelper.prepareInterstitial();
+        await AdMobHelper.showBanner();
       }
     })();
   },[]);
@@ -335,9 +332,9 @@ function App(){
     if(isOverlayOpen){
       AdMobHelper.hideBanner();
     } else {
-      AdMobHelper.showBanner();
+      if(!isPremium&&!noAds) AdMobHelper.showBanner();
     }
-  },[isOverlayOpen]);
+  },[isOverlayOpen,isPremium,noAds]);
 
   // アフィリエイトポップアップ: 7日後に1回、30日後から30日ごと
   useEffect(()=>{
