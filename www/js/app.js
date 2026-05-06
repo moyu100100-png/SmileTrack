@@ -432,7 +432,13 @@ function App(){
     if(Notif.isCapacitor()){
       await Notif.requestPermission();
     }
-  },[update]);
+    // オンボーディング完了後に広告初期化（RC結果が既に確定しているのでisPremium/noAdsを参照）
+    if(!isPremium&&!noAds){
+      await AdMobHelper.initialize();
+      await AdMobHelper.prepareInterstitial();
+      await AdMobHelper.showBanner();
+    }
+  },[update,isPremium,noAds]);
 
   // アラームモーダル（どのタブでも表示）
   const alarmSecs=(state.alarmMinutes||30)*60;
