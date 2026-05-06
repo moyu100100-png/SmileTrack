@@ -127,9 +127,12 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
     setLoading(true);
     try{
       const productId=RC_PRODUCTS[productKey];
-      await Purchases.purchaseProduct(productId);
-      const isPremium=await Purchases.isPremiumUser();
-      const noAds=await Purchases.hasNoAds();
+      const result=await Purchases.purchaseProduct(productId);
+      // purchaseProductの戻り値から直接判定（RCサーバー反映タイミングに依存しない）
+      const customerData=result?.customerInfo??result;
+      const active=customerData?.entitlements?.active??{};
+      const isPremium=active["premium"]!=null;
+      const noAds=active["no_ads"]!=null;
       if(onPurchased) onPurchased({isPremium,noAds});
       if(productKey==="coffee"){ setThankYou(true); }
       else { onClose(); }
