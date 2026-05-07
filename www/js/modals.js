@@ -127,12 +127,9 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
     setLoading(true);
     try{
       const productId=RC_PRODUCTS[productKey];
-      const result=await Purchases.purchaseProduct(productId);
-      // purchaseProductの戻り値から直接判定（RCサーバー反映タイミングに依存しない）
-      const customerData=result?.customerInfo??result;
-      const active=customerData?.entitlements?.active??{};
-      const isPremium=active["premium"]!=null;
-      const noAds=active["no_ads"]!=null;
+      await Purchases.purchaseProduct(productId);
+      const isPremium=await Purchases.isPremiumUser();
+      const noAds=await Purchases.hasNoAds();
       if(onPurchased) onPurchased({isPremium,noAds});
       if(productKey==="coffee"){ setThankYou(true); }
       else { onClose(); }
@@ -149,12 +146,11 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
     setErrorMsg(null);
     setLoading(true);
     try{
-      // restorePurchasesの結果から直接判定
-      const result=await Purchases.restorePurchases();
-      const isPremium=result?.isPremium===true;
-      const noAds=result?.noAds===true;
+      await Purchases.restorePurchases();
+      const isPremium=await Purchases.isPremiumUser();
+      const noAds=await Purchases.hasNoAds();
       if(onPurchased) onPurchased({isPremium,noAds});
-      if(isPremium||noAds){ onClose(); }
+      if(isPremium){ onClose(); }
       else{ setErrorMsg(t("restoreNotFound")); }
     }catch(e){ setErrorMsg(t("restoreFailed")); }
     finally{ setLoading(false); }
@@ -258,6 +254,11 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
               : `${prices[selectedPlan]||"---"} ${t("buy")||"購入する"}`
             }
           </button>
+        </div>
+        {/* 利用規約・プライバシーポリシー */}
+        <div style={{display:"flex",gap:16,justifyContent:"center",marginTop:12,flexWrap:"wrap"}}>
+          <a href="https://pickled-runner-04f.notion.site/ebd//329470522fe180399354fbae6be51bfb" target="_blank" style={{fontSize:11,color:T.accent,textDecoration:"underline"}}>{t("termsLabel")||"利用規約"}</a>
+          <a href="https://pickled-runner-04f.notion.site/ebd//329470522fe180d884bfc0afe2d3dd94" target="_blank" style={{fontSize:11,color:T.accent,textDecoration:"underline"}}>{t("privacyLabel")||"プライバシーポリシー"}</a>
         </div>
       </div>
     </div>
