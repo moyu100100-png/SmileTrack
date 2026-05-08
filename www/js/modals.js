@@ -127,9 +127,11 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
     setLoading(true);
     try{
       const productId=RC_PRODUCTS[productKey];
-      await Purchases.purchaseProduct(productId);
-      const isPremium=await Purchases.isPremiumUser();
-      const noAds=await Purchases.hasNoAds();
+      const result=await Purchases.purchaseProduct(productId);
+      const customerData=result?.customerInfo??result;
+      const active=customerData?.entitlements?.active??{};
+      const isPremium=active["premium"]!=null;
+      const noAds=active["no_ads"]!=null;
       if(onPurchased) onPurchased({isPremium,noAds});
       if(productKey==="coffee"){ setThankYou(true); }
       else { onClose(); }
@@ -146,11 +148,11 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
     setErrorMsg(null);
     setLoading(true);
     try{
-      await Purchases.restorePurchases();
-      const isPremium=await Purchases.isPremiumUser();
-      const noAds=await Purchases.hasNoAds();
+      const result=await Purchases.restorePurchases();
+      const isPremium=result?.isPremium===true;
+      const noAds=result?.noAds===true;
       if(onPurchased) onPurchased({isPremium,noAds});
-      if(isPremium){ onClose(); }
+      if(isPremium||noAds){ onClose(); }
       else{ setErrorMsg(t("restoreNotFound")); }
     }catch(e){ setErrorMsg(t("restoreFailed")); }
     finally{ setLoading(false); }
@@ -255,8 +257,12 @@ function PremiumModal({T,state,onClose,showCoffee=false,onPurchased}){
             }
           </button>
         </div>
+        {/* 自動更新注記 */}
+        <div style={{textAlign:"center",fontSize:10,color:T.text+"66",marginTop:12,lineHeight:1.5}}>
+          {t("autoRenewNote")||"月額・年額プランは期間終了の24時間前までに解約しない限り自動更新されます。"}
+        </div>
         {/* 利用規約・プライバシーポリシー */}
-        <div style={{display:"flex",gap:16,justifyContent:"center",marginTop:12,flexWrap:"wrap"}}>
+        <div style={{display:"flex",gap:16,justifyContent:"center",marginTop:6,flexWrap:"wrap"}}>
           <a href="https://pickled-runner-04f.notion.site/ebd//329470522fe180399354fbae6be51bfb" target="_blank" style={{fontSize:11,color:T.accent,textDecoration:"underline"}}>{t("termsLabel")||"利用規約"}</a>
           <a href="https://pickled-runner-04f.notion.site/ebd//329470522fe180d884bfc0afe2d3dd94" target="_blank" style={{fontSize:11,color:T.accent,textDecoration:"underline"}}>{t("privacyLabel")||"プライバシーポリシー"}</a>
         </div>
