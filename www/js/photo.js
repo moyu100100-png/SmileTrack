@@ -645,6 +645,52 @@ function PhotoPage({T,state,update,todayStr}){
         </div>
       )}
       {showComparePreview&&<ComparePreviewModal T={T} onClose={()=>setShowComparePreview(false)}/>}
+      {compareView&&(()=>{
+        const CompareViewer=()=>{
+          const [pos,setPos]=React.useState(50);
+          const containerRef=React.useRef(null);
+          const handleMove=(clientX)=>{
+            const rect=containerRef.current?.getBoundingClientRect();
+            if(!rect)return;
+            const p=Math.min(100,Math.max(0,(clientX-rect.left)/rect.width*100));
+            setPos(p);
+          };
+          return(
+            <div className="mo" onClick={()=>setCompareView(null)} style={{alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.92)"}}>
+              <div onClick={e=>e.stopPropagation()} style={{width:"92%",maxWidth:440,borderRadius:20,overflow:"hidden"}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 16px",background:"rgba(0,0,0,0.7)"}}>
+                  <span style={{color:"#fff",fontWeight:700,fontSize:15}}>{t("compare")||"比較"}</span>
+                  <button onClick={()=>setCompareView(null)} style={{background:"rgba(255,255,255,0.18)",border:"none",color:"#fff",padding:"5px 12px",borderRadius:12,cursor:"pointer",fontSize:13}}>✕</button>
+                </div>
+                <div ref={containerRef} style={{position:"relative",width:"100%",aspectRatio:"3/4",overflow:"hidden",userSelect:"none",cursor:"ew-resize",background:"#111"}}
+                  onMouseMove={e=>handleMove(e.clientX)}
+                  onTouchMove={e=>{e.preventDefault();handleMove(e.touches[0].clientX);}}
+                  onMouseDown={e=>handleMove(e.clientX)}
+                  onTouchStart={e=>handleMove(e.touches[0].clientX)}>
+                  {/* After（右側・背景） */}
+                  <img src={compareView.b.data} alt="After" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover"}}/>
+                  {/* Before（左側・クリップ） */}
+                  <div style={{position:"absolute",inset:0,clipPath:`inset(0 ${100-pos}% 0 0)`}}>
+                    <img src={compareView.a.data} alt="Before" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                  </div>
+                  {/* スライダー */}
+                  <div style={{position:"absolute",top:0,bottom:0,left:`${pos}%`,width:2,background:"#fff",transform:"translateX(-50%)",pointerEvents:"none"}}>
+                    <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:32,height:32,borderRadius:"50%",background:"#fff",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 2px 8px #0004"}}>
+                      <span style={{fontSize:12,color:"#333",letterSpacing:-2}}>◀▶</span>
+                    </div>
+                  </div>
+                  <div style={{position:"absolute",top:8,left:8,background:"rgba(0,0,0,0.5)",color:"#fff",fontSize:11,padding:"3px 8px",borderRadius:6,pointerEvents:"none"}}>{t("before")||"BEFORE"}</div>
+                  <div style={{position:"absolute",top:8,right:8,background:"rgba(0,0,0,0.5)",color:"#fff",fontSize:11,padding:"3px 8px",borderRadius:6,pointerEvents:"none"}}>{t("after")||"AFTER"}</div>
+                  {/* 日付・枚目 */}
+                  <div style={{position:"absolute",bottom:8,left:8,background:"rgba(0,0,0,0.5)",color:"#fff",fontSize:11,padding:"3px 8px",borderRadius:6,pointerEvents:"none"}}>{compareView.a.date}{compareView.a.piece?" #"+compareView.a.piece:""}</div>
+                  <div style={{position:"absolute",bottom:8,right:8,background:"rgba(0,0,0,0.5)",color:"#fff",fontSize:11,padding:"3px 8px",borderRadius:6,pointerEvents:"none"}}>{compareView.b.date}{compareView.b.piece?" #"+compareView.b.piece:""}</div>
+                </div>
+              </div>
+            </div>
+          );
+        };
+        return <CompareViewer/>;
+      })()}
       {showSetPin&&(<div className="mo" onClick={()=>setShowSetPin(false)}><div className="md" onClick={e=>e.stopPropagation()}><div className="mdtitle">{t("pinLock")}</div>{state.photoLockEnabled?<><div style={{fontSize:14,color:T.text+"88",marginBottom:12}}>{t("pinUnlock")}</div><PinPad T={T} title={t("pinInput")} onDone={p=>{if(p===state.photoLock){update({photoLockEnabled:false,photoLock:null});setUnlocked(false);setShowSetPin(false);}else return false;}}/></>:<PinPad T={T} title={t("pinSet")} onDone={p=>{update({photoLock:p,photoLockEnabled:true});alert(t("pinSetDone"));setShowSetPin(false);}}/>}<button className="btn bs" style={{width:"100%",marginTop:10}} onClick={()=>setShowSetPin(false)}>{t("cancel")}</button></div></div>)}
     </div>
   );
@@ -912,10 +958,36 @@ function ReportModal({T,state,onClose}){
   while(cur<=today){months.push({year:cur.getFullYear(),month:cur.getMonth()+1});cur.setMonth(cur.getMonth()+1);}
   months.reverse();
   const [sel,setSel]=React.useState(months[0]||{year:today.getFullYear(),month:today.getMonth()+1});
-  const openReport=()=>{
+  const openReport=async()=>{
     const html=buildReportHTML(state,sel.year,sel.month);
-    const w=window.open("","_blank");
-    if(w){w.document.write(html);w.document.close();}
+    try{
+      if(typeof Capacitor!=="undefined"&&Capacitor.isNativePlatform?.()){
+        // Capacitor環境：Blobを作ってShareシートで共有
+        const blob=new Blob([html],{type:"text/html"});
+        const url=URL.createObjectURL(blob);
+        if(Capacitor.Plugins&&Capacitor.Plugins.Share){
+          await Capacitor.Plugins.Share.share({
+            title:"SmileTrack レポート",
+            url:url,
+          });
+        }else{
+          // Shareプラグインがない場合はBlob URLを開く
+          window.open(url,"_blank");
+        }
+      }else{
+        // Web環境
+        const w=window.open("","_blank");
+        if(w){w.document.write(html);w.document.close();}
+      }
+    }catch(e){
+      // フォールバック：ダウンロード
+      const blob=new Blob([html],{type:"text/html"});
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement("a");
+      a.href=url;
+      a.download="SmileTrack_report.html";
+      a.click();
+    }
     onClose();
   };
   return(
