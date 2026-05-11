@@ -655,7 +655,7 @@ function PhotoPage({T,state,update,todayStr}){
         };
         return(
           <div className="mo" onClick={()=>setCompareView(null)} style={{alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.95)"}}>
-            <div onClick={e=>e.stopPropagation()} style={{width:"100%",height:"100%",display:"flex",flexDirection:"column"}}>
+            <div onClick={e=>e.stopPropagation()} style={{width:"92%",maxWidth:440,borderRadius:20,height:"100%",display:"flex",flexDirection:"column"}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 20px",paddingTop:"60px",background:"rgba(0,0,0,0.7)",flexShrink:0}}>
                 <span style={{color:"#fff",fontWeight:700,fontSize:15}}>比較</span>
                 <button onClick={()=>setCompareView(null)} style={{background:"rgba(255,255,255,0.18)",border:"none",color:"#fff",padding:"5px 14px",borderRadius:12,cursor:"pointer",fontSize:14}}>✕</button>
