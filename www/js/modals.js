@@ -71,7 +71,7 @@ function AboutModal({T,onClose}){
         <Row icon={lockIcon} label={t("privacyLabel")} onClick={()=>window.open("https://pickled-runner-04f.notion.site/ebd//329470522fe180d884bfc0afe2d3dd94","_blank")}/>
         <Row icon={mailIcon} label={t("contactLabel")} onClick={()=>window.open("mailto:contact.appname@gmail.com")}/>
         <Row icon={starIcon} label={t("review")} onClick={()=>window.open("https://apps.apple.com/app/smiletrack","_blank")}/>
-        <Row icon={starIcon} label={t("googlePlayReview")} onClick={()=>window.open("https://play.google.com/store/apps/details?id=app.smiletrack","_blank")}/>
+
         <Row icon={shareIcon} label={t("shareLabel")} onClick={share}/>
 
         <button className="btn bs" style={{width:"100%",marginTop:16}} onClick={onClose}>{t("close")}</button>

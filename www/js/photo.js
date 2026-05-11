@@ -1,5 +1,5 @@
 function PhotoPage({T,state,update,todayStr}){
-  const isPremium=state.isPremium||IS_PREMIUM;
+  const isPremium=IS_PREMIUM;
   const cs = state.cameraSettings||{};
   const slot1Id = cs.slot1||"face_front";
   const slot2Id = cs.slot2||"teeth_front";
@@ -14,8 +14,8 @@ function PhotoPage({T,state,update,todayStr}){
   const existingModes = new Set((state.photos||[]).map(p=>p.shotMode||"face_front"));
   // タブ名：歯正面→「歯」、顔正面→「顔」、それ以外はlabelJPそのまま
   const tabLabel = id => {
-    if(id==="teeth_front") return t("shotTeeth");
-    if(id==="face_front") return t("shotFace");
+    if(id==="teeth_front") return "歯";
+    if(id==="face_front") return "顔";
     return (SHOT_MODES.find(x=>x.id===id)||{labelJP:id}).labelJP;
   };
   // タブに出すmode一覧（重複なし・順番制御）
@@ -27,7 +27,7 @@ function PhotoPage({T,state,update,todayStr}){
   // 過去写真に存在するmodeも追加（写真が1枚以上あるもの）
   existingModes.forEach(mid => addTab(mid));
   // 写真が1枚もないmodeは除外（スロット1・2も同様）
-  const filterTabs = [["all",t("filterAll")],
+  const filterTabs = [["all","全て"],
     ...tabModeIds
       .filter(id => existingModes.has(id))
       .map(id => [id, tabLabel(id)])
@@ -109,19 +109,17 @@ function PhotoPage({T,state,update,todayStr}){
     setShowColorPanel(false);setBrightness(50);setSaturation(50);
     setLiveZoom(1);
     setCameraOpen(true);
-    if(!state.isPremium&&!state.noAds) AdMobHelper.hideBanner();
     try{
       const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:"user",width:{ideal:1600},height:{ideal:1200}},audio:false});
       setStream(s);
       setTimeout(()=>{if(videoRef.current)videoRef.current.srcObject=s;},100);
-    }catch(e){alert("カメラエラー: "+e.name+" / "+e.message);setCameraOpen(false);if(!state.isPremium&&!state.noAds) AdMobHelper.showBanner();}
+    }catch(e){showToast("カメラを起動できませんでした");setCameraOpen(false);}
   };
 
   const closeCam=()=>{
     if(stream)stream.getTracks().forEach(t=>t.stop());
     setStream(null);setCameraOpen(false);setCaptured(null);setCapComment("");setCapPiece(null);
     setShowColorPanel(false);setBrightness(50);setSaturation(50);setLiveZoom(1);
-    if(!state.isPremium&&!state.noAds) AdMobHelper.showBanner();
   };
 
   const capturePhoto=()=>{
@@ -194,15 +192,15 @@ function PhotoPage({T,state,update,todayStr}){
   return(
     <div style={{padding:12}}>
       <div className="card" style={{marginBottom:10}}>
-        <div className="ct" style={{marginBottom:8,fontSize:14}}>{t("takePhoto")}</div>
+        <div className="ct" style={{marginBottom:8,fontSize:14}}>写真を撮影</div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9}}>
           <button className="btn bp" onClick={()=>openCam(slot1Id)} style={{padding:"12px 8px",flexDirection:"column"}}>
-            <div style={{display:"flex",alignItems:"center",gap:4}}>{Icons.camera("#fff",14)}<span style={{fontSize:14}}>{t(slot1Info.labelKey)||slot1Info.labelJP}</span></div>
-            {getOverlayPhoto(slot1Id)&&<div style={{fontSize:11,opacity:.7,marginTop:2}}>{t("prevExists")}</div>}
+            <div style={{display:"flex",alignItems:"center",gap:4}}>{Icons.camera("#fff",14)}<span style={{fontSize:14}}>{slot1Info.labelJP}</span></div>
+            {getOverlayPhoto(slot1Id)&&<div style={{fontSize:11,opacity:.7,marginTop:2}}>前回あり</div>}
           </button>
           <button className="btn bp" onClick={()=>{if(!isPremium){setShowSlot2Gate(true);return;}openCam(slot2Id);}} style={{padding:"12px 8px",flexDirection:"column",opacity:isPremium?1:0.55}}>
-            <div style={{display:"flex",alignItems:"center",gap:4}}>{isPremium?Icons.camera("#fff",14):<span style={{fontSize:14}}>🔒</span>}<span style={{fontSize:14}}>{t(slot2Info.labelKey)||slot2Info.labelJP}</span></div>
-            {isPremium&&getOverlayPhoto(slot2Id)&&<div style={{fontSize:11,opacity:.7,marginTop:2}}>{t("prevExists")}</div>}
+            <div style={{display:"flex",alignItems:"center",gap:4}}>{isPremium?Icons.camera("#fff",14):<span style={{fontSize:14}}>🔒</span>}<span style={{fontSize:14}}>{slot2Info.labelJP}</span></div>
+            {isPremium&&getOverlayPhoto(slot2Id)&&<div style={{fontSize:11,opacity:.7,marginTop:2}}>前回あり</div>}
           </button>
         </div>
         {/* アルバムから追加 */}
@@ -217,14 +215,13 @@ function PhotoPage({T,state,update,todayStr}){
                 setAlbumMeta({comment:"",shotMode:"",piece:state.currentPiece||1});
                 setAlbumScale(1);
                 setAlbumOffset({x:0,y:0});
-                if(!state.isPremium&&!state.noAds) AdMobHelper.hideBanner();
               };
               reader.readAsDataURL(file);
               e.target.value="";
             }}/>
           <button className="btn bs" style={{width:"100%",padding:"10px"}}
             onClick={()=>document.getElementById("album-input").click()}>
-            <span style={{fontSize:14,marginRight:6}}>＋</span>{t("album")}
+            <span style={{fontSize:14,marginRight:6}}>＋</span>アルバムから追加
           </button>
         </div>
       </div>
@@ -232,43 +229,43 @@ function PhotoPage({T,state,update,todayStr}){
       {showSlot2Gate&&(
         <div className="card" style={{textAlign:"center",padding:"16px 14px"}}>
           <div style={{fontSize:22,marginBottom:6}}>🔒</div>
-          <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4}}>{t("slot2PremiumTitle")||"Premium Only"}</div>
-          <div style={{fontSize:12,color:T.accent,marginBottom:12}}>{t("slot2PremiumDesc")||"Unlock a second photo slot for more angles."}</div>
-          <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowSlot2Gate(false)}>{t("close")}</button>
+          <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4}}>プレミアム限定です</div>
+          <div style={{fontSize:12,color:T.accent,marginBottom:12}}>2つ目の撮影スロットでより多くの角度を記録できます。</div>
+          <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowSlot2Gate(false)}>閉じる</button>
         </div>
       )}
       {showPinGate&&(
         <div className="card" style={{textAlign:"center",padding:"16px 14px"}}>
           <div style={{fontSize:22,marginBottom:6}}>🔒</div>
-          <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4}}>{t("pinLockPremiumTitle")||"PIN Lock is Premium Only"}</div>
-          <div style={{fontSize:12,color:T.accent,marginBottom:12}}>{t("pinLockPremiumDesc")||"Protect your photo album with a PIN."}</div>
-          <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowPinGate(false)}>{t("close")}</button>
+          <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4}}>PINロックはプレミアム限定です</div>
+          <div style={{fontSize:12,color:T.accent,marginBottom:12}}>写真アルバムをPINで保護できます。</div>
+          <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowPinGate(false)}>閉じる</button>
         </div>
       )}
 
       <div className="card">
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
           <div style={{display:"flex",alignItems:"center",gap:8}}>
-            <div className="ct" style={{margin:0,fontSize:14}}>{t("photoAlbum")}</div>
+            <div className="ct" style={{margin:0,fontSize:14}}>フォトアルバム</div>
             {!isLocked&&(isPremium?(
               <button className={`btn bsm ${compareMode?"bp":"bs"}`} onClick={()=>{setCompareMode(v=>!v);setComparePick([]);}} style={{fontSize:11}}>
-                {compareMode?t("cancel"):t("compare")}
+                {compareMode?"キャンセル":"比較"}
               </button>
             ):(
-              <button className="btn bsm bs" style={{fontSize:11,opacity:0.6}} onClick={()=>setShowComparePreview(true)}>🔒{t("compare")}</button>
+              <button className="btn bsm bs" style={{fontSize:11,opacity:0.6}} onClick={()=>setShowComparePreview(true)}>🔒比較</button>
             ))}
           </div>
           {isPremium?(
             <button onClick={()=>setShowSetPin(true)} style={{display:"flex",alignItems:"center",gap:5,padding:"5px 10px",border:`1.5px solid ${state.photoLockEnabled?T.primary:T.soft}`,borderRadius:8,background:state.photoLockEnabled?T.primary:T.soft,cursor:"pointer",color:state.photoLockEnabled?"#fff":T.primary,fontSize:13,fontWeight:600,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>
-              {state.photoLockEnabled?Icons.lockClosed("#fff",13):Icons.lockOpen(T.primary,13)}<span>{state.photoLockEnabled?(t("locked")):t("pinLock")}</span>
+              {state.photoLockEnabled?Icons.lockClosed("#fff",13):Icons.lockOpen(T.primary,13)}<span>{state.photoLockEnabled?"ロック中":"ロック"}</span>
             </button>
           ):(
             <button onClick={()=>setShowPinGate(true)} style={{display:"flex",alignItems:"center",gap:5,padding:"5px 10px",border:`1.5px solid ${T.soft}`,borderRadius:8,background:T.soft,cursor:"pointer",color:T.primary,fontSize:13,fontWeight:600,fontFamily:"'M PLUS Rounded 1c',sans-serif",opacity:0.6}}>
-              <span style={{fontSize:13}}>🔒</span><span>{t("pinLock")||"Lock"}</span>
+              <span style={{fontSize:13}}>🔒</span><span>ロック</span>
             </button>
           )}
         </div>
-        {isLocked?<PinPad T={T} title={t("pinInput")} onDone={p=>{if(p===state.photoLock){setUnlocked(true);}else return false;}}/>
+        {isLocked?<PinPad T={T} title="PINを入力" onDone={p=>{if(p===state.photoLock)setUnlocked(true);else showToast("PINが違います");}}/>
         :<>
           <div style={{display:"flex",gap:6,marginBottom:10,flexWrap:"wrap"}}>
             {filterTabs.map(([v,lbl])=>(
@@ -276,10 +273,10 @@ function PhotoPage({T,state,update,todayStr}){
             ))}
           </div>
           {compareMode&&<div style={{fontSize:12,color:T.accent,marginBottom:8,fontWeight:600}}>
-            {comparePick.length===0?t("selectFirst"):comparePick.length===1?t("selectSecond"):""}
+            {comparePick.length===0?"1枚目を選択してください":comparePick.length===1?"2枚目を選択してください（同じスロットの写真）":""}
           </div>}
           {filtered.length===0
-            ?<div style={{textAlign:"center",color:T.text+"66",padding:"28px 16px",fontSize:13,lineHeight:1.8}}><div style={{fontSize:15,fontWeight:700,color:T.text+"88",marginBottom:10}}>{t("noPhotos")}</div><div style={{fontSize:12,color:T.text+"55",lineHeight:1.9,whiteSpace:"pre-line"}}>{t("offlineNotice")}</div></div>
+            ?<div style={{textAlign:"center",color:T.text+"55",padding:"22px 0",fontSize:14}}>まだ写真がありません</div>
             :<div className="pgrid">{(()=>{
               // 比較モード時：1枚目が選択済みなら同じshotModeのみ表示
               const compareFiltered = compareMode && comparePick.length===1
@@ -335,7 +332,7 @@ function PhotoPage({T,state,update,todayStr}){
           {/* Header */}
           <div style={{padding:"10px 16px",paddingTop:"75px",display:"flex",alignItems:"center",justifyContent:"space-between",background:"rgba(0,0,0,0.7)",flexShrink:0}}>
             <button onClick={closeCam} style={{background:"rgba(255,255,255,0.18)",border:"none",color:"#fff",padding:"6px 14px",borderRadius:13,cursor:"pointer",fontSize:14}}>✕</button>
-            <span style={{color:"#fff",fontWeight:700,fontSize:15}}>{t(currentModeInfo.labelKey)||currentModeInfo.labelJP}</span>
+            <span style={{color:"#fff",fontWeight:700,fontSize:15}}>{currentModeInfo.labelJP}</span>
             <button onClick={()=>setShowColorPanel(v=>!v)} style={{background:showColorPanel?"rgba(255,255,255,0.35)":"rgba(255,255,255,0.18)",border:"none",color:"#fff",padding:"6px 10px",borderRadius:13,cursor:"pointer",display:"flex",alignItems:"center",gap:4,fontSize:12}}>
               {Icons.sun("#fff",14)} 調整
             </button>
@@ -400,11 +397,11 @@ function PhotoPage({T,state,update,todayStr}){
                 {/* ガイド/前回トグル行 */}
                 <div style={{padding:"8px 16px 0",display:"flex",gap:8}}>
                   <button onClick={()=>setShowGuide(v=>!v)} style={{flex:1,padding:"5px 0",border:"none",borderRadius:8,background:showGuide?T.primary:"rgba(255,255,255,0.15)",color:"#fff",fontSize:12,fontWeight:600,cursor:"pointer"}}>
-                    {showGuide?(t("guideOn")):(t("guideOff"))}
+                    {showGuide?"⊙ ガイドON":"○ ガイドOFF"}
                   </button>
                   {overlayPhoto&&(
                     <button onClick={()=>setShowOverlay(v=>!v)} style={{flex:1,padding:"5px 0",border:"none",borderRadius:8,background:showOverlay?"rgba(255,180,220,0.4)":"rgba(255,255,255,0.15)",color:"#fff",fontSize:12,fontWeight:600,cursor:"pointer"}}>
-                      {showOverlay?(t("overlayOn")):(t("overlayOff"))}
+                      {showOverlay?"◎ 前回ON":"◯ 前回OFF"}
                     </button>
                   )}
                 </div>
@@ -440,18 +437,18 @@ function PhotoPage({T,state,update,todayStr}){
                 <img src={captured} alt="" style={{width:"100%",objectFit:"contain",maxHeight:"55dvh"}}/>
               </div>
               <div style={{padding:14,background:"#111",flexShrink:0}}>
-                <input value={capComment} onChange={e=>setCapComment(e.target.value)} placeholder={t("comment")} style={{background:"#222",color:"#fff",border:"1px solid #444",borderRadius:10,marginBottom:6}}/>
+                <input value={capComment} onChange={e=>setCapComment(e.target.value)} placeholder="コメントを入力…" style={{background:"#222",color:"#fff",border:"1px solid #444",borderRadius:10,marginBottom:6}}/>
                 <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
-                  <span style={{color:"#aaa",fontSize:13,flexShrink:0}}>{t("pieceNo")}</span>
+                  <span style={{color:"#aaa",fontSize:13,flexShrink:0}}># マウスピース番号</span>
                   <select value={capPiece||""} onChange={e=>setCapPiece(e.target.value?parseInt(e.target.value):null)}
                     style={{background:"#222",color:"#fff",border:"1px solid #444",borderRadius:10,width:80,textAlign:"center"}}>
-                    <option value="">{t("reasonNone")}</option>
+                    <option value="">ー</option>
                     {buildPieceList(state).map(p=><option key={p.n} value={p.n}>{p.label}</option>)}
                   </select>
                 </div>
                 <div style={{display:"flex",gap:8}}>
-                  <button className="btn bs" style={{flex:1}} onClick={()=>{setCaptured(null);openCam(cameraMode);}}>{t("retake")}</button>
-                  <button className="btn bp" style={{flex:1}} onClick={savePhoto}>{t("savePhoto")}</button>
+                  <button className="btn bs" style={{flex:1}} onClick={()=>{setCaptured(null);openCam(cameraMode);}}>撮り直し</button>
+                  <button className="btn bp" style={{flex:1}} onClick={savePhoto}>保存</button>
                 </div>
               </div>
             </div>
@@ -461,23 +458,23 @@ function PhotoPage({T,state,update,todayStr}){
       )}
 
       {/* 写真ビューアー（スワイプ・スライドショー・動画保存） */}
-      {viewPhoto&&<PhotoViewer T={T} photos={filtered} initialId={viewPhoto.id} onClose={()=>setViewPhoto(null)} state={state}/>}
+      {viewPhoto&&<PhotoViewer T={T} photos={filtered} initialId={viewPhoto.id} onClose={()=>setViewPhoto(null)}/>}
       {editId&&(
         <div className="mo" style={{alignItems:"center"}} onClick={()=>setEditId(null)}>
           <div className="md" style={{borderRadius:20,maxHeight:"80dvh",overflowY:"auto"}} onClick={e=>e.stopPropagation()}>
-            <div className="mdtitle">{t("editPhoto")}</div>
-            <label>{t("commentLabel")}</label>
+            <div className="mdtitle">写真を編集</div>
+            <label>コメント</label>
             <input value={editComment} onChange={e=>setEditComment(e.target.value)} style={{marginBottom:10}}/>
-            <label>{t("dateLabel")}</label>
+            <label>日付</label>
             <input type="date" value={editDate} onChange={e=>setEditDate(e.target.value)}
               style={{marginBottom:10,width:"100%",boxSizing:"border-box",height:44,fontSize:16,
                 borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,
                 padding:"0 12px",WebkitAppearance:"none",appearance:"none"}}/>
-            <label>{t("pieceNoLabel")}</label>
+            <label>マウスピース番号</label>
             <select value={editPiece} onChange={e=>setEditPiece(parseInt(e.target.value)||1)} style={{marginBottom:6,textAlign:"center"}}>
               {buildPieceList(state).map(p=><option key={p.n} value={p.n}>{p.label}</option>)}
             </select>
-            <div style={{fontSize:11,color:T.text+"55",marginBottom:14}}>{t("shotModeFixed")}</div>
+            <div style={{fontSize:11,color:T.text+"55",marginBottom:14}}>部位は変更できません</div>
             <button className="btn bs" style={{width:"100%",marginBottom:10}} onClick={()=>{
               const photo=state.photos.find(p=>p.id===editId);
               if(!photo||!photo.data)return;
@@ -493,10 +490,10 @@ function PhotoPage({T,state,update,todayStr}){
                 setEditId(null);
               };
               img.src=photo.data;
-            }}>{t("mirrorSaveBtn")}</button>
+            }}>↔ 左右反転して保存</button>
             <div style={{display:"flex",gap:8,marginBottom:8}}>
-              <button className="btn bs" style={{flex:1}} onClick={()=>setEditId(null)}>{t("cancel")}</button>
-              <button className="btn bp" style={{flex:1}} onClick={()=>{update({photos:state.photos.map(p=>p.id===editId?{...p,comment:editComment,date:editDate,piece:editPiece}:p)});setEditId(null);}}>{t("savePhoto")}</button>
+              <button className="btn bs" style={{flex:1}} onClick={()=>setEditId(null)}>キャンセル</button>
+              <button className="btn bp" style={{flex:1}} onClick={()=>{update({photos:state.photos.map(p=>p.id===editId?{...p,comment:editComment,date:editDate,piece:editPiece}:p)});setEditId(null);}}>保存</button>
             </div>
 
           </div>
@@ -505,7 +502,7 @@ function PhotoPage({T,state,update,todayStr}){
       {albumCropPhoto&&(
         <div className="mo" onClick={e=>e.stopPropagation()} style={{zIndex:250}}>
           <div className="md" onClick={e=>e.stopPropagation()} style={{maxHeight:"95dvh",overflowY:"auto",padding:"16px"}}>
-            <div className="mdtitle">{t("album")}</div>
+            <div className="mdtitle">写真を追加</div>
 
             {/* トリミングエリア */}
             {(()=>{
@@ -552,12 +549,12 @@ function PhotoPage({T,state,update,todayStr}){
             })()}
             <div style={{display:"flex",justifyContent:"center",gap:12,marginBottom:14}}>
               <button onClick={()=>setAlbumScale(s=>Math.min(8,s+0.2))} style={{background:T.soft,border:"none",borderRadius:8,padding:"6px 16px",fontSize:18,cursor:"pointer",color:T.primary}}>＋</button>
-              <button onClick={()=>{setAlbumScale(1);setAlbumOffset({x:0,y:0});}} style={{background:T.soft,border:"none",borderRadius:8,padding:"6px 12px",fontSize:13,cursor:"pointer",color:T.text}}>{t("resetBtn")}</button>
+              <button onClick={()=>{setAlbumScale(1);setAlbumOffset({x:0,y:0});}} style={{background:T.soft,border:"none",borderRadius:8,padding:"6px 12px",fontSize:13,cursor:"pointer",color:T.text}}>リセット</button>
               <button onClick={()=>setAlbumScale(s=>Math.max(0.5,s-0.2))} style={{background:T.soft,border:"none",borderRadius:8,padding:"6px 16px",fontSize:18,cursor:"pointer",color:T.primary}}>－</button>
             </div>
 
             {/* 部位選択（必須） */}
-            <label>{t("shotMode")} <span style={{color:"#E74C3C"}}>*</span></label>
+            <label>部位 <span style={{color:"#E74C3C"}}>*必須</span></label>
             <div style={{display:"flex",flexWrap:"wrap",gap:8,marginBottom:14,marginTop:4}}>
               {SHOT_MODES.map(m=>(
                 <button key={m.id} onClick={()=>setAlbumMeta(v=>({...v,shotMode:m.id}))}
@@ -565,18 +562,18 @@ function PhotoPage({T,state,update,todayStr}){
                     background:albumMeta.shotMode===m.id?T.primary:"transparent",
                     color:albumMeta.shotMode===m.id?"#fff":T.text,
                     fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>
-                  {t(m.labelKey)||m.labelJP}
+                  {m.labelJP}
                 </button>
               ))}
             </div>
 
             {/* コメント */}
-            <label>{t("commentLabel")}</label>
+            <label>コメント</label>
             <input value={albumMeta.comment} onChange={e=>setAlbumMeta(v=>({...v,comment:e.target.value}))}
-              placeholder={t("comment")} style={{marginBottom:10}}/>
+              placeholder="コメントを入力…" style={{marginBottom:10}}/>
 
             {/* マウスピース番号 */}
-            <label>{t("pieceNoLabel")}</label>
+            <label>マウスピース番号</label>
             <select value={albumMeta.piece}
               onChange={e=>setAlbumMeta(v=>({...v,piece:parseInt(e.target.value)||1}))}
               style={{marginBottom:16}}>
@@ -584,7 +581,7 @@ function PhotoPage({T,state,update,todayStr}){
             </select>
 
             <div style={{display:"flex",gap:8}}>
-              <button className="btn bs" style={{flex:1}} onClick={()=>{setAlbumCropPhoto(null);if(!state.isPremium&&!state.noAds) AdMobHelper.showBanner();}}>{t("cancel")}</button>
+              <button className="btn bs" style={{flex:1}} onClick={()=>setAlbumCropPhoto(null)}>キャンセル</button>
               <button className="btn bp" style={{flex:1,opacity:albumMeta.shotMode?"1":"0.4",cursor:albumMeta.shotMode?"pointer":"default"}}
                 onClick={()=>{
                   if(!albumMeta.shotMode) return;
@@ -597,15 +594,19 @@ function PhotoPage({T,state,update,todayStr}){
                     const canvas=document.createElement("canvas");
                     canvas.width=outW;canvas.height=outH;
                     const ctx=canvas.getContext("2d");
+                    // プレビューエリアの実際のサイズを取得
                     const previewEl=albumPreviewRef.current;
                     const previewW=previewEl?previewEl.offsetWidth:outW;
                     const previewH=previewEl?previewEl.offsetHeight:outH;
+                    // プレビューとcanvasのスケール比
                     const scaleX=outW/previewW;
                     const scaleY=outH/previewH;
+                    // 画像をcontainで収めるfitScale（プレビューサイズ基準）
                     const fitScale=Math.min(previewW/img.width,previewH/img.height);
                     const dispW=img.width*fitScale;
                     const dispH=img.height*fitScale;
                     ctx.save();
+                    // オフセットをcanvasスケールに変換
                     ctx.translate(outW/2+albumOffset.x*scaleX,outH/2+albumOffset.y*scaleY);
                     ctx.scale(albumScale,albumScale);
                     ctx.drawImage(img,-dispW*scaleX/2,-dispH*scaleY/2,dispW*scaleX,dispH*scaleY);
@@ -618,10 +619,9 @@ function PhotoPage({T,state,update,todayStr}){
                       comment:albumMeta.comment,timestamp:Date.now()
                     }]});
                     setAlbumCropPhoto(null);
-                    if(!state.isPremium&&!state.noAds) AdMobHelper.showBanner();
                   };
                   img.src=albumCropPhoto.src;
-                }}>{t("savePhoto")}</button>
+                }}>保存</button>
             </div>
           </div>
         </div>
@@ -637,61 +637,51 @@ function PhotoPage({T,state,update,todayStr}){
             <div className="mdtitle" style={{marginBottom:8}}>写真を削除</div>
             <div style={{fontSize:14,color:T.text+"88",marginBottom:20}}>この写真を削除しますか？<br/>削除すると元に戻せません。</div>
             <div style={{display:"flex",gap:8}}>
-              <button className="btn bs" style={{flex:1}} onClick={()=>setDeleteConfirmId(null)}>{t("cancel")}</button>
+              <button className="btn bs" style={{flex:1}} onClick={()=>setDeleteConfirmId(null)}>キャンセル</button>
               <button style={{flex:1,padding:"10px",border:"none",borderRadius:12,background:"#E74C3C",color:"#fff",fontWeight:600,cursor:"pointer",fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:16}}
-                onClick={()=>{update({photos:state.photos.filter(p=>p.id!==deleteConfirmId)});setDeleteConfirmId(null);}}>{t("deleteBtn")}</button>
+                onClick={()=>{update({photos:state.photos.filter(p=>p.id!==deleteConfirmId)});setDeleteConfirmId(null);}}>削除する</button>
             </div>
           </div>
         </div>
       )}
       {showComparePreview&&<ComparePreviewModal T={T} onClose={()=>setShowComparePreview(false)}/>}
-      {compareView&&(()=>{
-        const CompareViewer=()=>{
-          const [pos,setPos]=React.useState(50);
-          const containerRef=React.useRef(null);
-          const handleMove=(clientX)=>{
-            const rect=containerRef.current?.getBoundingClientRect();
-            if(!rect)return;
-            const p=Math.min(100,Math.max(0,(clientX-rect.left)/rect.width*100));
-            setPos(p);
-          };
-          return(
-            <div className="mo" onClick={()=>setCompareView(null)} style={{alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.92)"}}>
-              <div onClick={e=>e.stopPropagation()} style={{width:"92%",maxWidth:440,borderRadius:20,overflow:"hidden"}}>
-                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 16px",background:"rgba(0,0,0,0.7)"}}>
-                  <span style={{color:"#fff",fontWeight:700,fontSize:15}}>{t("compare")||"比較"}</span>
-                  <button onClick={()=>setCompareView(null)} style={{background:"rgba(255,255,255,0.18)",border:"none",color:"#fff",padding:"5px 12px",borderRadius:12,cursor:"pointer",fontSize:13}}>✕</button>
+      {compareView&&React.createElement(()=>{
+        const [pos,setPos]=React.useState(50);
+        const containerRef=React.useRef(null);
+        const handleMove=(clientX)=>{
+          const rect=containerRef.current?.getBoundingClientRect();
+          if(!rect)return;
+          setPos(Math.min(100,Math.max(0,(clientX-rect.left)/rect.width*100)));
+        };
+        return(
+          <div className="mo" onClick={()=>setCompareView(null)} style={{alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.95)"}}>
+            <div onClick={e=>e.stopPropagation()} style={{width:"100%",height:"100%",display:"flex",flexDirection:"column"}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 20px",paddingTop:"60px",background:"rgba(0,0,0,0.7)",flexShrink:0}}>
+                <span style={{color:"#fff",fontWeight:700,fontSize:15}}>比較</span>
+                <button onClick={()=>setCompareView(null)} style={{background:"rgba(255,255,255,0.18)",border:"none",color:"#fff",padding:"5px 14px",borderRadius:12,cursor:"pointer",fontSize:14}}>✕</button>
+              </div>
+              <div ref={containerRef} style={{flex:1,position:"relative",overflow:"hidden",userSelect:"none",cursor:"ew-resize",background:"#000"}}
+                onMouseMove={e=>handleMove(e.clientX)}
+                onTouchMove={e=>{e.preventDefault();handleMove(e.touches[0].clientX);},{passive:false}}
+                onMouseDown={e=>handleMove(e.clientX)}
+                onTouchStart={e=>handleMove(e.touches[0].clientX)}>
+                <img src={compareView.b.data} alt="After" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"contain"}}/>
+                <div style={{position:"absolute",inset:0,clipPath:`inset(0 ${100-pos}% 0 0)`}}>
+                  <img src={compareView.a.data} alt="Before" style={{width:"100%",height:"100%",objectFit:"contain"}}/>
                 </div>
-                <div ref={containerRef} style={{position:"relative",width:"100%",aspectRatio:"3/4",overflow:"hidden",userSelect:"none",cursor:"ew-resize",background:"#111"}}
-                  onMouseMove={e=>handleMove(e.clientX)}
-                  onTouchMove={e=>{e.preventDefault();handleMove(e.touches[0].clientX);}}
-                  onMouseDown={e=>handleMove(e.clientX)}
-                  onTouchStart={e=>handleMove(e.touches[0].clientX)}>
-                  {/* After（右側・背景） */}
-                  <img src={compareView.b.data} alt="After" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"cover"}}/>
-                  {/* Before（左側・クリップ） */}
-                  <div style={{position:"absolute",inset:0,clipPath:`inset(0 ${100-pos}% 0 0)`}}>
-                    <img src={compareView.a.data} alt="Before" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                <div style={{position:"absolute",top:0,bottom:0,left:`${pos}%`,width:2,background:"#fff",transform:"translateX(-50%)",pointerEvents:"none"}}>
+                  <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:36,height:36,borderRadius:"50%",background:"#fff",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 2px 8px #0006"}}>
+                    <span style={{fontSize:13,color:"#333",letterSpacing:-2}}>◀▶</span>
                   </div>
-                  {/* スライダー */}
-                  <div style={{position:"absolute",top:0,bottom:0,left:`${pos}%`,width:2,background:"#fff",transform:"translateX(-50%)",pointerEvents:"none"}}>
-                    <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:32,height:32,borderRadius:"50%",background:"#fff",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 2px 8px #0004"}}>
-                      <span style={{fontSize:12,color:"#333",letterSpacing:-2}}>◀▶</span>
-                    </div>
-                  </div>
-                  <div style={{position:"absolute",top:8,left:8,background:"rgba(0,0,0,0.5)",color:"#fff",fontSize:11,padding:"3px 8px",borderRadius:6,pointerEvents:"none"}}>{t("before")||"BEFORE"}</div>
-                  <div style={{position:"absolute",top:8,right:8,background:"rgba(0,0,0,0.5)",color:"#fff",fontSize:11,padding:"3px 8px",borderRadius:6,pointerEvents:"none"}}>{t("after")||"AFTER"}</div>
-                  {/* 日付・枚目 */}
-                  <div style={{position:"absolute",bottom:8,left:8,background:"rgba(0,0,0,0.5)",color:"#fff",fontSize:11,padding:"3px 8px",borderRadius:6,pointerEvents:"none"}}>{compareView.a.date}{compareView.a.piece?" #"+compareView.a.piece:""}</div>
-                  <div style={{position:"absolute",bottom:8,right:8,background:"rgba(0,0,0,0.5)",color:"#fff",fontSize:11,padding:"3px 8px",borderRadius:6,pointerEvents:"none"}}>{compareView.b.date}{compareView.b.piece?" #"+compareView.b.piece:""}</div>
                 </div>
+                <div style={{position:"absolute",top:8,left:8,background:"rgba(0,0,0,0.6)",color:"#fff",fontSize:11,padding:"3px 8px",borderRadius:6,pointerEvents:"none"}}>BEFORE<br/>{compareView.a.date}{compareView.a.piece?" #"+compareView.a.piece:""}</div>
+                <div style={{position:"absolute",top:8,right:8,background:"rgba(0,0,0,0.6)",color:"#fff",fontSize:11,padding:"3px 8px",borderRadius:6,pointerEvents:"none",textAlign:"right"}}>AFTER<br/>{compareView.b.date}{compareView.b.piece?" #"+compareView.b.piece:""}</div>
               </div>
             </div>
-          );
-        };
-        return <CompareViewer/>;
-      })()}
-      {showSetPin&&(<div className="mo" onClick={()=>setShowSetPin(false)}><div className="md" onClick={e=>e.stopPropagation()}><div className="mdtitle">{t("pinLock")}</div>{state.photoLockEnabled?<><div style={{fontSize:14,color:T.text+"88",marginBottom:12}}>{t("pinUnlock")}</div><PinPad T={T} title={t("pinInput")} onDone={p=>{if(p===state.photoLock){update({photoLockEnabled:false,photoLock:null});setUnlocked(false);setShowSetPin(false);}else return false;}}/></>:<PinPad T={T} title={t("pinSet")} onDone={p=>{update({photoLock:p,photoLockEnabled:true});alert(t("pinSetDone"));setShowSetPin(false);}}/>}<button className="btn bs" style={{width:"100%",marginTop:10}} onClick={()=>setShowSetPin(false)}>{t("cancel")}</button></div></div>)}
+          </div>
+        );
+      },null)}
+      {showSetPin&&(<div className="mo" onClick={()=>setShowSetPin(false)}><div className="md" onClick={e=>e.stopPropagation()}><div className="mdtitle">アルバムをロック</div>{state.photoLockEnabled?<><div style={{fontSize:14,color:T.text+"88",marginBottom:12}}>解除するにはPINを入力してください</div><PinPad T={T} title="PINを入力" onDone={p=>{if(p===state.photoLock){update({photoLockEnabled:false,photoLock:null});setUnlocked(false);setShowSetPin(false);}else showToast("PINが違います");}}/></>:<PinPad T={T} title="PINを設定（4桁）" onDone={p=>{update({photoLock:p,photoLockEnabled:true});showToast("PINを設定しました");setShowSetPin(false);}}/>}<button className="btn bs" style={{width:"100%",marginTop:10}} onClick={()=>setShowSetPin(false)}>キャンセル</button></div></div>)}
     </div>
   );
 }
@@ -766,7 +756,7 @@ function PDFPreviewModal({T,onClose,onUpgrade}){
           <div dangerouslySetInnerHTML={{__html:previewHTML}}/>
         </div>
         <div style={{fontSize:11,color:T.text+"66",textAlign:"center",marginBottom:14}}>実際のデータで毎月1クリックでPDF出力できます</div>
-        <button className="btn bs" style={{width:"100%"}} onClick={onClose}>{t("close")}</button>
+        <button className="btn bs" style={{width:"100%"}} onClick={onClose}>閉じる</button>
       </div>
     </div>
   );
@@ -962,31 +952,21 @@ function ReportModal({T,state,onClose}){
     const html=buildReportHTML(state,sel.year,sel.month);
     try{
       if(typeof Capacitor!=="undefined"&&Capacitor.isNativePlatform?.()){
-        // Capacitor環境：Blobを作ってShareシートで共有
+        const {Filesystem,Share}=Capacitor.Plugins;
+        const fileName=`SmileTrack_${sel.year}${String(sel.month).padStart(2,"0")}.html`;
+        const b64=btoa(unescape(encodeURIComponent(html)));
+        await Filesystem.writeFile({path:fileName,data:b64,directory:"CACHE"});
+        const {uri}=await Filesystem.getUri({path:fileName,directory:"CACHE"});
+        await Share.share({title:"SmileTrack レポート",url:uri,dialogTitle:"レポートを保存・共有"});
+      }else{
         const blob=new Blob([html],{type:"text/html"});
         const url=URL.createObjectURL(blob);
-        if(Capacitor.Plugins&&Capacitor.Plugins.Share){
-          await Capacitor.Plugins.Share.share({
-            title:"SmileTrack レポート",
-            url:url,
-          });
-        }else{
-          // Shareプラグインがない場合はBlob URLを開く
-          window.open(url,"_blank");
-        }
-      }else{
-        // Web環境
-        const w=window.open("","_blank");
-        if(w){w.document.write(html);w.document.close();}
+        const a=document.createElement("a");
+        a.href=url;a.download=`SmileTrack_${sel.year}${String(sel.month).padStart(2,"0")}.html`;a.click();
       }
     }catch(e){
-      // フォールバック：ダウンロード
-      const blob=new Blob([html],{type:"text/html"});
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement("a");
-      a.href=url;
-      a.download="SmileTrack_report.html";
-      a.click();
+      console.warn("[PDF]",e);
+      alert("出力に失敗しました");
     }
     onClose();
   };
@@ -999,7 +979,7 @@ function ReportModal({T,state,onClose}){
           {months.map(({year,month})=>(<option key={year+"-"+month} value={year+"-"+month}>{year}年{month}月</option>))}
         </select>
         <div style={{display:"flex",gap:8}}>
-          <button className="btn bs" style={{flex:1}} onClick={onClose}>{t("cancel")}</button>
+          <button className="btn bs" style={{flex:1}} onClick={onClose}>キャンセル</button>
           <button className="btn bp" style={{flex:1}} onClick={openReport}>PDF出力</button>
         </div>
       </div>
@@ -1023,10 +1003,10 @@ function ComparePreviewModal({T,onClose}){
     setPos(p);
   };
   return(
-    <div className="mo" onClick={onClose} style={{alignItems:"center",justifyContent:"center"}}>
-      <div className="md" onClick={e=>e.stopPropagation()} style={{padding:"16px 16px 20px",borderRadius:20,maxHeight:"80dvh",width:"90%",maxWidth:400}}>
-        <div style={{fontFamily:"'Outfit',sans-serif",fontSize:15,fontWeight:700,color:T.primary,marginBottom:4,textAlign:"center"}}>{t("comparePreviewTitle")||"Compare Preview"}</div>
-        <div style={{fontSize:12,color:T.text+"88",marginBottom:10,textAlign:"center"}}>🔒 {t("comparePremiumHint")||"Compare feature is premium only"}</div>
+    <div className="mo" onClick={onClose}>
+      <div className="md" onClick={e=>e.stopPropagation()} style={{padding:"16px 16px 20px"}}>
+        <div style={{fontFamily:"'Outfit',sans-serif",fontSize:15,fontWeight:700,color:T.primary,marginBottom:4,textAlign:"center"}}>写真比較プレビュー</div>
+        <div style={{fontSize:12,color:T.text+"88",marginBottom:10,textAlign:"center"}}>🔒 比較機能はプレミアムでご利用いただけます</div>
         <div ref={containerRef} style={{position:"relative",width:"100%",borderRadius:10,overflow:"hidden",userSelect:"none",cursor:"ew-resize",aspectRatio:"4/3"}}
           onMouseMove={e=>handleMove(e.clientX)}
           onTouchMove={e=>{e.preventDefault();handleMove(e.touches[0].clientX);}}
@@ -1047,7 +1027,7 @@ function ComparePreviewModal({T,onClose}){
         <div style={{padding:"8px 0 0"}}>
           <input type="range" min={0} max={100} value={pos} onChange={e=>setPos(Number(e.target.value))} style={{width:"100%",accentColor:T.primary}}/>
         </div>
-        <button className="btn bs" style={{width:"100%",marginTop:10}} onClick={onClose}>{t("close")}</button>
+        <button className="btn bs" style={{width:"100%",marginTop:10}} onClick={onClose}>閉じる</button>
       </div>
     </div>
   );
@@ -1069,7 +1049,7 @@ function PhotoCompare({T,a,b,onClose}){
     <div style={{position:"fixed",inset:0,background:"#000",zIndex:400,display:"flex",flexDirection:"column"}}>
       {/* ヘッダー */}
       <div style={{padding:"10px 16px",paddingTop:"75px",display:"flex",alignItems:"center",justifyContent:"space-between",background:"rgba(0,0,0,0.7)",flexShrink:0}}>
-        <button onClick={onClose} style={{background:"rgba(255,255,255,0.18)",border:"none",color:"#fff",padding:"6px 14px",borderRadius:13,cursor:"pointer",fontSize:14}}>{t("close")}</button>
+        <button onClick={onClose} style={{background:"rgba(255,255,255,0.18)",border:"none",color:"#fff",padding:"6px 14px",borderRadius:13,cursor:"pointer",fontSize:14}}>閉じる</button>
         <span style={{color:"#fff",fontWeight:700,fontSize:14}}>写真比較</span>
         <div style={{width:60}}/>
       </div>
@@ -1112,7 +1092,7 @@ function PhotoCompare({T,a,b,onClose}){
 
 // ── PHOTO VIEWER ─────────────────────────────────────────────────────────────
 function PhotoViewer({T,photos,initialId,onClose,onEdit,state}){
-  const isPremium=state.isPremium||IS_PREMIUM;
+  const isPremium=IS_PREMIUM;
   const cs=state?.cameraSettings||{};
   const [idx,setIdx]=useState(()=>Math.max(0,photos.findIndex(p=>p.id===initialId)));
   const [playing,setPlaying]=useState(false);
@@ -1331,7 +1311,7 @@ function PhotoViewer({T,photos,initialId,onClose,onEdit,state}){
           <img src={savePopupUrl} alt="" style={{maxWidth:"100%",maxHeight:"62dvh",objectFit:"contain",borderRadius:10}}/>
           <div style={{color:"rgba(255,255,255,0.5)",fontSize:12,marginTop:12,textAlign:"center",lineHeight:1.8}}>長押し →「写真に追加」でカメラロールへ</div>
           <button onTouchEnd={e=>{e.stopPropagation();setSavePopupUrl(null);}} onClick={()=>setSavePopupUrl(null)}
-            style={{marginTop:16,padding:"10px 32px",borderRadius:20,background:"rgba(255,255,255,0.2)",border:"none",color:"#fff",fontSize:14,cursor:"pointer"}}>{t("close")}</button>
+            style={{marginTop:16,padding:"10px 32px",borderRadius:20,background:"rgba(255,255,255,0.2)",border:"none",color:"#fff",fontSize:14,cursor:"pointer"}}>閉じる</button>
         </div>
       )}
     </div>
