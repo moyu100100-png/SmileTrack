@@ -1,5 +1,5 @@
 function PhotoPage({T,state,update,todayStr}){
-  const isPremium=IS_PREMIUM;
+  const isPremium=state.isPremium||IS_PREMIUM;
   const cs = state.cameraSettings||{};
   const slot1Id = cs.slot1||"face_front";
   const slot2Id = cs.slot2||"teeth_front";
@@ -655,7 +655,7 @@ function PhotoPage({T,state,update,todayStr}){
         };
         return(
           <div className="mo" onClick={()=>setCompareView(null)} style={{alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.95)"}}>
-            <div onClick={e=>e.stopPropagation()} style={{width:"92%",maxWidth:440,borderRadius:20,height:"100%",display:"flex",flexDirection:"column"}}>
+            <div onClick={e=>e.stopPropagation()} style={{width:"100%",height:"100%",display:"flex",flexDirection:"column"}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 20px",paddingTop:"60px",background:"rgba(0,0,0,0.7)",flexShrink:0}}>
                 <span style={{color:"#fff",fontWeight:700,fontSize:15}}>比較</span>
                 <button onClick={()=>setCompareView(null)} style={{background:"rgba(255,255,255,0.18)",border:"none",color:"#fff",padding:"5px 14px",borderRadius:12,cursor:"pointer",fontSize:14}}>✕</button>
@@ -950,23 +950,25 @@ function ReportModal({T,state,onClose}){
   const [sel,setSel]=React.useState(months[0]||{year:today.getFullYear(),month:today.getMonth()+1});
   const openReport=async()=>{
     const html=buildReportHTML(state,sel.year,sel.month);
+    const fileName=`SmileTrack_${sel.year}${String(sel.month).padStart(2,"0")}.html`;
+    const blob=new Blob([html],{type:"text/html"});
+    const file=new File([blob],fileName,{type:"text/html"});
     try{
-      if(typeof Capacitor!=="undefined"&&Capacitor.isNativePlatform?.()){
-        const {Filesystem,Share}=Capacitor.Plugins;
-        const fileName=`SmileTrack_${sel.year}${String(sel.month).padStart(2,"0")}.html`;
-        const b64=btoa(unescape(encodeURIComponent(html)));
-        await Filesystem.writeFile({path:fileName,data:b64,directory:"CACHE"});
-        const {uri}=await Filesystem.getUri({path:fileName,directory:"CACHE"});
-        await Share.share({title:"SmileTrack レポート",url:uri,dialogTitle:"レポートを保存・共有"});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){
+        await navigator.share({files:[file],title:"SmileTrack レポート"});
+      }else if(navigator.share){
+        const url=URL.createObjectURL(blob);
+        await navigator.share({title:"SmileTrack レポート",url});
       }else{
-        const blob=new Blob([html],{type:"text/html"});
         const url=URL.createObjectURL(blob);
         const a=document.createElement("a");
-        a.href=url;a.download=`SmileTrack_${sel.year}${String(sel.month).padStart(2,"0")}.html`;a.click();
+        a.href=url;a.download=fileName;a.click();
       }
     }catch(e){
-      console.warn("[PDF]",e);
-      alert("出力に失敗しました");
+      if(e?.name!=="AbortError"){
+        console.warn("[PDF]",e);
+        alert("出力に失敗しました");
+      }
     }
     onClose();
   };
@@ -1092,7 +1094,7 @@ function PhotoCompare({T,a,b,onClose}){
 
 // ── PHOTO VIEWER ─────────────────────────────────────────────────────────────
 function PhotoViewer({T,photos,initialId,onClose,onEdit,state}){
-  const isPremium=IS_PREMIUM;
+  const isPremium=state?.isPremium||IS_PREMIUM;
   const cs=state?.cameraSettings||{};
   const [idx,setIdx]=useState(()=>Math.max(0,photos.findIndex(p=>p.id===initialId)));
   const [playing,setPlaying]=useState(false);
