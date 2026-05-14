@@ -317,6 +317,7 @@ const I18N = {
     monthLabel: "月",
     sampleDataMsg: "サンプルデータによるイメージです",
     pdfPremiumMsg: "🔒 PDF出力はプレミアム機能でご利用いただけます",
+    pdfSampleMsg: "実際のデータで毎月1クリックでPDF出力できます",
     reportPreviewTitle: "レポートプレビュー",
 
     // 追加: タイマー
@@ -738,6 +739,7 @@ const I18N = {
     monthLabel: "",
     sampleDataMsg: "Preview based on sample data",
     pdfPremiumMsg: "🔒 PDF export is a premium feature",
+    pdfSampleMsg: "Export your monthly report as PDF with one tap",
     reportPreviewTitle: "Report Preview",
 
     totalRemovalLabel: "Total Removal Time",
@@ -1154,6 +1156,7 @@ const I18N = {
     monthLabel: "월",
     sampleDataMsg: "샘플 데이터 기반 미리보기",
     pdfPremiumMsg: "🔒 PDF 출력은 프리미엄 기능입니다",
+    pdfSampleMsg: "매달 한 번의 탭으로 PDF를 출력하세요",
     reportPreviewTitle: "리포트 미리보기",
     totalRemovalLabel: "오늘 제거 합계",
     expectedWearLabel: "오늘 예상 착용 시간",
@@ -1551,6 +1554,7 @@ const I18N = {
     monthLabel: "月",
     sampleDataMsg: "基于样本数据的预览",
     pdfPremiumMsg: "🔒 PDF导出为高级功能",
+    pdfSampleMsg: "每月一键导出PDF报告",
     reportPreviewTitle: "报告预览",
     totalRemovalLabel: "今日摘除合计",
     expectedWearLabel: "今日预计佩戴时间",
@@ -1948,6 +1952,7 @@ const I18N = {
     monthLabel: "",
     sampleDataMsg: "Vorschau basiert auf Beispieldaten",
     pdfPremiumMsg: "🔒 PDF-Export ist eine Premium-Funktion",
+    pdfSampleMsg: "Exportieren Sie Ihren monatlichen Bericht mit einem Tipp als PDF",
     reportPreviewTitle: "Berichtsvorschau",
     totalRemovalLabel: "Gesamte Entnahmezeit",
     expectedWearLabel: "Erwartete Tragezeit heute",
@@ -2345,6 +2350,7 @@ const I18N = {
     monthLabel: "",
     sampleDataMsg: "Vista previa basada en datos de muestra",
     pdfPremiumMsg: "🔒 La exportación PDF es una función premium",
+    pdfSampleMsg: "Exporta tu informe mensual en PDF con un toque",
     reportPreviewTitle: "Vista previa del informe",
     totalRemovalLabel: "Tiempo total de retirada",
     expectedWearLabel: "Tiempo de uso estimado hoy",

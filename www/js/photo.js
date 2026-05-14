@@ -648,11 +648,27 @@ function PhotoPage({T,state,update,todayStr}){
       {compareView&&React.createElement(()=>{
         const [pos,setPos]=React.useState(50);
         const containerRef=React.useRef(null);
+        const dragging=React.useRef(false);
         const handleMove=(clientX)=>{
           const rect=containerRef.current?.getBoundingClientRect();
           if(!rect)return;
           setPos(Math.min(100,Math.max(0,(clientX-rect.left)/rect.width*100)));
         };
+        React.useEffect(()=>{
+          const el=containerRef.current;
+          if(!el)return;
+          const onTM=(e)=>{e.preventDefault();if(e.touches[0])handleMove(e.touches[0].clientX);};
+          const onTS=(e)=>{dragging.current=true;if(e.touches[0])handleMove(e.touches[0].clientX);};
+          const onTE=()=>{dragging.current=false;};
+          el.addEventListener('touchmove',onTM,{passive:false});
+          el.addEventListener('touchstart',onTS,{passive:false});
+          el.addEventListener('touchend',onTE);
+          return()=>{
+            el.removeEventListener('touchmove',onTM);
+            el.removeEventListener('touchstart',onTS);
+            el.removeEventListener('touchend',onTE);
+          };
+        },[]);
         return(
           <div className="mo" onClick={()=>setCompareView(null)} style={{alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.95)"}}>
             <div onClick={e=>e.stopPropagation()} style={{width:"100%",height:"100%",display:"flex",flexDirection:"column"}}>
@@ -662,9 +678,7 @@ function PhotoPage({T,state,update,todayStr}){
               </div>
               <div ref={containerRef} style={{flex:1,position:"relative",overflow:"hidden",userSelect:"none",cursor:"ew-resize",background:"#000"}}
                 onMouseMove={e=>handleMove(e.clientX)}
-                onTouchMove={e=>{e.preventDefault();handleMove(e.touches[0].clientX);},{passive:false}}
-                onMouseDown={e=>handleMove(e.clientX)}
-                onTouchStart={e=>handleMove(e.touches[0].clientX)}>
+                onMouseDown={e=>handleMove(e.clientX)}>
                 <img src={compareView.b.data} alt="After" style={{position:"absolute",inset:0,width:"100%",height:"100%",objectFit:"contain"}}/>
                 <div style={{position:"absolute",inset:0,clipPath:`inset(0 ${100-pos}% 0 0)`}}>
                   <img src={compareView.a.data} alt="Before" style={{width:"100%",height:"100%",objectFit:"contain"}}/>
@@ -750,13 +764,13 @@ function PDFPreviewModal({T,onClose,onUpgrade}){
     <div className="mo" onClick={onClose}>
       <div className="md" onClick={e=>e.stopPropagation()} style={{maxHeight:"88dvh",overflowY:"auto",position:"relative"}}>
         <button onClick={onClose} style={{position:"absolute",top:8,right:8,background:"none",border:"none",cursor:"pointer",fontSize:20,color:T.text+"66",lineHeight:1,padding:4}}>✕</button>
-        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:15,fontWeight:700,color:T.primary,marginBottom:4,textAlign:"center"}}>レポートプレビュー</div>
-        <div style={{fontSize:12,color:T.text+"88",marginBottom:12,textAlign:"center"}}>🔒 PDF出力はプレミアム機能です</div>
+        <div style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontSize:15,fontWeight:700,color:T.primary,marginBottom:4,textAlign:"center"}}>{t("reportPreviewTitle")}</div>
+        <div style={{fontSize:12,color:T.text+"88",marginBottom:12,textAlign:"center"}}>{t("pdfPremiumMsg")}</div>
         <div style={{overflowX:"auto",marginBottom:14}}>
           <div dangerouslySetInnerHTML={{__html:previewHTML}}/>
         </div>
-        <div style={{fontSize:11,color:T.text+"66",textAlign:"center",marginBottom:14}}>実際のデータで毎月1クリックでPDF出力できます</div>
-        <button className="btn bs" style={{width:"100%"}} onClick={onClose}>閉じる</button>
+        <div style={{fontSize:11,color:T.text+"66",textAlign:"center",marginBottom:14}}>{t("pdfSampleMsg")}</div>
+        <button className="btn bs" style={{width:"100%"}} onClick={onClose}>{t("close")}</button>
       </div>
     </div>
   );
@@ -917,7 +931,7 @@ function buildReportHTML(state, y, m) {
     "<div class='section-title'>日別装着時間グラフ</div>",
     "<div id='bar-chart-wrap' style='width:100%;margin-bottom:12px;position:relative;'>",
     "<div style='position:absolute;left:0;right:0;top:" + (100-tgtPct) + "%;border-top:1.5px dashed #888;pointer-events:none'><span style='position:absolute;right:0;top:-14px;font-size:8px;color:#777;font-weight:bold'>目標 " + tgt + "h</span></div>",
-    "<div style='display:flex;align-items:flex-end;gap:2px;height:110px;border-bottom:1px solid #eee;padding-bottom:4px'>",
+    "<div style='display:flex;align-items:flex-end;gap:2px;height:220px;border-bottom:1px solid #eee;padding-bottom:4px'>",
     bars,
     "</div></div>",
     "<div class='legend'>",
@@ -948,29 +962,16 @@ function ReportModal({T,state,onClose}){
   const [sel,setSel]=React.useState(months[0]||{year:today.getFullYear(),month:today.getMonth()+1});
   const [preview,setPreview]=React.useState(null);
 
-  const openPreview=()=>{
+  const openReport=()=>{
     const html=buildReportHTML(state,sel.year,sel.month);
-    setPreview(html);
-  };
-
-  const saveReport=async()=>{
-    if(!preview)return;
-    const fileName=`SmileTrack_${sel.year}${String(sel.month).padStart(2,"0")}.html`;
-    const blob=new Blob([preview],{type:"text/html"});
-    const file=new File([blob],fileName,{type:"text/html"});
-    try{
-      if(navigator.canShare&&navigator.canShare({files:[file]})){
-        await navigator.share({files:[file],title:"SmileTrack レポート"});
-      }else if(navigator.share){
-        const url=URL.createObjectURL(blob);
-        await navigator.share({title:"SmileTrack レポート",url});
-      }else{
-        const url=URL.createObjectURL(blob);
-        const a=document.createElement("a");
-        a.href=url;a.download=fileName;a.click();
-      }
-    }catch(e){
-      if(e?.name!=="AbortError") alert("出力に失敗しました");
+    const blob=new Blob([html],{type:"text/html"});
+    const url=URL.createObjectURL(blob);
+    const w=window.open(url,"_blank");
+    if(w){
+      w.onload=()=>{setTimeout(()=>w.print(),600);};
+    }else{
+      // window.openがブロックされた場合はiframeプレビュー
+      setPreview(html);
     }
   };
 
@@ -986,7 +987,7 @@ function ReportModal({T,state,onClose}){
             <iframe srcDoc={preview} style={{width:"100%",height:"100%",minHeight:"60vh",border:"none"}} title="report"/>
           </div>
           <div style={{padding:"12px 16px",background:"#f5f5f7",flexShrink:0}}>
-            <button className="btn bp" style={{width:"100%"}} onClick={saveReport}>保存・共有</button>
+            <button className="btn bp" style={{width:"100%"}} onClick={()=>{const blob=new Blob([preview],{type:"text/html"});const url=URL.createObjectURL(blob);const w=window.open(url,"_blank");if(w){w.onload=()=>{setTimeout(()=>w.print(),600);};}else{navigator.share&&navigator.share({title:"SmileTrack レポート",url});};}}>{t("save")}</button>
           </div>
         </div>
       </div>
@@ -1003,7 +1004,7 @@ function ReportModal({T,state,onClose}){
         </select>
         <div style={{display:"flex",gap:8}}>
           <button className="btn bs" style={{flex:1}} onClick={onClose}>キャンセル</button>
-          <button className="btn bp" style={{flex:1}} onClick={openPreview}>プレビュー</button>
+          <button className="btn bp" style={{flex:1}} onClick={openReport}>{t("save")}</button>
         </div>
       </div>
     </div>
