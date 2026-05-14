@@ -941,38 +941,6 @@ function buildReportHTML(state, y, m) {
 function ReportModal({T,state,onClose}){
   const today=new Date();
   const months=[];
-  const start=state.startDate?new Date(state.startDate+"T00:00:00"):new Date(today.getFullYear(),today.getMonth(),1);
-  const cur=new Date(start.getFullYear(),start.getMonth(),1);
-  while(cur<=today){months.push({year:cur.getFullYear(),month:cur.getMonth()+1});cur.setMonth(cur.getMonth()+1);}
-  months.reverse();
-  const [sel,setSel]=React.useState(months[0]||{year:today.getFullYear(),month:today.getMonth()+1});
-  const openReport=async()=>{
-    const html=buildReportHTML(state,sel.year,sel.month);
-    const fileName=`SmileTrack_${sel.year}${String(sel.month).padStart(2,"0")}.html`;
-    const blob=new Blob([html],{type:"text/html"});
-    const file=new File([blob],fileName,{type:"text/html"});
-    try{
-      if(navigator.canShare&&navigator.canShare({files:[file]})){
-        await navigator.share({files:[file],title:"SmileTrack レポート"});
-      }else if(navigator.share){
-        const url=URL.createObjectURL(blob);
-        await navigator.share({title:"SmileTrack レポート",url});
-      }else{
-        const url=URL.createObjectURL(blob);
-        const a=document.createElement("a");
-        a.href=url;a.download=fileName;a.click();
-      }
-    }catch(e){
-      if(e?.name!=="AbortError"){
-        console.warn("[PDF]",e);
-        alert("出力に失敗しました");
-      }
-    }
-    onClose();
-  };
-function ReportModal({T,state,onClose}){
-  const today=new Date();
-  const months=[];
   for(let i=0;i<12;i++){
     const d=new Date(today.getFullYear(),today.getMonth()-i,1);
     months.push({year:d.getFullYear(),month:d.getMonth()+1});
