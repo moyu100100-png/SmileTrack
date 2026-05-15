@@ -862,7 +862,9 @@ function buildReportHTML(state, y, m) {
   const maxH = Math.max(...chartData, tgt);
   const tgtPct = Math.round((tgt / maxH) * 100);
   const bars = days.map((d, i) => {
-    const h = d.ws !== null && !d.outOfMonth ? Math.round(d.ws/36)/100 : 0;
+    // d.wsは「外していた時間（秒）」なので、装着時間 = 86400 - d.ws
+    const wearSec = d.ws !== null && !d.outOfMonth ? Math.max(0, 86400 - d.ws) : 0;
+    const h = Math.round(wearSec/36)/100; // 秒 → 時間（小数点2桁）
     const pct = h > 0 ? Math.max(2, Math.round((h / maxH) * 100)) : 0;
     const color = d.outOfMonth ? "#f0f0f0" : (d.ok ? "#bbbbbb" : (d.ws !== null && !d.before && !d.fut ? "#A8D4E6" : "#f0f0f0"));
     const lbl = d.outOfMonth ? "" : String(d.d);
