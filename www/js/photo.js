@@ -838,8 +838,12 @@ function buildReportHTML(state, y, m) {
   const today = new Date();
   const todayStr2 = today.getFullYear() + "年" + (today.getMonth()+1) + "月" + today.getDate() + "日";
 
-  // Chart.js用データ
-  const chartData = days.map(d => d.ws !== null ? Math.round(d.ws/36)/100 : 0);
+  // Chart.js用データ（d.wsは「外していた時間」なので装着時間に変換）
+  const chartData = days.map(d => {
+    if (d.ws === null || d.outOfMonth || d.before || d.fut) return 0;
+    const wearSec = Math.max(0, 86400 - d.ws);
+    return Math.round(wearSec/36)/100;
+  });
   const chartColors = days.map(d => d.ok ? "#cccccc" : (d.ws !== null && !d.outOfMonth && !d.before ? "#A8D4E6" : "#f0f0f0"));
 
   // テーブル行生成
@@ -956,13 +960,17 @@ function buildReportHTML(state, y, m) {
 
 function ReportModal({T,state,onClose}){
   const today=new Date();
+  const startDs = state.startDate;
+  const startDate = startDs ? new Date(startDs + "T00:00:00") : null;
+  
   const months=[];
   for(let i=0;i<12;i++){
     const d=new Date(today.getFullYear(),today.getMonth()-i,1);
+    // スタート日が設定されている場合、その月以降のみ表示
+    if(startDate && d < new Date(startDate.getFullYear(), startDate.getMonth(), 1)) break;
     months.push({year:d.getFullYear(),month:d.getMonth()+1});
   }
   const [sel,setSel]=React.useState(months[0]||{year:today.getFullYear(),month:today.getMonth()+1});
-  const [preview,setPreview]=React.useState(null);
 
   const openReport=()=>{
     const html=buildReportHTML(state,sel.year,sel.month);
@@ -972,29 +980,10 @@ function ReportModal({T,state,onClose}){
     if(w){
       w.onload=()=>{setTimeout(()=>w.print(),600);};
     }else{
-      // window.openがブロックされた場合はiframeプレビュー
-      setPreview(html);
+      // window.openがブロックされた場合
+      alert("ポップアップがブロックされています。ブラウザの設定を確認してください。");
     }
   };
-
-  if(preview){
-    return(
-      <div className="mo" onClick={()=>setPreview(null)} style={{alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.85)"}}>
-        <div onClick={e=>e.stopPropagation()} style={{width:"92%",maxWidth:480,maxHeight:"82vh",borderRadius:16,overflow:"hidden",display:"flex",flexDirection:"column",background:"#fff"}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 16px",background:"#f5f5f7",flexShrink:0}}>
-            <span style={{fontWeight:700,fontSize:15}}>{sel.year}年{sel.month}月 レポート</span>
-            <button onClick={()=>setPreview(null)} style={{background:"none",border:"none",fontSize:18,cursor:"pointer",color:"#666"}}>✕</button>
-          </div>
-          <div style={{flex:1,overflow:"auto"}}>
-            <iframe srcDoc={preview} style={{width:"100%",height:"100%",minHeight:"60vh",border:"none"}} title="report"/>
-          </div>
-          <div style={{padding:"12px 16px",background:"#f5f5f7",flexShrink:0}}>
-            <button className="btn bp" style={{width:"100%"}} onClick={()=>{const blob=new Blob([preview],{type:"text/html"});const url=URL.createObjectURL(blob);const w=window.open(url,"_blank");if(w){w.onload=()=>{setTimeout(()=>w.print(),600);};}else{navigator.share&&navigator.share({title:"SmileTrack レポート",url});};}}>{t("save")}</button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return(
     <div className="mo" onClick={onClose}>
