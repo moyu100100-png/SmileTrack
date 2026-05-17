@@ -972,16 +972,35 @@ function ReportModal({T,state,onClose}){
   }
   const [sel,setSel]=React.useState(months[0]||{year:today.getFullYear(),month:today.getMonth()+1});
 
-  const openReport=()=>{
+  const openReport=async()=>{
     const html=buildReportHTML(state,sel.year,sel.month);
-    const blob=new Blob([html],{type:"text/html"});
-    const url=URL.createObjectURL(blob);
-    const w=window.open(url,"_blank");
-    if(w){
-      w.onload=()=>{setTimeout(()=>w.print(),600);};
+    const blob=new Blob([html],{type:'text/html'});
+    const fileName='SmileTrack_Report_'+sel.year+'_'+sel.month+'.html';
+    
+    // Share APIが使える場合（iOS/Android）
+    if(navigator.share){
+      try{
+        const file=new File([blob],fileName,{type:'text/html'});
+        await navigator.share({
+          files:[file],
+          title:'SmileTrack レポート',
+          text:sel.year+'年'+sel.month+'月のレポート'
+        });
+      }catch(err){
+        if(err.name!=='AbortError'){
+          console.error('Share error:',err);
+          alert('共有できませんでした');
+        }
+      }
     }else{
-      // window.openがブロックされた場合
-      alert("ポップアップがブロックされています。ブラウザの設定を確認してください。");
+      // Web環境の場合（デスクトップブラウザ）
+      const url=URL.createObjectURL(blob);
+      const w=window.open(url,"_blank");
+      if(w){
+        w.onload=()=>{setTimeout(()=>w.print(),600);};
+      }else{
+        alert("ポップアップがブロックされています。ブラウザの設定を確認してください。");
+      }
     }
   };
 
