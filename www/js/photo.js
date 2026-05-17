@@ -870,7 +870,7 @@ function buildReportHTML(state, y, m) {
   const dataMax = validData.length > 0 ? Math.max(...validData) : 0;
   const maxH = 24; // 24時間固定
   const tgtPct = Math.round((tgt / 24) * 100); // 目標線は常に24h基準
-  const tgtTopPx = Math.round((1 - tgt / 24) * 210); // 目標線のtop位置(px)
+  const tgtBottomPx = Math.round((tgt / 24) * 210); // 目標線のbottom位置(px)
   
   // ★デバッグログ★
   console.log('=== PDFグラフデバッグ ===');
@@ -956,8 +956,8 @@ function buildReportHTML(state, y, m) {
     "</div>",
     "<div class='section-title'>装着時間グラフ</div>",
     "<div id='bar-chart-wrap' style='width:100%;position:relative;'>",
-    "<div style='position:absolute;left:0;right:0;top:" + tgtTopPx + "px;border-top:1.5px dashed #888;pointer-events:none;z-index:1'><span style='position:absolute;right:0;font-size:8px;color:#777;transform:translateY(-10px)'>目標 " + tgt + "h</span></div>",
-    "<div style='display:flex;align-items:flex-end;gap:2px;height:210px;border-bottom:1px solid #eee;padding-bottom:4px'>",
+    "<div style='position:absolute;left:0;right:0;bottom:" + tgtBottomPx + "px;border-top:1.5px dashed #888;pointer-events:none;z-index:1'><span style='position:absolute;right:0;font-size:8px;color:#777;transform:translateY(-10px)'>目標 " + tgt + "h</span></div>",
+    "<div style='display:flex;align-items:flex-end;gap:2px;height:210px;border-bottom:1px solid #eee'>",
     bars,
     "</div></div>",
     "<div class='legend'>",
