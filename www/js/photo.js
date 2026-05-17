@@ -870,6 +870,7 @@ function buildReportHTML(state, y, m) {
   const dataMax = validData.length > 0 ? Math.max(...validData) : 0;
   const maxH = 24; // 24時間固定
   const tgtPct = Math.round((tgt / 24) * 100); // 目標線は常に24h基準
+  const tgtTopPx = Math.round((1 - tgt / 24) * 220); // 目標線のtop位置(px)
   
   // ★デバッグログ★
   console.log('=== PDFグラフデバッグ ===');
@@ -885,18 +886,13 @@ function buildReportHTML(state, y, m) {
     // d.wsは「装着時間（秒）」
     const wearSec = d.ws !== null && !d.outOfMonth && !d.before && !d.fut ? d.ws : 0;
     const h = wearSec / 3600; // 秒 → 時間（小数）
-    const pct = Math.round((h / maxH) * 100);
+    // height:px指定（iOSのSafariでheight:%が効かないため）
+    const heightPx = Math.round((h / 24) * 220);
     const color = d.outOfMonth ? "#f0f0f0" : (d.ok ? "#bbbbbb" : (d.ws !== null && !d.before && !d.fut ? "#A8D4E6" : "#f0f0f0"));
     const lbl = d.outOfMonth ? "" : String(d.d);
     
-    // ★最初の3日分のデバッグログ★
-    if (i < 3) {
-      console.log(`day ${d.d}: ws=${d.ws}, outOfMonth=${d.outOfMonth}, before=${d.before}, fut=${d.fut}, ok=${d.ok}`);
-      console.log(`  → wearSec=${wearSec}, h=${h.toFixed(2)}, pct=${pct}%, color=${color}`);
-    }
-    
     return "<div style='flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:1px'>" +
-      "<div style='width:100%;height:" + Math.max(1, pct) + "%;background:" + color + ";border-radius:2px 2px 0 0;min-height:" + (pct > 0 ? "1px" : "0") + "'></div>" +
+      "<div style='width:100%;height:" + Math.max(1, heightPx) + "px;background:" + color + ";border-radius:2px 2px 0 0'></div>" +
       "<div style='font-size:7px;color:#bbb;margin-top:1px'>" + lbl + "</div>" +
       "</div>";
   }).join("");
@@ -908,8 +904,9 @@ function buildReportHTML(state, y, m) {
     "<style>",
     "*{box-sizing:border-box;margin:0;padding:0;}",
     "body{background:#e8e8e8;padding:24px 16px;font-family:'M PLUS Rounded 1c',sans-serif;display:flex;flex-direction:column;align-items:center;}",
+    ".scale-wrapper{width:794px;transform-origin:top center;}",
     "@page{size:A4 portrait;margin:0;}@page{orphans:0;widows:0;}",
-    "@media print{html,body{background:#fff!important;margin:0!important;padding:0!important;height:auto!important;}body{display:block!important;}#bar-chart-wrap,canvas{max-height:220px;}.paper{box-shadow:none!important;border-radius:0!important;margin:0!important;padding:10mm 12mm!important;width:210mm!important;max-height:297mm!important;overflow:hidden!important;}*{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}",
+    "@media print{html,body{background:#fff!important;margin:0!important;padding:0!important;height:auto!important;}body{display:block!important;}.scale-wrapper{transform:none!important;width:100%!important;}#bar-chart-wrap,canvas{max-height:220px;}.paper{box-shadow:none!important;border-radius:0!important;margin:0!important;padding:10mm 12mm!important;width:210mm!important;max-height:297mm!important;overflow:hidden!important;}*{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}",
     ".paper{width:794px;background:#fff;border-radius:4px;box-shadow:0 2px 16px rgba(0,0,0,0.10);padding:44px 40px 48px;overflow:hidden;}",
     ".report-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid #ddd;}",
     ".report-logo{font-family:'Outfit',sans-serif;font-size:22px;font-weight:700;color:#444;}",
@@ -943,7 +940,7 @@ function buildReportHTML(state, y, m) {
     ".tv.ng{color:#4A88A8;font-weight:700;}",
     ".report-footer{margin-top:16px;padding-top:10px;border-top:1px solid #eee;display:flex;justify-content:space-between;align-items:center;}",
     ".footer-txt{font-size:9px;color:#ccc;font-family:'Outfit',sans-serif;}",
-    "</style></head><body><div class='paper'>",
+    "</style></head><body><div class='scale-wrapper' id='scaleWrapper'><div class='paper'>",
     "<div class='report-header'>",
     "<div><div class='report-logo'>Smile<span>Track</span></div><div style='font-size:9px;color:#ccc;margin-top:2px'>マウスピース矯正管理</div></div>",
     "<div class='report-meta'>",
@@ -959,7 +956,7 @@ function buildReportHTML(state, y, m) {
     "</div>",
     "<div class='section-title'>日別装着時間グラフ</div>",
     "<div id='bar-chart-wrap' style='width:100%;margin-bottom:12px;position:relative;'>",
-    "<div style='position:absolute;left:0;right:0;top:" + (100 - tgtPct) + "%;border-top:1.5px dashed #888;pointer-events:none'><span style='position:absolute;right:0;font-size:8px;color:#777;transform:translateY(-10px)'>目標 " + tgt + "h</span></div>",
+    "<div style='position:absolute;left:0;right:0;top:" + tgtTopPx + "px;border-top:1.5px dashed #888;pointer-events:none;z-index:1'><span style='position:absolute;right:0;font-size:8px;color:#777;transform:translateY(-10px)'>目標 " + tgt + "h</span></div>",
     "<div style='display:flex;align-items:flex-end;gap:2px;height:220px;border-bottom:1px solid #eee;padding-bottom:4px'>",
     bars,
     "</div></div>",
@@ -977,7 +974,30 @@ function buildReportHTML(state, y, m) {
     "<div class='footer-txt'>SmileTrack</div>",
     "<div class='footer-txt' style='font-style:italic'>Generated by SmileTrack</div>",
     "<div class='footer-txt'>1 / 1</div>",
-      ];
+    "</div></div></div>",
+    "<script>",
+    "(function(){",
+    "  function applyScale(){",
+    "    var w=document.getElementById('scaleWrapper');",
+    "    if(!w)return;",
+    "    var scale=Math.min(1,window.innerWidth/826);",
+    "    w.style.transform=scale<1?'scale('+scale+')':'';",
+    "    w.style.transformOrigin='top center';",
+    "    if(scale<1){",
+    "      requestAnimationFrame(function(){",
+    "        document.body.style.height=(w.scrollHeight*scale)+'px';",
+    "        document.body.style.overflow='hidden';",
+    "      });",
+    "    } else {",
+    "      document.body.style.height='';",
+    "      document.body.style.overflow='';",
+    "    }",
+    "  }",
+    "  window.addEventListener('load',applyScale);",
+    "  window.addEventListener('resize',applyScale);",
+    "})();",
+    "<\/script></body></html>",
+  ];
   return parts.join("");
 }
 
