@@ -1032,8 +1032,7 @@ function ReportModal({T,state,onClose}){
         const file=new File([blob],fileName,{type:'text/html'});
         await navigator.share({
           files:[file],
-          title:'SmileTrack レポート',
-          text:sel.year+'年'+sel.month+'月のレポート'
+          title:'SmileTrack レポート'
         });
       }catch(err){
         if(err.name!=='AbortError'){
@@ -1055,16 +1054,16 @@ function ReportModal({T,state,onClose}){
 
   if(preview){
     return(
-      <div className="mo" onClick={()=>setPreview(null)} style={{background:"rgba(0,0,0,0.92)"}}>
-        <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:"794px",margin:"20px auto",display:"flex",flexDirection:"column",gap:"12px"}}>
-          <div style={{background:"#fff",borderRadius:"8px",padding:"12px 16px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-            <span style={{fontWeight:700,fontSize:15}}>{sel.year}年{sel.month}月 レポート</span>
-            <button onClick={()=>setPreview(null)} style={{background:"none",border:"none",fontSize:20,cursor:"pointer",color:"#666"}}>✕</button>
-          </div>
-          <div style={{background:"#e8e8e8",borderRadius:"8px",overflow:"auto",maxHeight:"calc(100vh - 140px)"}}>
+      <div className="mo" onClick={()=>setPreview(null)}>
+        <div className="md" onClick={e=>e.stopPropagation()} style={{maxHeight:"90vh",display:"flex",flexDirection:"column"}}>
+          <div className="mdtitle" style={{marginBottom:12}}>{sel.year}年{sel.month}月 レポート</div>
+          <div style={{flex:1,overflow:"auto",background:"#e8e8e8",borderRadius:8,marginBottom:16}}>
             <iframe srcDoc={preview} style={{width:"794px",height:"1123px",border:"none",display:"block",transform:"scale(1)",transformOrigin:"0 0"}} title="report"/>
           </div>
-          <button className="btn bp" style={{width:"100%"}} onClick={shareReport}>保存</button>
+          <div style={{display:"flex",gap:8}}>
+            <button className="btn bs" style={{flex:1}} onClick={()=>setPreview(null)}>キャンセル</button>
+            <button className="btn bp" style={{flex:1}} onClick={shareReport}>保存</button>
+          </div>
         </div>
       </div>
     );
