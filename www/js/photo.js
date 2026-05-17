@@ -817,6 +817,7 @@ function buildReportHTML(state, y, m) {
     const fut = dt > now2;
     const before = startDs && ds < startDs;
     const ws = (fut || before) ? null : (elog[ds] !== undefined ? elog[ds] : 86400);
+    // wsは「装着時間（秒）」
     const ok = !fut && !before && ws !== null && ws >= tgtSec;
     const ds2 = sess.filter(s => {
       if (s.start) { const sd = new Date(s.start); return sd.getFullYear()===y && sd.getMonth()===m-1 && sd.getDate()===d; }
@@ -828,7 +829,8 @@ function buildReportHTML(state, y, m) {
   }
 
   const vd = days.filter(d => !d.outOfMonth && !d.fut && !d.before && d.ws !== null);
-  const tot = vd.reduce((a,b) => a+b.ws, 0);
+  // d.wsは「装着時間（秒）」
+  const tot = vd.reduce((a,b) => a + b.ws, 0);
   const avg = vd.length ? tot/vd.length : 0;
   const ach = vd.filter(d => d.ok).length;
 
@@ -838,11 +840,10 @@ function buildReportHTML(state, y, m) {
   const today = new Date();
   const todayStr2 = today.getFullYear() + "年" + (today.getMonth()+1) + "月" + today.getDate() + "日";
 
-  // Chart.js用データ（d.wsは「外していた時間」なので装着時間に変換）
+  // Chart.js用データ（wsは装着時間）
   const chartData = days.map(d => {
     if (d.ws === null || d.outOfMonth || d.before || d.fut) return 0;
-    const wearSec = Math.max(0, 86400 - d.ws);
-    return Math.round(wearSec/36)/100;
+    return d.ws / 3600; // 秒 → 時間（小数）
   });
   const chartColors = days.map(d => d.ok ? "#cccccc" : (d.ws !== null && !d.outOfMonth && !d.before ? "#A8D4E6" : "#f0f0f0"));
 
@@ -855,6 +856,7 @@ function buildReportHTML(state, y, m) {
     }
     const tvCls = row.ok ? "tv" : "tv ng";
     const rc = ar.map(r => "<td>" + fmtMs(row.rt[r]) + "</td>").join("");
+    // row.wsは「装着時間（秒）」
     return "<tr class='" + bg + "'><td>" + m + "/" + row.d + "(" + row.dow + ")</td><td class='sep-right'><span class='" + tvCls + "'>" + fmtSec(row.ws) + "</span></td>" + rc + "</tr>";
   };
 
@@ -863,17 +865,38 @@ function buildReportHTML(state, y, m) {
   const thRow = "<tr><th>日付</th><th class='sep-right'>合計</th>" + ar.map(r => "<th>" + r + "</th>").join("") + "</tr>";
   const colW = "<col style='width:16%'><col style='width:13%'>" + ar.map(() => "<col style='width:" + Math.floor(71/ar.length) + "%'>").join("");
 
-  const maxH = Math.max(...chartData, tgt);
-  const tgtPct = Math.round((tgt / maxH) * 100);
+  // 統計画面と同じ計算方式（ただし余白を追加）
+  const validData = chartData.filter(h => h > 0);
+  const dataMax = validData.length > 0 ? Math.max(...validData) : 0;
+  const maxH = 24; // 24時間固定
+  const tgtPct = Math.round((tgt / 24) * 100); // 目標線は常に24h基準
+  
+  // ★デバッグログ★
+  console.log('=== PDFグラフデバッグ ===');
+  console.log('days[0]:', days[0]);
+  console.log('chartData (first 5):', chartData.slice(0, 5));
+  console.log('validData (first 5):', validData.slice(0, 5));
+  console.log('dataMax:', dataMax);
+  console.log('maxH:', maxH);
+  console.log('tgt:', tgt);
+  console.log('tgtPct:', tgtPct);
+  
   const bars = days.map((d, i) => {
-    // d.wsは「外していた時間（秒）」なので、装着時間 = 86400 - d.ws
-    const wearSec = d.ws !== null && !d.outOfMonth ? Math.max(0, 86400 - d.ws) : 0;
-    const h = Math.round(wearSec/36)/100; // 秒 → 時間（小数点2桁）
-    const pct = h > 0 ? Math.max(2, Math.round((h / maxH) * 100)) : 0;
+    // d.wsは「装着時間（秒）」
+    const wearSec = d.ws !== null && !d.outOfMonth && !d.before && !d.fut ? d.ws : 0;
+    const h = wearSec / 3600; // 秒 → 時間（小数）
+    const pct = Math.round((h / maxH) * 100);
     const color = d.outOfMonth ? "#f0f0f0" : (d.ok ? "#bbbbbb" : (d.ws !== null && !d.before && !d.fut ? "#A8D4E6" : "#f0f0f0"));
     const lbl = d.outOfMonth ? "" : String(d.d);
+    
+    // ★最初の3日分のデバッグログ★
+    if (i < 3) {
+      console.log(`day ${d.d}: ws=${d.ws}, outOfMonth=${d.outOfMonth}, before=${d.before}, fut=${d.fut}, ok=${d.ok}`);
+      console.log(`  → wearSec=${wearSec}, h=${h.toFixed(2)}, pct=${pct}%, color=${color}`);
+    }
+    
     return "<div style='flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:1px'>" +
-      "<div style='width:100%;height:" + pct + "%;background:" + color + ";border-radius:2px 2px 0 0;min-height:" + (pct > 0 ? "2px" : "0") + "'></div>" +
+      "<div style='width:100%;height:" + Math.max(1, pct) + "%;background:" + color + ";border-radius:2px 2px 0 0;min-height:" + (pct > 0 ? "1px" : "0") + "'></div>" +
       "<div style='font-size:7px;color:#bbb;margin-top:1px'>" + lbl + "</div>" +
       "</div>";
   }).join("");
@@ -936,7 +959,7 @@ function buildReportHTML(state, y, m) {
     "</div>",
     "<div class='section-title'>日別装着時間グラフ</div>",
     "<div id='bar-chart-wrap' style='width:100%;margin-bottom:12px;position:relative;'>",
-    "<div style='position:absolute;left:0;right:0;top:" + (100-tgtPct) + "%;border-top:1.5px dashed #888;pointer-events:none'><span style='position:absolute;right:0;top:-14px;font-size:8px;color:#777;font-weight:bold'>目標 " + tgt + "h</span></div>",
+    "<div style='position:absolute;left:0;right:0;top:" + (100 - tgtPct) + "%;border-top:1.5px dashed #888;pointer-events:none'><span style='position:absolute;right:0;font-size:8px;color:#777;transform:translateY(-10px)'>目標 " + tgt + "h</span></div>",
     "<div style='display:flex;align-items:flex-end;gap:2px;height:220px;border-bottom:1px solid #eee;padding-bottom:4px'>",
     bars,
     "</div></div>",
@@ -971,9 +994,15 @@ function ReportModal({T,state,onClose}){
     months.push({year:d.getFullYear(),month:d.getMonth()+1});
   }
   const [sel,setSel]=React.useState(months[0]||{year:today.getFullYear(),month:today.getMonth()+1});
+  const [preview,setPreview]=React.useState(null);
 
-  const openReport=async()=>{
+  const showPreview=()=>{
     const html=buildReportHTML(state,sel.year,sel.month);
+    setPreview(html);
+  };
+
+  const shareReport=async()=>{
+    const html=preview||buildReportHTML(state,sel.year,sel.month);
     const blob=new Blob([html],{type:'text/html'});
     const fileName='SmileTrack_Report_'+sel.year+'_'+sel.month+'.html';
     
@@ -1004,6 +1033,23 @@ function ReportModal({T,state,onClose}){
     }
   };
 
+  if(preview){
+    return(
+      <div className="mo" onClick={()=>setPreview(null)} style={{background:"rgba(0,0,0,0.92)"}}>
+        <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:"794px",margin:"20px auto",display:"flex",flexDirection:"column",gap:"12px"}}>
+          <div style={{background:"#fff",borderRadius:"8px",padding:"12px 16px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <span style={{fontWeight:700,fontSize:15}}>{sel.year}年{sel.month}月 レポート</span>
+            <button onClick={()=>setPreview(null)} style={{background:"none",border:"none",fontSize:20,cursor:"pointer",color:"#666"}}>✕</button>
+          </div>
+          <div style={{background:"#e8e8e8",borderRadius:"8px",overflow:"auto",maxHeight:"calc(100vh - 140px)"}}>
+            <iframe srcDoc={preview} style={{width:"794px",height:"1123px",border:"none",display:"block",transform:"scale(1)",transformOrigin:"0 0"}} title="report"/>
+          </div>
+          <button className="btn bp" style={{width:"100%"}} onClick={shareReport}>保存</button>
+        </div>
+      </div>
+    );
+  }
+
   return(
     <div className="mo" onClick={onClose}>
       <div className="md" onClick={e=>e.stopPropagation()}>
@@ -1014,7 +1060,7 @@ function ReportModal({T,state,onClose}){
         </select>
         <div style={{display:"flex",gap:8}}>
           <button className="btn bs" style={{flex:1}} onClick={onClose}>キャンセル</button>
-          <button className="btn bp" style={{flex:1}} onClick={openReport}>{t("save")}</button>
+          <button className="btn bp" style={{flex:1}} onClick={showPreview}>プレビュー</button>
         </div>
       </div>
     </div>
