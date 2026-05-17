@@ -870,7 +870,7 @@ function buildReportHTML(state, y, m) {
   const dataMax = validData.length > 0 ? Math.max(...validData) : 0;
   const maxH = 24; // 24時間固定
   const tgtPct = Math.round((tgt / 24) * 100); // 目標線は常に24h基準
-  const tgtTopPx = Math.round((1 - tgt / 24) * 220); // 目標線のtop位置(px)
+  const tgtTopPx = Math.round((1 - tgt / 24) * 210); // 目標線のtop位置(px)
   
   // ★デバッグログ★
   console.log('=== PDFグラフデバッグ ===');
@@ -887,7 +887,7 @@ function buildReportHTML(state, y, m) {
     const wearSec = d.ws !== null && !d.outOfMonth && !d.before && !d.fut ? d.ws : 0;
     const h = wearSec / 3600; // 秒 → 時間（小数）
     // height:px指定（iOSのSafariでheight:%が効かないため）
-    const heightPx = Math.round((h / 24) * 220);
+    const heightPx = Math.round((h / 24) * 210);
     const color = d.outOfMonth ? "#f0f0f0" : (d.ok ? "#bbbbbb" : (d.ws !== null && !d.before && !d.fut ? "#A8D4E6" : "#f0f0f0"));
     const lbl = d.outOfMonth ? "" : String(d.d);
     
@@ -906,7 +906,7 @@ function buildReportHTML(state, y, m) {
     "body{background:#e8e8e8;padding:24px 16px;font-family:'M PLUS Rounded 1c',sans-serif;display:flex;flex-direction:column;align-items:center;}",
     ".scale-wrapper{width:794px;transform-origin:top center;}",
     "@page{size:A4 portrait;margin:0;}@page{orphans:0;widows:0;}",
-    "@media print{html,body{background:#fff!important;margin:0!important;padding:0!important;height:auto!important;}body{display:block!important;}.scale-wrapper{transform:none!important;width:100%!important;}#bar-chart-wrap,canvas{max-height:220px;}.paper{box-shadow:none!important;border-radius:0!important;margin:0!important;padding:10mm 12mm!important;width:210mm!important;max-height:297mm!important;overflow:hidden!important;}*{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}",
+    "@media print{html,body{background:#fff!important;margin:0!important;padding:0!important;height:auto!important;}body{display:block!important;}.scale-wrapper{transform:none!important;width:100%!important;}#bar-chart-wrap,canvas{max-height:210px;}.paper{box-shadow:none!important;border-radius:0!important;margin:0!important;padding:10mm 12mm!important;width:210mm!important;max-height:297mm!important;overflow:hidden!important;}*{-webkit-print-color-adjust:exact;print-color-adjust:exact;}}",
     ".paper{width:794px;background:#fff;border-radius:4px;box-shadow:0 2px 16px rgba(0,0,0,0.10);padding:44px 40px 48px;overflow:hidden;}",
     ".report-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;padding-bottom:14px;border-bottom:1px solid #ddd;}",
     ".report-logo{font-family:'Outfit',sans-serif;font-size:22px;font-weight:700;color:#444;}",
@@ -914,12 +914,12 @@ function buildReportHTML(state, y, m) {
     ".report-meta{text-align:right;}",
     ".report-title{font-size:13px;font-weight:700;color:#333;margin-bottom:3px;}",
     ".report-period{font-size:9px;color:#999;}",
-    ".summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:28px;}",
+    ".summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}",
     ".summary-box{background:#F0F8FC;border-radius:8px;padding:12px 8px 10px;text-align:center;border:1px solid #D8EEF5;display:flex;flex-direction:column;align-items:center;gap:6px;}",
     ".summary-lbl{font-size:11px;color:#888;font-weight:500;}",
     ".summary-val{font-family:'Outfit',sans-serif;font-size:20px;font-weight:700;color:#666;line-height:1;}",
     ".summary-unit{font-size:9px;color:#aaa;}",
-    ".section-title{font-size:10px;font-weight:700;color:#999;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:6px;}",
+    ".section-title{font-size:10px;font-weight:700;color:#999;letter-spacing:1px;margin-bottom:16px;display:flex;align-items:center;gap:6px;}",
     ".section-title::after{content:'';flex:1;height:1px;background:#e8e8e8;}",
     ".legend{display:flex;gap:14px;margin-bottom:12px;}",
     ".legend-item{display:flex;align-items:center;gap:5px;font-size:8px;color:#999;}",
@@ -954,10 +954,10 @@ function buildReportHTML(state, y, m) {
     "<div class='summary-box'><div class='summary-lbl'>目標達成日数</div><div class='summary-val'>" + ach + "<span class='summary-unit'> 日</span></div></div>",
     "<div class='summary-box'><div class='summary-lbl'>目標未達成日数</div><div class='summary-val'>" + (vd.length-ach) + "<span class='summary-unit'> 日</span></div></div>",
     "</div>",
-    "<div class='section-title'>日別装着時間グラフ</div>",
-    "<div id='bar-chart-wrap' style='width:100%;margin-bottom:12px;position:relative;'>",
+    "<div class='section-title'>装着時間グラフ</div>",
+    "<div id='bar-chart-wrap' style='width:100%;position:relative;'>",
     "<div style='position:absolute;left:0;right:0;top:" + tgtTopPx + "px;border-top:1.5px dashed #888;pointer-events:none;z-index:1'><span style='position:absolute;right:0;font-size:8px;color:#777;transform:translateY(-10px)'>目標 " + tgt + "h</span></div>",
-    "<div style='display:flex;align-items:flex-end;gap:2px;height:220px;border-bottom:1px solid #eee;padding-bottom:4px'>",
+    "<div style='display:flex;align-items:flex-end;gap:2px;height:210px;border-bottom:1px solid #eee;padding-bottom:4px'>",
     bars,
     "</div></div>",
     "<div class='legend'>",
@@ -1024,7 +1024,7 @@ function ReportModal({T,state,onClose}){
   const shareReport=async()=>{
     const html=preview||buildReportHTML(state,sel.year,sel.month);
     const blob=new Blob([html],{type:'text/html'});
-    const fileName='SmileTrack_Report_'+sel.year+'_'+sel.month+'.html';
+    const fileName='SmileTrack_'+String(sel.year).slice(2)+String(sel.month).padStart(2,'0')+'.html';
     
     // Share APIが使える場合（iOS/Android）
     if(navigator.share){
@@ -1058,7 +1058,7 @@ function ReportModal({T,state,onClose}){
         <div className="md" onClick={e=>e.stopPropagation()} style={{maxHeight:"90vh",display:"flex",flexDirection:"column"}}>
           <div className="mdtitle" style={{marginBottom:12}}>{sel.year}年{sel.month}月 レポート</div>
           <div style={{flex:1,overflow:"auto",background:"#e8e8e8",borderRadius:8,marginBottom:16}}>
-            <iframe srcDoc={preview} style={{width:"794px",height:"1123px",border:"none",display:"block",transform:"scale(1)",transformOrigin:"0 0"}} title="report"/>
+            <iframe srcDoc={preview} style={{width:"100%",aspectRatio:"794/1123",border:"none",display:"block"}} title="report"/>
           </div>
           <div style={{display:"flex",gap:8}}>
             <button className="btn bs" style={{flex:1}} onClick={()=>setPreview(null)}>キャンセル</button>
