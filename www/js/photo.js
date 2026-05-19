@@ -716,12 +716,13 @@ function PDFPreviewModal({T,onClose,onUpgrade}){
     return `<tr style="background:${i%2===0?"#fff":"#f6f6f6"}"><td>3/${idx+1}(${["日","月","火","水","木","金","土"][(idx+6)%7]})</td><td style="border-right:1px solid #ddd;color:${ok?"#888":"#4A88A8"};font-weight:${ok?"400":"700"}">${dash}</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>`;
   }).join("");
   const maxH=Math.max(...mockDays,tgt);
+  const PREVIEW_H=80;
   const bars=mockDays.map(h=>{
-    const pct=Math.round((h/maxH)*100);
+    const heightPx=Math.round((h/24)*PREVIEW_H);
     const ok=h>=tgt;const color=h===0?"#f0f0f0":ok?"#bbb":"#A8D4E6";
-    return `<div style="flex:1;min-width:0;height:${Math.max(1,pct)}%;background:${color};border-radius:1px 1px 0 0"></div>`;
+    return `<div style="flex:1;display:flex;align-items:flex-end;justify-content:center"><div style="width:100%;height:${Math.max(1,heightPx)}px;background:${color};border-radius:1px 1px 0 0"></div></div>`;
   }).join("");
-  const tPct=Math.round((tgt/maxH)*100);
+  const tPct=Math.round((tgt/24)*PREVIEW_H);
   const xlbl=mockDays.map((_,i)=>`<span style="flex:1;text-align:center;font-size:4px;color:#bbb;min-width:0">${i+1}</span>`).join("");
 
   const previewHTML=`<div style="width:520px;background:#fff;padding:24px 28px;font-family:sans-serif;border:1px solid #eee;border-radius:6px">
@@ -733,9 +734,12 @@ function PDFPreviewModal({T,onClose,onUpgrade}){
       ${[["月間平均/日",avg+"h"],["月間合計","261h"],["目標達成日数",ach+"日"],["目標未達成日数",(vd.length-ach)+"日"]].map(([l,v])=>`<div style="background:#F0F8FC;border:1px solid #D8EEF5;border-radius:6px;padding:8px;text-align:center"><div style="font-size:8px;color:#888;margin-bottom:4px">${l}</div><div style="font-size:16px;font-weight:700;color:#666">${v}</div></div>`).join("")}
     </div>
     <div style="font-size:8px;font-weight:700;color:#999;letter-spacing:1px;margin-bottom:8px">日別装着時間グラフ</div>
-    <div style="display:flex;align-items:flex-end;gap:2px;height:80px;position:relative;border-bottom:1px solid #ddd;margin-bottom:4px">
-      <div style="position:absolute;left:0;right:0;bottom:${tPct}%;border-top:1.5px dashed #999"><span style="position:absolute;right:0;font-size:5px;color:#888;transform:translateY(-7px)">目標 22h</span></div>
-      ${bars}
+    <div style="position:relative;">
+      <div style="display:flex;align-items:flex-end;gap:2px;height:80px;position:relative;margin-bottom:0">
+        <div style="position:absolute;left:0;right:0;bottom:${tPct}px;border-top:1.5px dashed #999;pointer-events:none;z-index:1"><span style="position:absolute;right:0;font-size:5px;color:#888;transform:translateY(-7px)">目標 22h</span></div>
+        ${bars}
+      </div>
+      <div style="height:1px;background:#ddd;margin-bottom:4px"></div>
     </div>
     <div style="display:flex;gap:2px;margin-bottom:10px">${xlbl}</div>
     <div style="display:flex;gap:10px;margin-bottom:14px">
@@ -886,15 +890,16 @@ function buildReportHTML(state, y, m) {
     // d.wsは「装着時間（秒）」
     const wearSec = d.ws !== null && !d.outOfMonth && !d.before && !d.fut ? d.ws : 0;
     const h = wearSec / 3600; // 秒 → 時間（小数）
-    // height:px指定（iOSのSafariでheight:%が効かないため）
     const heightPx = Math.round((h / 24) * 210);
     const color = d.outOfMonth ? "#f0f0f0" : (d.ok ? "#bbbbbb" : (d.ws !== null && !d.before && !d.fut ? "#A8D4E6" : "#f0f0f0"));
-    const lbl = d.outOfMonth ? "" : String(d.d);
-    
-    return "<div style='flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:1px'>" +
+    return "<div style='flex:1;display:flex;align-items:flex-end;justify-content:center'>" +
       "<div style='width:100%;height:" + Math.max(1, heightPx) + "px;background:" + color + ";border-radius:2px 2px 0 0'></div>" +
-      "<div style='font-size:7px;color:#bbb;margin-top:1px'>" + lbl + "</div>" +
       "</div>";
+  }).join("");
+
+  const barLabels = days.map(d => {
+    const lbl = d.outOfMonth ? "" : String(d.d);
+    return "<div style='flex:1;text-align:center;font-size:7px;color:#bbb'>" + lbl + "</div>";
   }).join("");
 
   const parts = [
@@ -955,11 +960,14 @@ function buildReportHTML(state, y, m) {
     "<div class='summary-box'><div class='summary-lbl'>目標未達成日数</div><div class='summary-val'>" + (vd.length-ach) + "<span class='summary-unit'> 日</span></div></div>",
     "</div>",
     "<div class='section-title'>装着時間グラフ</div>",
-    "<div id='bar-chart-wrap' style='width:100%;position:relative;'>",
+    "<div style='position:relative;'>",
+    "<div style='display:flex;align-items:flex-end;gap:2px;height:210px;position:relative;'>",
     "<div style='position:absolute;left:0;right:0;bottom:" + tgtBottomPx + "px;border-top:1.5px dashed #888;pointer-events:none;z-index:1'><span style='position:absolute;right:0;font-size:8px;color:#777;transform:translateY(-10px)'>目標 " + tgt + "h</span></div>",
-    "<div style='display:flex;align-items:flex-end;gap:2px;height:210px;border-bottom:1px solid #eee'>",
     bars,
-    "</div></div>",
+    "</div>",
+    "<div style='height:1px;background:#eee;'></div>",
+    "<div style='display:flex;gap:2px;margin-top:2px'>" + barLabels + "</div>",
+    "</div>",
     "<div class='legend'>",
     "<div class='legend-item'><div class='legend-dot' style='background:#bbb'></div>目標達成（" + tgt + "時間以上）</div>",
     "<div class='legend-item'><div class='legend-dot' style='background:#A8D4E6'></div>目標未達成</div>",
