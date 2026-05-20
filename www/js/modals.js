@@ -377,7 +377,7 @@ function TimerSettingsModal({T,state,onSave,onClose,isPremiumProp=false}){
   const addWord=()=>{
     const w=newWord.replace(/\s/g,"").slice(0,6);
     if(!w){setErr(t("addItemHint"));return;}
-    if(pool.includes(w)){setErr(LANG==="ja"?"同じ項目がすでにあります":"Item already exists");return;}
+    if(pool.includes(w)){setErr(t("duplicateItem"));return;}
     if(pool.length>=MAX_ALL-1){setErr(t("maxSelectError").replace("{n}",MAX_ALL-1));return;}
     setPool(p=>[...p,w]);
     setNewWord("");setErr("");
