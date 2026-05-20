@@ -27,7 +27,7 @@ function PhotoPage({T,state,update,todayStr}){
   // 過去写真に存在するmodeも追加（写真が1枚以上あるもの）
   existingModes.forEach(mid => addTab(mid));
   // 写真が1枚もないmodeは除外（スロット1・2も同様）
-  const filterTabs = [["all","全て"],
+  const filterTabs = [["all",t("filterAll")],
     ...tabModeIds
       .filter(id => existingModes.has(id))
       .map(id => [id, tabLabel(id)])
@@ -192,15 +192,15 @@ function PhotoPage({T,state,update,todayStr}){
   return(
     <div style={{padding:12}}>
       <div className="card" style={{marginBottom:10}}>
-        <div className="ct" style={{marginBottom:8,fontSize:14}}>写真を撮影</div>
+        <div className="ct" style={{marginBottom:8,fontSize:14}}>{t("takePhoto")}</div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9}}>
           <button className="btn bp" onClick={()=>openCam(slot1Id)} style={{padding:"12px 8px",flexDirection:"column"}}>
             <div style={{display:"flex",alignItems:"center",gap:4}}>{Icons.camera("#fff",14)}<span style={{fontSize:14}}>{slot1Info.labelJP}</span></div>
-            {getOverlayPhoto(slot1Id)&&<div style={{fontSize:11,opacity:.7,marginTop:2}}>前回あり</div>}
+            {getOverlayPhoto(slot1Id)&&<div style={{fontSize:11,opacity:.7,marginTop:2}}>{t("prevExists")}</div>}
           </button>
           <button className="btn bp" onClick={()=>{if(!isPremium){setShowSlot2Gate(true);return;}openCam(slot2Id);}} style={{padding:"12px 8px",flexDirection:"column",opacity:isPremium?1:0.55}}>
             <div style={{display:"flex",alignItems:"center",gap:4}}>{isPremium?Icons.camera("#fff",14):<span style={{fontSize:14}}>🔒</span>}<span style={{fontSize:14}}>{slot2Info.labelJP}</span></div>
-            {isPremium&&getOverlayPhoto(slot2Id)&&<div style={{fontSize:11,opacity:.7,marginTop:2}}>前回あり</div>}
+            {isPremium&&getOverlayPhoto(slot2Id)&&<div style={{fontSize:11,opacity:.7,marginTop:2}}>{t("prevExists")}</div>}
           </button>
         </div>
         {/* アルバムから追加 */}
@@ -221,7 +221,7 @@ function PhotoPage({T,state,update,todayStr}){
             }}/>
           <button className="btn bs" style={{width:"100%",padding:"10px"}}
             onClick={()=>document.getElementById("album-input").click()}>
-            <span style={{fontSize:14,marginRight:6}}>＋</span>アルバムから追加
+            <span style={{fontSize:14,marginRight:6}}>＋</span>{t("albumAdd")}
           </button>
         </div>
       </div>
@@ -229,39 +229,39 @@ function PhotoPage({T,state,update,todayStr}){
       {showSlot2Gate&&(
         <div className="card" style={{textAlign:"center",padding:"16px 14px"}}>
           <div style={{fontSize:22,marginBottom:6}}>🔒</div>
-          <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4}}>プレミアム限定です</div>
+          <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4}}>{t("slot2PremiumTitle")}</div>
           <div style={{fontSize:12,color:T.accent,marginBottom:12}}>2つ目の撮影スロットでより多くの角度を記録できます。</div>
-          <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowSlot2Gate(false)}>閉じる</button>
+          <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowSlot2Gate(false)}>{t("close")}</button>
         </div>
       )}
       {showPinGate&&(
         <div className="card" style={{textAlign:"center",padding:"16px 14px"}}>
           <div style={{fontSize:22,marginBottom:6}}>🔒</div>
-          <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4}}>PINロックはプレミアム限定です</div>
+          <div style={{fontSize:14,fontWeight:700,color:T.text,marginBottom:4}}>{t("pinLockPremiumTitle")}</div>
           <div style={{fontSize:12,color:T.accent,marginBottom:12}}>写真アルバムをPINで保護できます。</div>
-          <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowPinGate(false)}>閉じる</button>
+          <button className="btn bs" style={{width:"100%"}} onClick={()=>setShowPinGate(false)}>{t("close")}</button>
         </div>
       )}
 
       <div className="card">
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
           <div style={{display:"flex",alignItems:"center",gap:8}}>
-            <div className="ct" style={{margin:0,fontSize:14}}>フォトアルバム</div>
+            <div className="ct" style={{margin:0,fontSize:14}}>{t("photoAlbum")}</div>
             {!isLocked&&(isPremium?(
               <button className={`btn bsm ${compareMode?"bp":"bs"}`} onClick={()=>{setCompareMode(v=>!v);setComparePick([]);}} style={{fontSize:11}}>
-                {compareMode?"キャンセル":"比較"}
+                {compareMode?t("cancel"):t("compare")}
               </button>
             ):(
-              <button className="btn bsm bs" style={{fontSize:11,opacity:0.6}} onClick={()=>setShowComparePreview(true)}>🔒比較</button>
+              <button className="btn bsm bs" style={{fontSize:11,opacity:0.6}} onClick={()=>setShowComparePreview(true)}>🔒{t("compare")}</button>
             ))}
           </div>
           {isPremium?(
             <button onClick={()=>setShowSetPin(true)} style={{display:"flex",alignItems:"center",gap:5,padding:"5px 10px",border:`1.5px solid ${state.photoLockEnabled?T.primary:T.soft}`,borderRadius:8,background:state.photoLockEnabled?T.primary:T.soft,cursor:"pointer",color:state.photoLockEnabled?"#fff":T.primary,fontSize:13,fontWeight:600,fontFamily:"'M PLUS Rounded 1c',sans-serif"}}>
-              {state.photoLockEnabled?Icons.lockClosed("#fff",13):Icons.lockOpen(T.primary,13)}<span>{state.photoLockEnabled?"ロック中":"ロック"}</span>
+              {state.photoLockEnabled?Icons.lockClosed("#fff",13):Icons.lockOpen(T.primary,13)}<span>{state.photoLockEnabled?t("locked"):t("pinLock")}</span>
             </button>
           ):(
             <button onClick={()=>setShowPinGate(true)} style={{display:"flex",alignItems:"center",gap:5,padding:"5px 10px",border:`1.5px solid ${T.soft}`,borderRadius:8,background:T.soft,cursor:"pointer",color:T.primary,fontSize:13,fontWeight:600,fontFamily:"'M PLUS Rounded 1c',sans-serif",opacity:0.6}}>
-              <span style={{fontSize:13}}>🔒</span><span>ロック</span>
+              <span style={{fontSize:13}}>🔒</span><span>{t("pinLock")}</span>
             </button>
           )}
         </div>
@@ -397,11 +397,11 @@ function PhotoPage({T,state,update,todayStr}){
                 {/* ガイド/前回トグル行 */}
                 <div style={{padding:"8px 16px 0",display:"flex",gap:8}}>
                   <button onClick={()=>setShowGuide(v=>!v)} style={{flex:1,padding:"5px 0",border:"none",borderRadius:8,background:showGuide?T.primary:"rgba(255,255,255,0.15)",color:"#fff",fontSize:12,fontWeight:600,cursor:"pointer"}}>
-                    {showGuide?"⊙ ガイドON":"○ ガイドOFF"}
+                    {showGuide?t("guideOn"):t("guideOff")}
                   </button>
                   {overlayPhoto&&(
                     <button onClick={()=>setShowOverlay(v=>!v)} style={{flex:1,padding:"5px 0",border:"none",borderRadius:8,background:showOverlay?"rgba(255,180,220,0.4)":"rgba(255,255,255,0.15)",color:"#fff",fontSize:12,fontWeight:600,cursor:"pointer"}}>
-                      {showOverlay?"◎ 前回ON":"◯ 前回OFF"}
+                      {showOverlay?t("overlayOn"):t("overlayOff")}
                     </button>
                   )}
                 </div>
@@ -439,7 +439,7 @@ function PhotoPage({T,state,update,todayStr}){
               <div style={{padding:14,background:"#111",flexShrink:0}}>
                 <input value={capComment} onChange={e=>setCapComment(e.target.value)} placeholder="コメントを入力…" style={{background:"#222",color:"#fff",border:"1px solid #444",borderRadius:10,marginBottom:6}}/>
                 <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
-                  <span style={{color:"#aaa",fontSize:13,flexShrink:0}}># マウスピース番号</span>
+                  <span style={{color:"#aaa",fontSize:13,flexShrink:0}}># {t("pieceNoLabel")}</span>
                   <select value={capPiece||""} onChange={e=>setCapPiece(e.target.value?parseInt(e.target.value):null)}
                     style={{background:"#222",color:"#fff",border:"1px solid #444",borderRadius:10,width:80,textAlign:"center"}}>
                     <option value="">ー</option>
@@ -470,11 +470,11 @@ function PhotoPage({T,state,update,todayStr}){
               style={{marginBottom:10,width:"100%",boxSizing:"border-box",height:44,fontSize:16,
                 borderRadius:10,border:`1.5px solid ${T.soft}`,background:T.bg,color:T.text,
                 padding:"0 12px",WebkitAppearance:"none",appearance:"none"}}/>
-            <label>マウスピース番号</label>
+            <label>{t("pieceNoLabel")}</label>
             <select value={editPiece} onChange={e=>setEditPiece(parseInt(e.target.value)||1)} style={{marginBottom:6,textAlign:"center"}}>
               {buildPieceList(state).map(p=><option key={p.n} value={p.n}>{p.label}</option>)}
             </select>
-            <div style={{fontSize:11,color:T.text+"55",marginBottom:14}}>部位は変更できません</div>
+            <div style={{fontSize:11,color:T.text+"55",marginBottom:14}}>{t("shotModeFixed")}</div>
             <button className="btn bs" style={{width:"100%",marginBottom:10}} onClick={()=>{
               const photo=state.photos.find(p=>p.id===editId);
               if(!photo||!photo.data)return;
@@ -490,7 +490,7 @@ function PhotoPage({T,state,update,todayStr}){
                 setEditId(null);
               };
               img.src=photo.data;
-            }}>↔ 左右反転して保存</button>
+            }}>{t("mirrorSaveBtn")}</button>
             <div style={{display:"flex",gap:8,marginBottom:8}}>
               <button className="btn bs" style={{flex:1}} onClick={()=>setEditId(null)}>キャンセル</button>
               <button className="btn bp" style={{flex:1}} onClick={()=>{update({photos:state.photos.map(p=>p.id===editId?{...p,comment:editComment,date:editDate,piece:editPiece}:p)});setEditId(null);}}>保存</button>
@@ -573,7 +573,7 @@ function PhotoPage({T,state,update,todayStr}){
               placeholder="コメントを入力…" style={{marginBottom:10}}/>
 
             {/* マウスピース番号 */}
-            <label>マウスピース番号</label>
+            <label>{t("pieceNoLabel")}</label>
             <select value={albumMeta.piece}
               onChange={e=>setAlbumMeta(v=>({...v,piece:parseInt(e.target.value)||1}))}
               style={{marginBottom:16}}>
@@ -784,7 +784,7 @@ function PDFPreviewModal({T,onClose,onUpgrade}){
 function buildReportHTML(state, y, m) {
   const pad = n => String(n).padStart(2, "0");
   const dim = new Date(y, m, 0).getDate();
-  const DOW = ["日","月","火","水","木","金","土"];
+  const DOW = t("reportDow") || ["日","月","火","水","木","金","土"];
   const tgt = state.targetWearHours || 22;
   const tgtSec = tgt * 3600;
   const sess = state.timerSessions || [];
@@ -842,7 +842,10 @@ function buildReportHTML(state, y, m) {
   const fmtMs = ms => { const s = Math.floor(ms/1000); if (s <= 0) return "—"; return Math.floor(s/3600) + ":" + pad(Math.floor((s%3600)/60)); };
 
   const today = new Date();
-  const todayStr2 = today.getFullYear() + "年" + (today.getMonth()+1) + "月" + today.getDate() + "日";
+  const todayFmtFn = t("reportTodayFmt");
+  const todayStr2 = typeof todayFmtFn === "function"
+    ? todayFmtFn(today.getFullYear(), today.getMonth()+1, today.getDate())
+    : today.getFullYear() + "年" + (today.getMonth()+1) + "月" + today.getDate() + "日";
 
   // Chart.js用データ（wsは装着時間）
   const chartData = days.map(d => {
@@ -866,7 +869,7 @@ function buildReportHTML(state, y, m) {
 
   const L = days.slice(0, 16);
   const R = days.slice(16);
-  const thRow = "<tr><th>日付</th><th class='sep-right'>合計</th>" + ar.map(r => "<th>" + r + "</th>").join("") + "</tr>";
+  const thRow = "<tr><th>" + t("reportDateHeader") + "</th><th class='sep-right'>" + t("reportTotalHeader") + "</th>" + ar.map(r => "<th>" + r + "</th>").join("") + "</tr>";
   const colW = "<col style='width:16%'><col style='width:13%'>" + ar.map(() => "<col style='width:" + Math.floor(71/ar.length) + "%'>").join("");
 
   // 統計画面と同じ計算方式（ただし余白を追加）
@@ -875,16 +878,6 @@ function buildReportHTML(state, y, m) {
   const maxH = 24; // 24時間固定
   const tgtPct = Math.round((tgt / 24) * 100); // 目標線は常に24h基準
   const tgtBottomPx = Math.round((tgt / 24) * 210); // 目標線のbottom位置(px)
-  
-  // ★デバッグログ★
-  console.log('=== PDFグラフデバッグ ===');
-  console.log('days[0]:', days[0]);
-  console.log('chartData (first 5):', chartData.slice(0, 5));
-  console.log('validData (first 5):', validData.slice(0, 5));
-  console.log('dataMax:', dataMax);
-  console.log('maxH:', maxH);
-  console.log('tgt:', tgt);
-  console.log('tgtPct:', tgtPct);
   
   const bars = days.map((d, i) => {
     // d.wsは「装着時間（秒）」
@@ -947,32 +940,32 @@ function buildReportHTML(state, y, m) {
     ".footer-txt{font-size:9px;color:#ccc;font-family:'Outfit',sans-serif;}",
     "</style></head><body><div class='scale-wrapper' id='scaleWrapper'><div class='paper'>",
     "<div class='report-header'>",
-    "<div><div class='report-logo'>Smile<span>Track</span></div><div style='font-size:9px;color:#ccc;margin-top:2px'>マウスピース矯正管理</div></div>",
+    "<div><div class='report-logo'>Smile<span>Track</span></div><div style='font-size:9px;color:#ccc;margin-top:2px'>" + t("reportSubtitle") + "</div></div>",
     "<div class='report-meta'>",
-    "<div class='report-title'>月次レポート（日別）</div>",
-    "<div class='report-period'>対象期間：" + y + "年" + m + "月1日 〜 " + m + "月" + dim + "日</div>",
-    "<div class='report-period' style='margin-top:2px'>出力日：" + todayStr2 + "</div>",
+    "<div class='report-title'>" + t("reportMonthly") + "</div>",
+    "<div class='report-period'>" + t("reportPeriod") + "：" + (typeof t("reportPeriodFmt")==="function" ? t("reportPeriodFmt")(y,m,dim) : y+"年"+m+"月1日 〜 "+m+"月"+dim+"日") + "</div>",
+    "<div class='report-period' style='margin-top:2px'>" + t("reportOutputDate") + "：" + todayStr2 + "</div>",
     "</div></div>",
     "<div class='summary-grid'>",
-    "<div class='summary-box'><div class='summary-lbl'>月間平均/日</div><div class='summary-val'>" + (avg/3600).toFixed(1) + "<span class='summary-unit'> h</span></div></div>",
-    "<div class='summary-box'><div class='summary-lbl'>月間合計</div><div class='summary-val'>" + Math.floor(tot/3600) + "<span class='summary-unit'> h</span></div></div>",
-    "<div class='summary-box'><div class='summary-lbl'>目標達成日数</div><div class='summary-val'>" + ach + "<span class='summary-unit'> 日</span></div></div>",
-    "<div class='summary-box'><div class='summary-lbl'>目標未達成日数</div><div class='summary-val'>" + (vd.length-ach) + "<span class='summary-unit'> 日</span></div></div>",
+    "<div class='summary-box'><div class='summary-lbl'>" + t("reportAvgDay") + "</div><div class='summary-val'>" + (avg/3600).toFixed(1) + "<span class='summary-unit'> h</span></div></div>",
+    "<div class='summary-box'><div class='summary-lbl'>" + t("reportTotal") + "</div><div class='summary-val'>" + Math.floor(tot/3600) + "<span class='summary-unit'> h</span></div></div>",
+    "<div class='summary-box'><div class='summary-lbl'>" + t("reportAchievedDays") + "</div><div class='summary-val'>" + ach + "<span class='summary-unit'> " + t("dayUnit") + "</span></div></div>",
+    "<div class='summary-box'><div class='summary-lbl'>" + t("reportUnachievedDays") + "</div><div class='summary-val'>" + (vd.length-ach) + "<span class='summary-unit'> " + t("dayUnit") + "</span></div></div>",
     "</div>",
-    "<div class='section-title'>装着時間グラフ</div>",
+    "<div class='section-title'>" + t("reportWearChart") + "</div>",
     "<div style='position:relative;'>",
     "<div style='display:flex;align-items:flex-end;gap:2px;height:210px;position:relative;'>",
-    "<div style='position:absolute;left:0;right:0;bottom:" + tgtBottomPx + "px;border-top:1.5px dashed #888;pointer-events:none;z-index:1'><span style='position:absolute;right:0;font-size:8px;color:#777;transform:translateY(-10px)'>目標 " + tgt + "h</span></div>",
+    "<div style='position:absolute;left:0;right:0;bottom:" + tgtBottomPx + "px;border-top:1.5px dashed #888;pointer-events:none;z-index:1'><span style='position:absolute;right:0;font-size:8px;color:#777;transform:translateY(-10px)'>" + t("reportTarget") + " " + tgt + "h</span></div>",
     bars,
     "</div>",
     "<div style='height:1px;background:#eee;'></div>",
     "<div style='display:flex;gap:2px;margin-top:2px'>" + barLabels + "</div>",
     "</div>",
     "<div class='legend'>",
-    "<div class='legend-item'><div class='legend-dot' style='background:#bbb'></div>目標達成（" + tgt + "時間以上）</div>",
-    "<div class='legend-item'><div class='legend-dot' style='background:#A8D4E6'></div>目標未達成</div>",
+    "<div class='legend-item'><div class='legend-dot' style='background:#bbb'></div>" + t("reportAchievedLegend") + "（" + tgt + "h+）</div>",
+    "<div class='legend-item'><div class='legend-dot' style='background:#A8D4E6'></div>" + t("reportUnachievedLegend") + "</div>",
     "</div>",
-    "<div class='section-title'>日別詳細</div>",
+    "<div class='section-title'>" + t("reportDailyDetail") + "</div>",
     "<div class='two-col-wrap'>",
     "<div class='two-col-half'><table class='dtbl'><colgroup>" + colW + "</colgroup><thead>" + thRow + "</thead><tbody>" + Array.from({length:16}, (_,i) => makeRow(L[i],i)).join("") + "</tbody></table></div>",
     "<div class='col-spacer'></div>",

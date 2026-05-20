@@ -9,6 +9,19 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
     const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
     return `${months[d.getMonth()]} ${d.getDate()}`;
   };
+  const fmtWeekRange = (start, end) => {
+    const lang = typeof LANG !== "undefined" ? LANG : "ja";
+    if(lang === "ja") return `${start.getMonth()+1}/${start.getDate()} –\n${end.getMonth()+1}/${end.getDate()}`;
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    return `${months[start.getMonth()]} ${start.getDate()} –\n${months[end.getMonth()]} ${end.getDate()}`;
+  };
+  const fmtMonthLabel = (y, m) => {
+    const lang = typeof LANG !== "undefined" ? LANG : "ja";
+    if(lang === "ja") return { year: `${y}`, month: `${m+1}月`, full: `${y}/${m+1}` };
+    const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const yr2 = String(y).slice(2);
+    return { year: `${y}`, month: `${months[m]}`, full: `${months[m]} '${yr2}` };
+  };
   const accentFailThemes=["atrium","navyrose","deepteal","elegan","ashviolet","blushhemp"];
   const greyFailThemes=["blush","wisteria","powder","glacier","amber"];
   const failCol=state.themeName==="night"?"rgba(220,38,38,0.8)":accentFailThemes.includes(state.themeName)?T.soft:greyFailThemes.includes(state.themeName)?"#A0A0A0":"#E88080";
@@ -74,7 +87,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
         const startDs=dsFromDate(start);
         const endDs=dsFromDate(end);
         const year=start.getFullYear();
-        const rangeLabel=`${start.getMonth()+1}/${start.getDate()} –\n${end.getMonth()+1}/${end.getDate()}`;
+        const rangeLabel=fmtWeekRange(start,end);
         bars.push({key:startDs,endKey:endDs,label:rangeLabel,yearLabel:`${year}`,secs:avgSecs,totalSecs:total,days:7,isPast:true,isToday:startDs===thisWeekDs});
       }
       return bars;
@@ -90,7 +103,8 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
           if(effectiveLog[ds]){total+=effectiveLog[ds];cnt++;}
         }
         const avgSecs=cnt>0?Math.floor(total/cnt):0;
-        bars.push({key:`${y}-${m}`,endKey:`${y}-${m}`,label:`${y}${t("yearLabel")}${m+1}${t("monthLabel")}`,secs:avgSecs,totalSecs:total,days:daysInMonth,isPast:true,isToday:(y===ty&&m===tm),year:y,month:m});
+        const ml=fmtMonthLabel(y,m);
+        bars.push({key:`${y}-${m}`,endKey:`${y}-${m}`,label:ml.full,labelYear:ml.year,labelMonth:ml.month,secs:avgSecs,totalSecs:total,days:daysInMonth,isPast:true,isToday:(y===ty&&m===tm),year:y,month:m});
         if(y===ty&&m===tm) break;
         m++;if(m>11){m=0;y++;}
       }
@@ -212,8 +226,8 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
                   <div style={{marginTop:3,textAlign:"center",lineHeight:1.3,maxWidth:barW}}>
                     {period==="monthly" ? (
                       <>
-                        <div style={{fontSize:11,color:isSelected?T.accent:T.text+"55",fontWeight:isSelected?700:400}}>{b.year}{t("yearLabel")}</div>
-                        <div style={{fontSize:12,color:labelColor,fontWeight:labelWeight}}>{b.month+1}{t("monthLabel")}</div>
+                        <div style={{fontSize:11,color:isSelected?T.accent:T.text+"55",fontWeight:isSelected?700:400}}>{b.labelYear}</div>
+                        <div style={{fontSize:12,color:labelColor,fontWeight:labelWeight}}>{b.labelMonth}</div>
                       </>
                     ) : period==="weekly" ? (
                       <>
@@ -252,7 +266,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
             const bd = getBreakdownForBar(activeBar);
             const rt = (24*3600) - target; // 24時間－目標時間を100%とする
             const labelStr = activeBar
-              ? (period==="daily" ? activeBar.key : period==="weekly" ? activeBar.label : `${activeBar.year}${t("yearLabel")}${activeBar.month+1}${t("monthLabel")}`)
+              ? (period==="daily" ? activeBar.key : period==="weekly" ? activeBar.label : activeBar.label)
               : null;
             const titleStr = isDefault && period==="daily"
               ? t("todayBreakdown")
@@ -315,7 +329,7 @@ function StatsPage({T,state,update,todayStr,todayDayStartMs}){
                   const weekLabel=period==="weekly"?b.label.replace(/–?\n/,"–"):"";
                   return(
                     <div key={b.key} className="wr" style={{background:isSelected?T.soft:"transparent",borderRadius:isSelected?8:0,cursor:"pointer",borderBottom:`1px solid ${T.text}07`}} onClick={()=>setSelectedBar(isSelected?null:b)}>
-                      <span style={{fontSize:13,fontWeight:isSelected?700:400,color:isSelected?T.primary:T.text,whiteSpace:"nowrap",lineHeight:1.4,flex:1}}>{period==="weekly"?weekLabel:`${parseInt(b.key.split("-")[1])+1}${t("monthLabel")}`}</span>
+                      <span style={{fontSize:13,fontWeight:isSelected?700:400,color:isSelected?T.primary:T.text,whiteSpace:"nowrap",lineHeight:1.4,flex:1}}>{period==="weekly"?weekLabel:b.label}</span>
                       <span style={{fontFamily:"'M PLUS Rounded 1c',sans-serif",fontWeight:700,color:total===0?T.text+"44":achieved?T.primary:failCol,fontSize:14,flexShrink:0}}>{total===0?t("noRecord"):fmt(total)}</span>
                     </div>
                   );
