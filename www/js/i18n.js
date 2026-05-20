@@ -2199,6 +2199,8 @@ const I18N = {
     reportTodayFmt: (y,m,d) => `${d}.${m}.${y}`,
     reportPeriodFmt: (y,m,dim) => `01.${String(m).padStart(2,'0')}.${y} – ${String(dim).padStart(2,'0')}.${String(m).padStart(2,'0')}.${y}`,
   },
+
+  es: {
     appName: "SmileTrack",
     appSub: "Control de alineadores",
     close: "Cerrar",
