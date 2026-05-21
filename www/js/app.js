@@ -418,25 +418,17 @@ function App(){
   // オンボーディング完了処理
   const handleOnboardingComplete=useCallback(async(settings)=>{
     update({...settings,onboardingDone:true});
-    // オンボーディング完了時に通知許可を一度だけ求める
+    // 通知許可
     if(Notif.isCapacitor()){
       await Notif.requestPermission();
     }
-    // ATT許可ダイアログ（通知許可の次、AdMob初期化より前に必ず表示）
-    if(typeof Capacitor!=="undefined"&&Capacitor.isNativePlatform?.()){
-      try{
-        await Capacitor.Plugins.AdMob.requestConsentInfoUpdateAndLoadForm?.();
-      }catch(e){}
-      try{
-        await Capacitor.Plugins.AdMob.initialize({
-          requestTrackingAuthorization:true,
-          testingDevices:[],
-          initializeForTesting:false,
-        });
-      }catch(e){}
+    // ATT許可（通知許可の次、AdMob初期化より前）
+    if(ATTHelper.isCapacitor()){
+      await ATTHelper.requestPermission();
     }
-    // オンボーディング完了後に広告表示（初期化は上で済んでいるのでskip）
+    // 広告初期化・表示
     if(!isPremium&&!noAds){
+      await AdMobHelper.initialize();
       await AdMobHelper.prepareInterstitial();
       await AdMobHelper.showBanner();
     }

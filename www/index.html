@@ -216,6 +216,17 @@
     }
   };
   </script>
+  <script>
+  const ATTHelper = {
+    async requestPermission(){
+      try{
+        await Capacitor.Plugins.AdMob.trackingAuthorizationStatus();
+        return true;
+      }catch(e){console.warn("[ATT] error",e);return false;}
+    },
+    isCapacitor(){return typeof Capacitor!=="undefined"&&Capacitor.isNativePlatform?.();}
+  };
+  </script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
