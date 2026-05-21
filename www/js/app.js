@@ -422,9 +422,21 @@ function App(){
     if(Notif.isCapacitor()){
       await Notif.requestPermission();
     }
-    // オンボーディング完了後に広告初期化（RC結果が既に確定しているのでisPremium/noAdsを参照）
+    // ATT許可ダイアログ（通知許可の次、AdMob初期化より前に必ず表示）
+    if(typeof Capacitor!=="undefined"&&Capacitor.isNativePlatform?.()){
+      try{
+        await Capacitor.Plugins.AdMob.requestConsentInfoUpdateAndLoadForm?.();
+      }catch(e){}
+      try{
+        await Capacitor.Plugins.AdMob.initialize({
+          requestTrackingAuthorization:true,
+          testingDevices:[],
+          initializeForTesting:false,
+        });
+      }catch(e){}
+    }
+    // オンボーディング完了後に広告表示（初期化は上で済んでいるのでskip）
     if(!isPremium&&!noAds){
-      await AdMobHelper.initialize();
       await AdMobHelper.prepareInterstitial();
       await AdMobHelper.showBanner();
     }
