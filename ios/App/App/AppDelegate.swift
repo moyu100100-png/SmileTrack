@@ -1,6 +1,7 @@
 import UIKit
 import Capacitor
 import UserNotifications
+import AppTrackingTransparency
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
@@ -9,6 +10,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
         UNUserNotificationCenter.current().delegate = self
+        CAPBridge.registerPlugin(ATTPlugin.self)
 
         let stopAction = UNNotificationAction(identifier: "ALARM_STOP", title: "Stop Alarm", options: [.foreground])
         let snoozeAction = UNNotificationAction(identifier: "ALARM_SNOOZE", title: "Snooze", options: [.foreground])

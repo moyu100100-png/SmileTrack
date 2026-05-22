@@ -4,7 +4,7 @@ import AppTrackingTransparency
 
 @objc(ATTPlugin)
 public class ATTPlugin: CAPPlugin {
-    @objc func requestPermission(_ call: CAPPluginCall) {
+    @objc public func requestPermission(_ call: CAPPluginCall) {
         if #available(iOS 14, *) {
             ATTrackingManager.requestTrackingAuthorization { status in
                 call.resolve(["status": status.rawValue])
