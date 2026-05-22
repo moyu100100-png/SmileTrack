@@ -11,6 +11,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         UNUserNotificationCenter.current().delegate = self
 
+        // ATT許可ダイアログ：初回のみ、起動120秒後に表示（オンボーディング完了後を想定）
+        if #available(iOS 14, *) {
+            let attShown = UserDefaults.standard.bool(forKey: "att_shown")
+            if !attShown {
+                UserDefaults.standard.set(true, forKey: "att_shown")
+                DispatchQueue.main.asyncAfter(deadline: .now() + 120.0) {
+                    ATTrackingManager.requestTrackingAuthorization { _ in }
+                }
+            }
+        }
+
         let stopAction = UNNotificationAction(identifier: "ALARM_STOP", title: "Stop Alarm", options: [.foreground])
         let snoozeAction = UNNotificationAction(identifier: "ALARM_SNOOZE", title: "Snooze", options: [.foreground])
         let alarmCategory = UNNotificationCategory(identifier: "ALARM_CATEGORY", actions: [stopAction, snoozeAction], intentIdentifiers: [], options: [])
@@ -22,17 +33,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let action = AppDelegate.pendingAlarmAction {
             AppDelegate.pendingAlarmAction = nil
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { self.sendAlarmActionToJS(action: action) }
-        }
-        // オンボーディング完了済み かつ ATT未表示の場合のみダイアログを出す
-        if #available(iOS 14, *) {
-            let onboardingDone = UserDefaults.standard.bool(forKey: "onboarding_done")
-            let attShown = UserDefaults.standard.bool(forKey: "att_shown")
-            if onboardingDone && !attShown {
-                UserDefaults.standard.set(true, forKey: "att_shown")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    ATTrackingManager.requestTrackingAuthorization { _ in }
-                }
-            }
         }
     }
 
