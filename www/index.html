@@ -220,7 +220,7 @@
   const ATTHelper = {
     async requestPermission(){
       try{
-        await Capacitor.Plugins.AdMob.trackingAuthorizationStatus();
+        await Capacitor.Plugins.ATTPlugin.requestPermission();
         return true;
       }catch(e){console.warn("[ATT] error",e);return false;}
     },
