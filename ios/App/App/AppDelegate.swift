@@ -16,7 +16,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let attShown = UserDefaults.standard.bool(forKey: "att_shown")
             if !attShown {
                 UserDefaults.standard.set(true, forKey: "att_shown")
-                DispatchQueue.main.asyncAfter(deadline: .now() + 120.0) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 60.0) {
                     ATTrackingManager.requestTrackingAuthorization { _ in }
                 }
             }
