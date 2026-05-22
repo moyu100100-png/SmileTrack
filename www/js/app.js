@@ -422,10 +422,10 @@ function App(){
     if(Notif.isCapacitor()){
       await Notif.requestPermission();
     }
-    // ATT許可（通知許可の次、AdMob初期化より前）
-    if(ATTHelper.isCapacitor()){
-      await ATTHelper.requestPermission();
-    }
+    // ATT用フラグをUserDefaultsに保存（AppDelegate側でATTダイアログを出す）
+    try{
+      await Capacitor.Plugins.Preferences.set({key:"onboarding_done",value:"true"});
+    }catch(e){}
     // 広告初期化・表示
     if(!isPremium&&!noAds){
       await AdMobHelper.initialize();
