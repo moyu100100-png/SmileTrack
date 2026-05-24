@@ -344,9 +344,11 @@ function PhotoPage({T,state,update,todayStr}){
           <div style={{padding:"10px 16px",paddingTop:"75px",display:"flex",alignItems:"center",justifyContent:"space-between",background:"rgba(0,0,0,0.7)",flexShrink:0}}>
             <button onClick={closeCam} style={{background:"rgba(255,255,255,0.18)",border:"none",color:"#fff",padding:"6px 14px",borderRadius:13,cursor:"pointer",fontSize:14}}>✕</button>
             <span style={{color:"#fff",fontWeight:700,fontSize:15}}>{shotModeLabel(cameraMode)}</span>
-            <button onClick={()=>setShowColorPanel(v=>!v)} style={{background:showColorPanel?"rgba(255,255,255,0.35)":"rgba(255,255,255,0.18)",border:"none",color:"#fff",padding:"6px 10px",borderRadius:13,cursor:"pointer",display:"flex",alignItems:"center",gap:4,fontSize:12}}>
-              {Icons.sun("#fff",14)} {t("adjust")}
-            </button>
+            {!captured&&(
+              <button onClick={()=>setShowColorPanel(v=>!v)} style={{background:showColorPanel?"rgba(255,255,255,0.35)":"rgba(255,255,255,0.18)",border:"none",color:"#fff",padding:"6px 10px",borderRadius:13,cursor:"pointer",display:"flex",alignItems:"center",gap:4,fontSize:12}}>
+                {Icons.sun("#fff",14)} {t("adjust")}
+              </button>
+            )}
           </div>
 
           {/* カラー調整パネル */}

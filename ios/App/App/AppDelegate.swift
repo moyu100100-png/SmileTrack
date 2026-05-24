@@ -49,6 +49,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return ApplicationDelegateProxy.shared.application(application, continue: userActivity, restorationHandler: restorationHandler)
     }
 
+    func sendNotifTapToJS(type: String) {
+        if let webView = (self.window?.rootViewController as? CAPBridgeViewController)?.webView {
+            let js = "window.dispatchEvent(new CustomEvent('NotificationTap', {detail: {type: '\(type)'}}))"
+            webView.evaluateJavaScript(js, completionHandler: nil)
+        }
+    }
+
     func sendAlarmActionToJS(action: String) {
         if let webView = (self.window?.rootViewController as? CAPBridgeViewController)?.webView {
             let js = "window.dispatchEvent(new CustomEvent('AlarmAction', {detail: {action: '\(action)'}}))"
@@ -65,6 +72,19 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         let actionId = response.actionIdentifier
         if actionId == "ALARM_STOP" { AppDelegate.pendingAlarmAction = "stop" }
         else if actionId == "ALARM_SNOOZE" { AppDelegate.pendingAlarmAction = "snooze" }
+        else {
+            // 交換リマインダー（2001）・写真リマインダー（3001）のタップ
+            let notifId = response.notification.request.identifier
+            if notifId == "2001" {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                    self.sendNotifTapToJS(type: "exchange")
+                }
+            } else if notifId == "3001" {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                    self.sendNotifTapToJS(type: "photo")
+                }
+            }
+        }
         completionHandler()
     }
 }

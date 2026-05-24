@@ -1,4 +1,68 @@
 // ── TOAST ────────────────────────────────────────────────────────────────────
+// ── NOTIFICATION TAP MODAL ───────────────────────────────────────────────────
+function NotifTapExchangeModal({T, daysUntil, onClose}) {
+  const title = daysUntil===0 ? t("notifTapExchangeToday")
+    : daysUntil===1 ? t("notifTapExchangeTomorrow")
+    : t("notifTapExchangeDayAfter");
+  const sub = daysUntil===0 ? t("notifTapExchangeSub") : t("notifTapExchangeSubBefore");
+  return (
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:9999,display:"flex",alignItems:"flex-end"}} onClick={onClose}>
+      <div style={{background:"#fff",borderRadius:"24px 24px 0 0",width:"100%",padding:"28px 24px 44px",textAlign:"center"}} onClick={e=>e.stopPropagation()}>
+        <div style={{width:52,height:52,borderRadius:14,background:"#EAF6F5",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 16px"}}>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#5AAAA0" strokeWidth="1.8">
+            <rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/>
+          </svg>
+        </div>
+        <div style={{fontSize:16,fontWeight:600,color:"#1a1a1a",lineHeight:1.5,marginBottom:8}}>{title}</div>
+        <div style={{fontSize:12,color:"#999",marginBottom:24,lineHeight:1.6}}>{sub}</div>
+        <button onClick={onClose} style={{width:"100%",padding:14,borderRadius:14,border:"none",background:"#5AAAA0",color:"#fff",fontSize:15,fontWeight:600,cursor:"pointer"}}>OK</button>
+      </div>
+    </div>
+  );
+}
+
+function NotifTapPhotoModal({T, onClose, onGoPhoto}) {
+  return (
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:9999,display:"flex",alignItems:"flex-end"}} onClick={onClose}>
+      <div style={{background:"#fff",borderRadius:"24px 24px 0 0",width:"100%",padding:"28px 24px 44px",textAlign:"center"}} onClick={e=>e.stopPropagation()}>
+        <div style={{width:52,height:52,borderRadius:14,background:"#FEF5F7",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 16px"}}>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D4788A" strokeWidth="1.8">
+            <rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/>
+          </svg>
+        </div>
+        <div style={{fontSize:16,fontWeight:600,color:"#1a1a1a",lineHeight:1.5,marginBottom:8}}>{t("notifTapPhoto")}</div>
+        <div style={{fontSize:12,color:"#999",marginBottom:24,lineHeight:1.6}}>{t("notifTapPhotoSub")}</div>
+        <button onClick={()=>{onClose();onGoPhoto();}} style={{width:"100%",padding:14,borderRadius:14,border:"none",background:"#D4788A",color:"#fff",fontSize:15,fontWeight:600,cursor:"pointer",marginBottom:10}}>{t("notifTapPhotoBtn")}</button>
+        <button onClick={onClose} style={{width:"100%",padding:12,borderRadius:14,border:"none",background:"none",fontSize:14,color:"#999",cursor:"pointer"}}>{t("notifTapLater")}</button>
+      </div>
+    </div>
+  );
+}
+
+// ── REVIEW REQUEST MODAL ──────────────────────────────────────────────────────
+function ReviewRequestModal({T, onClose}) {
+  const handleReview = () => {
+    window.open("https://apps.apple.com/app/id6761232027?action=write-review","_blank");
+    onClose();
+  };
+  return (
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:9999,display:"flex",alignItems:"flex-end"}} onClick={onClose}>
+      <div style={{background:"#fff",borderRadius:"24px 24px 0 0",width:"100%",padding:"28px 24px 44px",textAlign:"center"}} onClick={e=>e.stopPropagation()}>
+        <div style={{width:52,height:52,borderRadius:14,background:"#FFF8E1",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 16px"}}>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F4A800" strokeWidth="1.8">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+          </svg>
+        </div>
+        <div style={{fontSize:16,fontWeight:600,color:"#1a1a1a",lineHeight:1.5,marginBottom:8}}>{t("reviewTitle")}</div>
+        <div style={{fontSize:12,color:"#999",marginBottom:24,lineHeight:1.6}}>{t("reviewSub")}</div>
+        <button onClick={handleReview} style={{width:"100%",padding:14,borderRadius:14,border:"none",background:"#F4A800",color:"#fff",fontSize:15,fontWeight:600,cursor:"pointer",marginBottom:10}}>{t("reviewBtn")}</button>
+        <button onClick={onClose} style={{width:"100%",padding:12,borderRadius:14,border:"none",background:"none",fontSize:14,color:"#999",cursor:"pointer"}}>{t("notifTapLater")}</button>
+      </div>
+    </div>
+  );
+}
+
+
 function showToast(msg, duration=2000){
   const existing=document.getElementById("st-toast");
   if(existing) existing.remove();
@@ -70,7 +134,7 @@ function AboutModal({T,onClose}){
         <Row icon={docIcon} label={t("termsLabel")} onClick={()=>window.open("https://pickled-runner-04f.notion.site/ebd//329470522fe180399354fbae6be51bfb","_blank")}/>
         <Row icon={lockIcon} label={t("privacyLabel")} onClick={()=>window.open("https://pickled-runner-04f.notion.site/ebd//329470522fe180d884bfc0afe2d3dd94","_blank")}/>
         <Row icon={mailIcon} label={t("contactLabel")} onClick={()=>window.open("mailto:contact.appname@gmail.com")}/>
-        <Row icon={starIcon} label={t("review")} onClick={()=>window.open("https://apps.apple.com/app/smiletrack","_blank")}/>
+        <Row icon={starIcon} label={t("review")} onClick={()=>window.open("https://apps.apple.com/app/id6761232027?action=write-review","_blank")}/>
 
         <Row icon={shareIcon} label={t("shareLabel")} onClick={share}/>
 

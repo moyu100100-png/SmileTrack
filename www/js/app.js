@@ -274,6 +274,9 @@ function App(){
   const [drawerSection,setDrawerSection]=useState(null);
   const [showResetConfirm,setShowResetConfirm]=useState(false);
   const [showAffiliatePopup,setShowAffiliatePopup]=useState(false);
+  const [notifTapExchange,setNotifTapExchange]=useState(null); // null | daysUntil(0,1,2)
+  const [notifTapPhoto,setNotifTapPhoto]=useState(false);
+  const [showReviewModal,setShowReviewModal]=useState(false);
   const [snoozedUntil,setSnoozedUntil]=useState(null);
   const alarmStopped=state.alarmStopped||false;
   const setAlarmStopped=(v)=>update({alarmStopped:v});
@@ -408,6 +411,41 @@ function App(){
     window.addEventListener("AlarmAction",handler);
     return()=>window.removeEventListener("AlarmAction",handler);
   },[state.alarmMinutes,state.alarmSound,setAlarmStopped,setSnoozedUntil]);
+
+  // 通知タップイベント
+  useEffect(()=>{
+    const handler=(event)=>{
+      const type=event.detail?.type;
+      if(type==="exchange"){
+        // 交換日までの日数を計算
+        const today=todayISO();
+        const daysTo=getDaysToNextExchange(state,today);
+        const days=daysTo<=1?0:daysTo<=2?1:2;
+        setNotifTapExchange(days);
+      } else if(type==="photo"){
+        setNotifTapPhoto(true);
+      }
+    };
+    window.addEventListener("NotificationTap",handler);
+    return()=>window.removeEventListener("NotificationTap",handler);
+  },[state]);
+
+  // 星5レビューポップアップ（使用5日目・その後25日ごと）
+  useEffect(()=>{
+    if(!state.startDate||!state.onboardingDone) return;
+    const startMs=new Date(state.startDate+"T00:00:00").getTime();
+    const todayMs=new Date(todayISO()+"T00:00:00").getTime();
+    const elapsedDays=Math.floor((todayMs-startMs)/86400000)+1;
+    const reviewShownDays=state.reviewShownDays||[];
+    // 5日目、30日目、55日目...
+    const targets=[5,...Array.from({length:10},(_,i)=>30+i*25)];
+    const shouldShow=targets.some(d=>elapsedDays===d&&!reviewShownDays.includes(d));
+    if(shouldShow){
+      const day=targets.find(d=>elapsedDays===d);
+      update({reviewShownDays:[...reviewShownDays,day]});
+      setTimeout(()=>setShowReviewModal(true),2000);
+    }
+  },[state.startDate,state.onboardingDone]);
 
   // bodyの背景色をテーマに合わせて更新（セーフエリアの白帯を防ぐ）
   useEffect(()=>{
@@ -648,6 +686,9 @@ function App(){
       {drawerSection==="about"&&<AboutModal T={T} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="coffee"&&<PremiumModal T={T} state={{...state,isPremium,noAds}} onClose={()=>setDrawerSection(null)} showCoffee={true} onPurchased={({isPremium:p,noAds:n})=>{setIsPremium(p);setNoAds(n);if(p||n)AdMobHelper.removeBanner();}}/>}
       {showAffiliatePopup&&<AffiliatePopup T={T} type={showAffiliatePopup} onClose={()=>setShowAffiliatePopup(false)}/>}
+      {notifTapExchange!==null&&<NotifTapExchangeModal T={T} daysUntil={notifTapExchange} onClose={()=>setNotifTapExchange(null)}/>}
+      {notifTapPhoto&&<NotifTapPhotoModal T={T} onClose={()=>setNotifTapPhoto(false)} onGoPhoto={()=>setTab("photo")}/>}
+      {showReviewModal&&<ReviewRequestModal T={T} onClose={()=>setShowReviewModal(false)}/>}
       {showResetConfirm&&<ResetConfirmModal T={T} onConfirm={()=>{
         localStorage.removeItem(LS_KEY);
         idbSavePhotos([]);
