@@ -104,7 +104,7 @@ function HomePreviewModal({T,themeName,themeObj,onClose}){
 }
 
 // ── ABOUT MODAL ──────────────────────────────────────────────────────────────
-function AboutModal({T,onClose}){
+function AboutModal({T,onClose,debugLog=[],onTestNotif}){
   const share=()=>{
     if(navigator.share){
       navigator.share({title:"SmileTrack",text:"マウスピース矯正の管理アプリ「SmileTrack」を使ってみてください！",url:"https://smiletrack.app"});
@@ -139,6 +139,24 @@ function AboutModal({T,onClose}){
         <Row icon={shareIcon} label={t("shareLabel")} onClick={share}/>
 
         <button className="btn bs" style={{width:"100%",marginTop:16}} onClick={onClose}>{t("close")}</button>
+
+        {/* デバッグパネル（開発中のみ） */}
+        <div style={{marginTop:16,borderTop:`1px solid ${T.soft}`,paddingTop:12}}>
+          <div style={{fontSize:10,color:T.text+"44",marginBottom:8,textAlign:"center"}}>DEBUG</div>
+          <div style={{display:"flex",gap:8,marginBottom:8}}>
+            <button onClick={()=>onTestNotif&&onTestNotif("exchange")} style={{flex:1,padding:"8px 0",borderRadius:10,border:`1px solid ${T.soft}`,background:"none",fontSize:11,color:T.text,cursor:"pointer"}}>交換テスト</button>
+            <button onClick={()=>onTestNotif&&onTestNotif("photo")} style={{flex:1,padding:"8px 0",borderRadius:10,border:`1px solid ${T.soft}`,background:"none",fontSize:11,color:T.text,cursor:"pointer"}}>写真テスト</button>
+          </div>
+          <div style={{background:T.soft+"44",borderRadius:10,padding:"8px 10px",maxHeight:120,overflowY:"auto"}}>
+            {debugLog.length===0&&<div style={{fontSize:10,color:T.text+"44",textAlign:"center"}}>ログなし</div>}
+            {debugLog.map((l,i)=>(
+              <div key={i} style={{fontSize:10,color:T.text+"88",fontFamily:"monospace",marginBottom:2}}>
+                <span style={{color:T.text+"44"}}>{l.time} </span>{l.msg}
+              </div>
+            ))}
+          </div>
+        </div>
+
       </div>
     </div>
   );
