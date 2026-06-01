@@ -70,25 +70,25 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     }
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         let actionId = response.actionIdentifier
+        let notifId = response.notification.request.identifier
+
         if actionId == "ALARM_STOP" { AppDelegate.pendingAlarmAction = "stop" }
         else if actionId == "ALARM_SNOOZE" { AppDelegate.pendingAlarmAction = "snooze" }
-        else {
-            // 通知タップ: rawIdをJSに送ってデバッグ
-            let notifId = response.notification.request.identifier
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                // デバッグ: rawIdをJSに送る
-                if let webView = (self.window?.rootViewController as? CAPBridgeViewController)?.webView {
-                    let debugJs = "window._debugNotifId && window._debugNotifId('\(notifId)')"
-                    webView.evaluateJavaScript(debugJs, completionHandler: nil)
-                }
-                // 交換・写真リマインダーの判定
-                if notifId == "2001" || notifId.hasSuffix("_2001") || notifId.contains("2001") {
-                    self.sendNotifTapToJS(type: "exchange")
-                } else if notifId == "3001" || notifId.hasSuffix("_3001") || notifId.contains("3001") {
-                    self.sendNotifTapToJS(type: "photo")
-                }
+
+        // 全ての通知タップでデバッグ＆処理（Capacitorへも渡す）
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+            if let webView = (self.window?.rootViewController as? CAPBridgeViewController)?.webView {
+                let debugJs = "window._debugNotifId && window._debugNotifId('\(notifId)_action:\(actionId)')"
+                webView.evaluateJavaScript(debugJs, completionHandler: nil)
+            }
+            if notifId == "2001" || notifId.hasSuffix("_2001") || notifId.contains("2001") {
+                self.sendNotifTapToJS(type: "exchange")
+            } else if notifId == "3001" || notifId.hasSuffix("_3001") || notifId.contains("3001") {
+                self.sendNotifTapToJS(type: "photo")
             }
         }
-        completionHandler()
+
+        // Capacitorにも渡す
+        ApplicationDelegateProxy.shared.userNotificationCenter(center, didReceive: response, withCompletionHandler: completionHandler)
     }
 }
