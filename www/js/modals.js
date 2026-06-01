@@ -6,16 +6,16 @@ function NotifTapExchangeModal({T, daysUntil, onClose}) {
     : t("notifTapExchangeDayAfter");
   const sub = daysUntil===0 ? t("notifTapExchangeSub") : t("notifTapExchangeSubBefore");
   return (
-    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:9999,display:"flex",alignItems:"flex-end"}} onClick={onClose}>
-      <div style={{background:"#fff",borderRadius:"24px 24px 0 0",width:"100%",padding:"28px 24px 44px",textAlign:"center"}} onClick={e=>e.stopPropagation()}>
-        <div style={{width:52,height:52,borderRadius:14,background:"#EAF6F5",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 16px"}}>
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#5AAAA0" strokeWidth="1.8">
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",padding:"24px"}} onClick={onClose}>
+      <div style={{background:T.card,borderRadius:24,width:"100%",maxWidth:340,padding:"32px 24px 28px",textAlign:"center",boxShadow:"0 8px 32px rgba(0,0,0,0.18)"}} onClick={e=>e.stopPropagation()}>
+        <div style={{width:56,height:56,borderRadius:16,background:T.soft,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 18px"}}>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="1.8">
             <rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/>
           </svg>
         </div>
-        <div style={{fontSize:16,fontWeight:600,color:"#1a1a1a",lineHeight:1.5,marginBottom:8}}>{title}</div>
-        <div style={{fontSize:12,color:"#999",marginBottom:24,lineHeight:1.6}}>{sub}</div>
-        <button onClick={onClose} style={{width:"100%",padding:14,borderRadius:14,border:"none",background:"#5AAAA0",color:"#fff",fontSize:15,fontWeight:600,cursor:"pointer"}}>OK</button>
+        <div style={{fontSize:16,fontWeight:600,color:T.text,lineHeight:1.5,marginBottom:8}}>{title}</div>
+        <div style={{fontSize:12,color:T.text+"88",marginBottom:24,lineHeight:1.6}}>{sub}</div>
+        <button onClick={onClose} style={{width:"100%",padding:14,borderRadius:14,border:"none",background:T.primary,color:"#fff",fontSize:15,fontWeight:600,cursor:"pointer"}}>OK</button>
       </div>
     </div>
   );
@@ -23,17 +23,17 @@ function NotifTapExchangeModal({T, daysUntil, onClose}) {
 
 function NotifTapPhotoModal({T, onClose, onGoPhoto}) {
   return (
-    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:9999,display:"flex",alignItems:"flex-end"}} onClick={onClose}>
-      <div style={{background:"#fff",borderRadius:"24px 24px 0 0",width:"100%",padding:"28px 24px 44px",textAlign:"center"}} onClick={e=>e.stopPropagation()}>
-        <div style={{width:52,height:52,borderRadius:14,background:"#FEF5F7",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 16px"}}>
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D4788A" strokeWidth="1.8">
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",padding:"24px"}} onClick={onClose}>
+      <div style={{background:T.card,borderRadius:24,width:"100%",maxWidth:340,padding:"32px 24px 28px",textAlign:"center",boxShadow:"0 8px 32px rgba(0,0,0,0.18)"}} onClick={e=>e.stopPropagation()}>
+        <div style={{width:56,height:56,borderRadius:16,background:T.soft,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 18px"}}>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="1.8">
             <rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/>
           </svg>
         </div>
-        <div style={{fontSize:16,fontWeight:600,color:"#1a1a1a",lineHeight:1.5,marginBottom:8}}>{t("notifTapPhoto")}</div>
-        <div style={{fontSize:12,color:"#999",marginBottom:24,lineHeight:1.6}}>{t("notifTapPhotoSub")}</div>
-        <button onClick={()=>{onClose();onGoPhoto();}} style={{width:"100%",padding:14,borderRadius:14,border:"none",background:"#D4788A",color:"#fff",fontSize:15,fontWeight:600,cursor:"pointer",marginBottom:10}}>{t("notifTapPhotoBtn")}</button>
-        <button onClick={onClose} style={{width:"100%",padding:12,borderRadius:14,border:"none",background:"none",fontSize:14,color:"#999",cursor:"pointer"}}>{t("notifTapLater")}</button>
+        <div style={{fontSize:16,fontWeight:600,color:T.text,lineHeight:1.5,marginBottom:8}}>{t("notifTapPhoto")}</div>
+        <div style={{fontSize:12,color:T.text+"88",marginBottom:24,lineHeight:1.6}}>{t("notifTapPhotoSub")}</div>
+        <button onClick={()=>{onClose();onGoPhoto();}} style={{width:"100%",padding:14,borderRadius:14,border:"none",background:T.primary,color:"#fff",fontSize:15,fontWeight:600,cursor:"pointer",marginBottom:10}}>{t("notifTapPhotoBtn")}</button>
+        <button onClick={onClose} style={{width:"100%",padding:12,borderRadius:14,border:"none",background:"none",fontSize:14,color:T.text+"66",cursor:"pointer"}}>{t("notifTapLater")}</button>
       </div>
     </div>
   );
@@ -46,17 +46,17 @@ function ReviewRequestModal({T, onClose}) {
     onClose();
   };
   return (
-    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:9999,display:"flex",alignItems:"flex-end"}} onClick={onClose}>
-      <div style={{background:"#fff",borderRadius:"24px 24px 0 0",width:"100%",padding:"28px 24px 44px",textAlign:"center"}} onClick={e=>e.stopPropagation()}>
-        <div style={{width:52,height:52,borderRadius:14,background:"#FFF8E1",display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 16px"}}>
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#F4A800" strokeWidth="1.8">
+    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",padding:"24px"}} onClick={onClose}>
+      <div style={{background:T.card,borderRadius:24,width:"100%",maxWidth:340,padding:"32px 24px 28px",textAlign:"center",boxShadow:"0 8px 32px rgba(0,0,0,0.18)"}} onClick={e=>e.stopPropagation()}>
+        <div style={{width:56,height:56,borderRadius:16,background:T.soft,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 18px"}}>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="1.8">
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
           </svg>
         </div>
-        <div style={{fontSize:16,fontWeight:600,color:"#1a1a1a",lineHeight:1.5,marginBottom:8}}>{t("reviewTitle")}</div>
-        <div style={{fontSize:12,color:"#999",marginBottom:24,lineHeight:1.6}}>{t("reviewSub")}</div>
-        <button onClick={handleReview} style={{width:"100%",padding:14,borderRadius:14,border:"none",background:"#F4A800",color:"#fff",fontSize:15,fontWeight:600,cursor:"pointer",marginBottom:10}}>{t("reviewBtn")}</button>
-        <button onClick={onClose} style={{width:"100%",padding:12,borderRadius:14,border:"none",background:"none",fontSize:14,color:"#999",cursor:"pointer"}}>{t("notifTapLater")}</button>
+        <div style={{fontSize:16,fontWeight:600,color:T.text,lineHeight:1.5,marginBottom:8}}>{t("reviewTitle")}</div>
+        <div style={{fontSize:12,color:T.text+"88",marginBottom:24,lineHeight:1.6}}>{t("reviewSub")}</div>
+        <button onClick={handleReview} style={{width:"100%",padding:14,borderRadius:14,border:"none",background:T.primary,color:"#fff",fontSize:15,fontWeight:600,cursor:"pointer",marginBottom:10}}>{t("reviewBtn")}</button>
+        <button onClick={onClose} style={{width:"100%",padding:12,borderRadius:14,border:"none",background:"none",fontSize:14,color:T.text+"66",cursor:"pointer"}}>{t("notifTapLater")}</button>
       </div>
     </div>
   );

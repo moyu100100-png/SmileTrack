@@ -232,7 +232,7 @@ function PhotoPage({T,state,update,todayStr}){
             }}/>
           <button className="btn bs" style={{width:"100%",padding:"10px"}}
             onClick={()=>document.getElementById("album-input").click()}>
-            <span style={{fontSize:14,marginRight:6}}>＋</span>{t("albumAdd")}
+            {t("albumAdd")}
           </button>
         </div>
       </div>
