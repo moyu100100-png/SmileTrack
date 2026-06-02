@@ -75,20 +75,20 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         if actionId == "ALARM_STOP" { AppDelegate.pendingAlarmAction = "stop" }
         else if actionId == "ALARM_SNOOZE" { AppDelegate.pendingAlarmAction = "snooze" }
 
-        // 全ての通知タップでデバッグ＆処理（Capacitorへも渡す）
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+            // デバッグ: rawIdとactionIdをJSに送る
             if let webView = (self.window?.rootViewController as? CAPBridgeViewController)?.webView {
                 let debugJs = "window._debugNotifId && window._debugNotifId('\(notifId)_action:\(actionId)')"
                 webView.evaluateJavaScript(debugJs, completionHandler: nil)
             }
-            if notifId == "2001" || notifId.hasSuffix("_2001") || notifId.contains("2001") {
+            // 交換・写真リマインダーの判定
+            if notifId.contains("2001") {
                 self.sendNotifTapToJS(type: "exchange")
-            } else if notifId == "3001" || notifId.hasSuffix("_3001") || notifId.contains("3001") {
+            } else if notifId.contains("3001") {
                 self.sendNotifTapToJS(type: "photo")
             }
         }
 
-        // Capacitorにも渡す
-        ApplicationDelegateProxy.shared.userNotificationCenter(center, didReceive: response, withCompletionHandler: completionHandler)
+        completionHandler()
     }
 }
