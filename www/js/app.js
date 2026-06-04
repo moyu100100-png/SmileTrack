@@ -277,8 +277,6 @@ function App(){
   const [notifTapExchange,setNotifTapExchange]=useState(null); // null | daysUntil(0,1,2)
   const [notifTapPhoto,setNotifTapPhoto]=useState(false);
   const [showReviewModal,setShowReviewModal]=useState(false);
-  const [debugLog,setDebugLog]=useState([]); // デバッグログ
-  const addDebugLog=(msg)=>setDebugLog(prev=>[...prev.slice(-9),{msg,time:new Date().toLocaleTimeString()}]);
   const [snoozedUntil,setSnoozedUntil]=useState(null);
   const alarmStopped=state.alarmStopped||false;
   const setAlarmStopped=(v)=>update({alarmStopped:v});
@@ -414,36 +412,55 @@ function App(){
     return()=>window.removeEventListener("AlarmAction",handler);
   },[state.alarmMinutes,state.alarmSound,setAlarmStopped,setSnoozedUntil]);
 
-  // 通知タップイベント
+  // 通知タップイベント（CapacitorのLocalNotificationsプラグイン経由）
   useEffect(()=>{
+    if(!Notif.isCapacitor()) return;
+    let listener=null;
+    try{
+      Capacitor.Plugins.LocalNotifications.addListener(
+        "localNotificationActionPerformed",
+        (event)=>{
+          const id=event?.notification?.id;
+          addDebugLog(`[LocalNotif] id=${id}`);
+          if(id===2001||id==="2001"){
+            const today=todayISO();
+            const daysTo=getDaysToNextExchange(state,today);
+            const days=daysTo<=1?0:daysTo<=2?1:2;
+            addDebugLog(`[Exchange] daysTo=${daysTo} -> days=${days}`);
+            setNotifTapExchange(days);
+          } else if(id===3001||id==="3001"){
+            addDebugLog("[Photo] setNotifTapPhoto=true");
+            setNotifTapPhoto(true);
+          } else {
+            addDebugLog(`[LocalNotif] 未知のid: ${id}`);
+          }
+        }
+      ).then(l=>{ listener=l; });
+    }catch(e){ addDebugLog(`[LocalNotif] error: ${e.message}`); }
+
+    // Swift側からのフォールバック（デバッグ用も残す）
     const handler=(event)=>{
       const type=event.detail?.type;
-      const rawId=event.detail?.rawId||"(none)";
-      addDebugLog(`[NotifTap] type=${type} rawId=${rawId}`);
+      addDebugLog(`[NotifTap fallback] type=${type}`);
       if(type==="exchange"){
         const today=todayISO();
         const daysTo=getDaysToNextExchange(state,today);
         const days=daysTo<=1?0:daysTo<=2?1:2;
-        addDebugLog(`[Exchange] daysTo=${daysTo} -> days=${days}`);
         setNotifTapExchange(days);
       } else if(type==="photo"){
-        addDebugLog("[Photo] setNotifTapPhoto=true");
         setNotifTapPhoto(true);
-      } else {
-        addDebugLog(`[NotifTap] 未知のtype: ${type}`);
       }
     };
     window.addEventListener("NotificationTap",handler);
-    // Swift側からのrawIdテスト用グローバル関数
     window._testNotifTap=(type,rawId="test")=>{
       addDebugLog(`[Manual] type=${type} rawId=${rawId}`);
       window.dispatchEvent(new CustomEvent("NotificationTap",{detail:{type,rawId}}));
     };
-    // Swift側からrawIdだけ受け取るグローバル関数（AppDelegateデバッグ用）
-    window._debugNotifId=(rawId)=>{
-      addDebugLog(`[Swift] rawId=${rawId}`);
+    window._debugNotifId=(rawId)=>{ addDebugLog(`[Swift] rawId=${rawId}`); };
+    return()=>{
+      window.removeEventListener("NotificationTap",handler);
+      if(listener) listener.remove();
     };
-    return()=>window.removeEventListener("NotificationTap",handler);
   },[state]);
 
   // 星5レビューポップアップ（使用5日目・その後25日ごと）
@@ -699,7 +716,7 @@ function App(){
       {drawerSection==="timerSettings"&&<TimerSettingsModal T={T} state={state} onSave={f=>update(f)} onClose={()=>setDrawerSection(null)} isPremiumProp={isPremium}/>}
       {drawerSection==="cameraSettings"&&<CameraSettingsModal T={T} state={state} onSave={f=>update(f)} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="premium"&&<PremiumModal T={T} state={{...state,isPremium,noAds}} onClose={()=>setDrawerSection(null)} onPurchased={({isPremium:p,noAds:n})=>{setIsPremium(p);setNoAds(n);if(p||n)AdMobHelper.removeBanner();}}/>}
-      {drawerSection==="about"&&<AboutModal T={T} onClose={()=>setDrawerSection(null)} debugLog={debugLog} onTestNotif={(type)=>window._testNotifTap&&window._testNotifTap(type)}/>}
+      {drawerSection==="about"&&<AboutModal T={T} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="coffee"&&<PremiumModal T={T} state={{...state,isPremium,noAds}} onClose={()=>setDrawerSection(null)} showCoffee={true} onPurchased={({isPremium:p,noAds:n})=>{setIsPremium(p);setNoAds(n);if(p||n)AdMobHelper.removeBanner();}}/>}
       {showAffiliatePopup&&<AffiliatePopup T={T} type={showAffiliatePopup} onClose={()=>setShowAffiliatePopup(false)}/>}
       {notifTapExchange!==null&&<NotifTapExchangeModal T={T} daysUntil={notifTapExchange} onClose={()=>setNotifTapExchange(null)}/>}
