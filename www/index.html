@@ -217,15 +217,32 @@
   };
   </script>
   <script>
-  const ATTHelper = {
-    async requestPermission(){
-      try{
-        await Capacitor.Plugins.ATTPlugin.requestPermission();
-        return true;
-      }catch(e){console.warn("[ATT] error",e);return false;}
-    },
-    isCapacitor(){return typeof Capacitor!=="undefined"&&Capacitor.isNativePlatform?.();}
-  };
+  // LocalNotificationsのタップイベントをアプリ起動時に一度だけ登録
+  // Reactのレンダリングサイクルに影響されないようにindex.htmlで登録する
+  document.addEventListener("DOMContentLoaded", function() {
+    function registerNotifListener() {
+      if(typeof Capacitor === "undefined" || !Capacitor.isNativePlatform?.()) return;
+      const plugin = Capacitor.Plugins.LocalNotifications;
+      if(!plugin) { setTimeout(registerNotifListener, 500); return; }
+      plugin.addListener("localNotificationActionPerformed", function(event) {
+        const id = event && event.notification && event.notification.id;
+        console.log("[NotifTap] id=", id, event);
+        // デバッグログをReact側に送る
+        if(window._debugNotifId) window._debugNotifId("LocalNotif_id:" + id);
+        // 交換リマインダー
+        if(id === 2001 || id === "2001") {
+          window.dispatchEvent(new CustomEvent("NotificationTap", {detail: {type: "exchange"}}));
+        }
+        // 写真リマインダー
+        else if(id === 3001 || id === "3001") {
+          window.dispatchEvent(new CustomEvent("NotificationTap", {detail: {type: "photo"}}));
+        }
+      });
+      console.log("[NotifTap] listener registered");
+    }
+    // Capacitorが初期化されるまで少し待つ
+    setTimeout(registerNotifListener, 1000);
+  });
   </script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }

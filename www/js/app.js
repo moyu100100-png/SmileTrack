@@ -412,43 +412,22 @@ function App(){
     return()=>window.removeEventListener("AlarmAction",handler);
   },[state.alarmMinutes,state.alarmSound,setAlarmStopped,setSnoozedUntil]);
 
-  // 通知タップイベント（CapacitorのLocalNotificationsプラグイン経由）
+  // 通知タップイベント（index.htmlのLocalNotificationsリスナーからNotificationTapイベントを受け取る）
   useEffect(()=>{
-    if(!Notif.isCapacitor()) return;
-    let listener=null;
-    try{
-      Capacitor.Plugins.LocalNotifications.addListener(
-        "localNotificationActionPerformed",
-        (event)=>{
-          const id=event?.notification?.id;
-          addDebugLog(`[LocalNotif] id=${id}`);
-          if(id===2001||id==="2001"){
-            const today=todayISO();
-            const daysTo=getDaysToNextExchange(state,today);
-            const days=daysTo<=1?0:daysTo<=2?1:2;
-            addDebugLog(`[Exchange] daysTo=${daysTo} -> days=${days}`);
-            setNotifTapExchange(days);
-          } else if(id===3001||id==="3001"){
-            addDebugLog("[Photo] setNotifTapPhoto=true");
-            setNotifTapPhoto(true);
-          } else {
-            addDebugLog(`[LocalNotif] 未知のid: ${id}`);
-          }
-        }
-      ).then(l=>{ listener=l; });
-    }catch(e){ addDebugLog(`[LocalNotif] error: ${e.message}`); }
-
-    // Swift側からのフォールバック（デバッグ用も残す）
     const handler=(event)=>{
       const type=event.detail?.type;
-      addDebugLog(`[NotifTap fallback] type=${type}`);
+      addDebugLog(`[NotifTap] type=${type}`);
       if(type==="exchange"){
         const today=todayISO();
         const daysTo=getDaysToNextExchange(state,today);
         const days=daysTo<=1?0:daysTo<=2?1:2;
+        addDebugLog(`[Exchange] daysTo=${daysTo} -> days=${days}`);
         setNotifTapExchange(days);
       } else if(type==="photo"){
+        addDebugLog("[Photo] setNotifTapPhoto=true");
         setNotifTapPhoto(true);
+      } else {
+        addDebugLog(`[NotifTap] 未知のtype: ${type}`);
       }
     };
     window.addEventListener("NotificationTap",handler);
@@ -457,10 +436,7 @@ function App(){
       window.dispatchEvent(new CustomEvent("NotificationTap",{detail:{type,rawId}}));
     };
     window._debugNotifId=(rawId)=>{ addDebugLog(`[Swift] rawId=${rawId}`); };
-    return()=>{
-      window.removeEventListener("NotificationTap",handler);
-      if(listener) listener.remove();
-    };
+    return()=>window.removeEventListener("NotificationTap",handler);
   },[state]);
 
   // 星5レビューポップアップ（使用5日目・その後25日ごと）
