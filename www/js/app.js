@@ -277,6 +277,8 @@ function App(){
   const [notifTapExchange,setNotifTapExchange]=useState(null); // null | daysUntil(0,1,2)
   const [notifTapPhoto,setNotifTapPhoto]=useState(false);
   const [showReviewModal,setShowReviewModal]=useState(false);
+  const [debugLog,setDebugLog]=useState([]);
+  const addDebugLog=(msg)=>setDebugLog(prev=>[...prev.slice(-9),{msg,time:new Date().toLocaleTimeString()}]);
   const [snoozedUntil,setSnoozedUntil]=useState(null);
   const alarmStopped=state.alarmStopped||false;
   const setAlarmStopped=(v)=>update({alarmStopped:v});
@@ -438,6 +440,28 @@ function App(){
     window._debugNotifId=(rawId)=>{ addDebugLog(`[Swift] rawId=${rawId}`); };
     return()=>window.removeEventListener("NotificationTap",handler);
   },[state]);
+
+  // コールドスタート時のpendingNotifTap確認
+  useEffect(()=>{
+    const check=()=>{
+      if(window._pendingNotifTap){
+        const type=window._pendingNotifTap;
+        window._pendingNotifTap=null;
+        addDebugLog(`[Pending] type=${type}`);
+        if(type==="exchange"){
+          const today=todayISO();
+          const daysTo=getDaysToNextExchange(state,today);
+          const days=daysTo<=1?0:daysTo<=2?1:2;
+          setNotifTapExchange(days);
+        } else if(type==="photo"){
+          setNotifTapPhoto(true);
+        }
+      }
+    };
+    // React準備後に確認（少し待つ）
+    const t=setTimeout(check, 800);
+    return()=>clearTimeout(t);
+  },[]);
 
   // 星5レビューポップアップ（使用5日目・その後25日ごと）
   useEffect(()=>{
@@ -692,7 +716,7 @@ function App(){
       {drawerSection==="timerSettings"&&<TimerSettingsModal T={T} state={state} onSave={f=>update(f)} onClose={()=>setDrawerSection(null)} isPremiumProp={isPremium}/>}
       {drawerSection==="cameraSettings"&&<CameraSettingsModal T={T} state={state} onSave={f=>update(f)} onClose={()=>setDrawerSection(null)}/>}
       {drawerSection==="premium"&&<PremiumModal T={T} state={{...state,isPremium,noAds}} onClose={()=>setDrawerSection(null)} onPurchased={({isPremium:p,noAds:n})=>{setIsPremium(p);setNoAds(n);if(p||n)AdMobHelper.removeBanner();}}/>}
-      {drawerSection==="about"&&<AboutModal T={T} onClose={()=>setDrawerSection(null)}/>}
+      {drawerSection==="about"&&<AboutModal T={T} onClose={()=>setDrawerSection(null)} debugLog={debugLog} onTestNotif={(type)=>window._testNotifTap&&window._testNotifTap(type)}/>}
       {drawerSection==="coffee"&&<PremiumModal T={T} state={{...state,isPremium,noAds}} onClose={()=>setDrawerSection(null)} showCoffee={true} onPurchased={({isPremium:p,noAds:n})=>{setIsPremium(p);setNoAds(n);if(p||n)AdMobHelper.removeBanner();}}/>}
       {showAffiliatePopup&&<AffiliatePopup T={T} type={showAffiliatePopup} onClose={()=>setShowAffiliatePopup(false)}/>}
       {notifTapExchange!==null&&<NotifTapExchangeModal T={T} daysUntil={notifTapExchange} onClose={()=>setNotifTapExchange(null)}/>}

@@ -230,13 +230,20 @@
       return _orig(e);
     };
 
+    // pendingNotifTap: React準備前にタップされた場合の保存場所
+    window._pendingNotifTap = null;
+
     function handleNotifId(id) {
       if(window._debugNotifId) window._debugNotifId("notif_id:" + id);
-      if(id === 2001 || id === "2001") {
-        _orig(new CustomEvent("NotificationTap", {detail: {type: "exchange"}}));
-      } else if(id === 3001 || id === "3001") {
-        _orig(new CustomEvent("NotificationTap", {detail: {type: "photo"}}));
-      }
+      const type = (id === 2001 || id === "2001") ? "exchange"
+                 : (id === 3001 || id === "3001") ? "photo"
+                 : null;
+      if(!type) return;
+      // pendingに保存（コールドスタート対策）
+      window._pendingNotifTap = type;
+      // イベントも発火（起動中・バックグラウンドのケース）
+      _orig(new CustomEvent("NotificationTap", {detail: {type}}));
+      if(window._debugNotifId) window._debugNotifId("dispatched:" + type);
     }
 
     function registerListeners() {
