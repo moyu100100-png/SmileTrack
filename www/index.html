@@ -217,32 +217,53 @@
   };
   </script>
   <script>
-  // LocalNotificationsのタップイベントをアプリ起動時に一度だけ登録
-  // Reactのレンダリングサイクルに影響されないようにindex.htmlで登録する
-  document.addEventListener("DOMContentLoaded", function() {
-    function registerNotifListener() {
+  // 通知タップ処理 + 全イベントキャプチャ（デバッグ兼用）
+  (function() {
+    // 全dispatchEventをキャプチャ
+    const _orig = window.dispatchEvent.bind(window);
+    window.dispatchEvent = function(e) {
+      try {
+        if(window._debugNotifId && e && e.type && e.type !== "mousemove" && e.type !== "pointermove" && e.type !== "touchmove") {
+          window._debugNotifId('evt:' + e.type);
+        }
+      } catch(err) {}
+      return _orig(e);
+    };
+
+    function handleNotifId(id) {
+      if(window._debugNotifId) window._debugNotifId("notif_id:" + id);
+      if(id === 2001 || id === "2001") {
+        _orig(new CustomEvent("NotificationTap", {detail: {type: "exchange"}}));
+      } else if(id === 3001 || id === "3001") {
+        _orig(new CustomEvent("NotificationTap", {detail: {type: "photo"}}));
+      }
+    }
+
+    function registerListeners() {
       if(typeof Capacitor === "undefined" || !Capacitor.isNativePlatform?.()) return;
       const plugin = Capacitor.Plugins.LocalNotifications;
-      if(!plugin) { setTimeout(registerNotifListener, 500); return; }
+      if(!plugin) { setTimeout(registerListeners, 500); return; }
+
       plugin.addListener("localNotificationActionPerformed", function(event) {
-        const id = event && event.notification && event.notification.id;
-        console.log("[NotifTap] id=", id, event);
-        // デバッグログをReact側に送る
-        if(window._debugNotifId) window._debugNotifId("LocalNotif_id:" + id);
-        // 交換リマインダー
-        if(id === 2001 || id === "2001") {
-          window.dispatchEvent(new CustomEvent("NotificationTap", {detail: {type: "exchange"}}));
-        }
-        // 写真リマインダー
-        else if(id === 3001 || id === "3001") {
-          window.dispatchEvent(new CustomEvent("NotificationTap", {detail: {type: "photo"}}));
-        }
+        const id = event?.notification?.id ?? event?.id;
+        if(window._debugNotifId) window._debugNotifId("actionPerformed:" + JSON.stringify(event).slice(0,100));
+        handleNotifId(id);
       });
-      console.log("[NotifTap] listener registered");
+
+      plugin.addListener("localNotificationReceived", function(event) {
+        const id = event?.id;
+        if(window._debugNotifId) window._debugNotifId("received:" + id);
+      });
+
+      if(window._debugNotifId) window._debugNotifId("listeners_OK");
     }
-    // Capacitorが初期化されるまで少し待つ
-    setTimeout(registerNotifListener, 1000);
-  });
+
+    if(document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", function() { setTimeout(registerListeners, 1000); });
+    } else {
+      setTimeout(registerListeners, 1000);
+    }
+  })();
   </script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
