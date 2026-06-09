@@ -420,7 +420,8 @@ function App(){
         // 交換日までの日数を計算
         const today=todayISO();
         const daysTo=getDaysToNextExchange(state,today);
-        const days=daysTo<=1?0:daysTo<=2?1:2;
+        // daysTo=0:今日交換日, 1:明日交換日(前日通知), 2:明後日(2日前通知)
+        const days=daysTo<=0?0:daysTo===1?1:2;
         setNotifTapExchange(days);
       } else if(type==="photo"){
         setNotifTapPhoto(true);
