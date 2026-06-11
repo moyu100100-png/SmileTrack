@@ -5,7 +5,6 @@ function NotifTapExchangeModal({T, daysUntil, onClose}) {
     : daysUntil===1 ? t("notifTapExchangeTomorrow")
     : t("notifTapExchangeDayAfter");
   const sub = daysUntil===0 ? t("notifTapExchangeSub") : t("notifTapExchangeSubBefore");
-  const font="'M PLUS Rounded 1c',sans-serif";
   return (
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",padding:"24px"}} onClick={onClose}>
       <div style={{background:T.card,borderRadius:24,width:"100%",maxWidth:340,padding:"32px 24px 28px",textAlign:"center",boxShadow:"0 8px 32px rgba(0,0,0,0.18)"}} onClick={e=>e.stopPropagation()}>
@@ -14,29 +13,27 @@ function NotifTapExchangeModal({T, daysUntil, onClose}) {
             <rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/>
           </svg>
         </div>
-        <div style={{fontFamily:font,fontSize:16,fontWeight:600,color:T.text,lineHeight:1.5,marginBottom:8}}>{title}</div>
-        <div style={{fontFamily:font,fontSize:12,color:T.text+"88",marginBottom:24,lineHeight:1.6}}>{sub}</div>
-        <button onClick={onClose} style={{width:"100%",padding:14,borderRadius:14,border:"none",background:T.primary,color:"#fff",fontFamily:font,fontSize:15,fontWeight:600,cursor:"pointer"}}>OK</button>
+        <div style={{fontSize:16,fontWeight:600,color:T.text,lineHeight:1.5,marginBottom:8}}>{title}</div>
+        <div style={{fontSize:12,color:T.text+"88",marginBottom:24,lineHeight:1.6}}>{sub}</div>
+        <button onClick={onClose} style={{width:"100%",padding:14,borderRadius:14,border:"none",background:T.primary,color:"#fff",fontSize:15,fontWeight:600,cursor:"pointer"}}>OK</button>
       </div>
     </div>
   );
 }
 
 function NotifTapPhotoModal({T, onClose, onGoPhoto}) {
-  const font="'M PLUS Rounded 1c',sans-serif";
   return (
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",padding:"24px"}} onClick={onClose}>
       <div style={{background:T.card,borderRadius:24,width:"100%",maxWidth:340,padding:"32px 24px 28px",textAlign:"center",boxShadow:"0 8px 32px rgba(0,0,0,0.18)"}} onClick={e=>e.stopPropagation()}>
         <div style={{width:56,height:56,borderRadius:16,background:T.soft,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 18px"}}>
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={T.primary} strokeWidth="1.8">
-            <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
-            <circle cx="12" cy="13" r="4"/>
+            <rect x="3" y="4" width="18" height="18" rx="3"/><path d="M16 2v4M8 2v4M3 10h18"/>
           </svg>
         </div>
-        <div style={{fontFamily:font,fontSize:16,fontWeight:600,color:T.text,lineHeight:1.5,marginBottom:8}}>{t("notifTapPhoto")}</div>
-        <div style={{fontFamily:font,fontSize:12,color:T.text+"88",marginBottom:24,lineHeight:1.6}}>{t("notifTapPhotoSub")}</div>
-        <button onClick={()=>{onClose();onGoPhoto();}} style={{width:"100%",padding:14,borderRadius:14,border:"none",background:T.primary,color:"#fff",fontFamily:font,fontSize:15,fontWeight:600,cursor:"pointer",marginBottom:10}}>{t("notifTapPhotoBtn")}</button>
-        <button onClick={onClose} style={{width:"100%",padding:12,borderRadius:14,border:"none",background:"none",fontFamily:font,fontSize:14,color:T.text+"66",cursor:"pointer"}}>{t("notifTapLater")}</button>
+        <div style={{fontSize:16,fontWeight:600,color:T.text,lineHeight:1.5,marginBottom:8}}>{t("notifTapPhoto")}</div>
+        <div style={{fontSize:12,color:T.text+"88",marginBottom:24,lineHeight:1.6}}>{t("notifTapPhotoSub")}</div>
+        <button onClick={()=>{onClose();onGoPhoto();}} style={{width:"100%",padding:14,borderRadius:14,border:"none",background:T.primary,color:"#fff",fontSize:15,fontWeight:600,cursor:"pointer",marginBottom:10}}>{t("notifTapPhotoBtn")}</button>
+        <button onClick={onClose} style={{width:"100%",padding:12,borderRadius:14,border:"none",background:"none",fontSize:14,color:T.text+"66",cursor:"pointer"}}>{t("notifTapLater")}</button>
       </div>
     </div>
   );
@@ -48,7 +45,6 @@ function ReviewRequestModal({T, onClose}) {
     window.open("https://apps.apple.com/app/id6761232027?action=write-review","_blank");
     onClose();
   };
-  const font="'M PLUS Rounded 1c',sans-serif";
   return (
     <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.45)",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",padding:"24px"}} onClick={onClose}>
       <div style={{background:T.card,borderRadius:24,width:"100%",maxWidth:340,padding:"32px 24px 28px",textAlign:"center",boxShadow:"0 8px 32px rgba(0,0,0,0.18)"}} onClick={e=>e.stopPropagation()}>
@@ -57,10 +53,10 @@ function ReviewRequestModal({T, onClose}) {
             <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
           </svg>
         </div>
-        <div style={{fontFamily:font,fontSize:16,fontWeight:600,color:T.text,lineHeight:1.5,marginBottom:8}}>{t("reviewTitle")}</div>
-        <div style={{fontFamily:font,fontSize:12,color:T.text+"88",marginBottom:24,lineHeight:1.6}}>{t("reviewSub")}</div>
-        <button onClick={handleReview} style={{width:"100%",padding:14,borderRadius:14,border:"none",background:T.primary,color:"#fff",fontFamily:font,fontSize:15,fontWeight:600,cursor:"pointer",marginBottom:10}}>{t("reviewBtn")}</button>
-        <button onClick={onClose} style={{width:"100%",padding:12,borderRadius:14,border:"none",background:"none",fontFamily:font,fontSize:14,color:T.text+"66",cursor:"pointer"}}>{t("notifTapLater")}</button>
+        <div style={{fontSize:16,fontWeight:600,color:T.text,lineHeight:1.5,marginBottom:8}}>{t("reviewTitle")}</div>
+        <div style={{fontSize:12,color:T.text+"88",marginBottom:24,lineHeight:1.6}}>{t("reviewSub")}</div>
+        <button onClick={handleReview} style={{width:"100%",padding:14,borderRadius:14,border:"none",background:T.primary,color:"#fff",fontSize:15,fontWeight:600,cursor:"pointer",marginBottom:10}}>{t("reviewBtn")}</button>
+        <button onClick={onClose} style={{width:"100%",padding:12,borderRadius:14,border:"none",background:"none",fontSize:14,color:T.text+"66",cursor:"pointer"}}>{t("notifTapLater")}</button>
       </div>
     </div>
   );
@@ -108,7 +104,7 @@ function HomePreviewModal({T,themeName,themeObj,onClose}){
 }
 
 // ── ABOUT MODAL ──────────────────────────────────────────────────────────────
-function AboutModal({T,onClose}){
+function AboutModal({T,onClose,debugLog=[],onTestNotif}){
   const share=()=>{
     if(navigator.share){
       navigator.share({title:"SmileTrack",text:"マウスピース矯正の管理アプリ「SmileTrack」を使ってみてください！",url:"https://smiletrack.app"});
@@ -143,6 +139,23 @@ function AboutModal({T,onClose}){
         <Row icon={shareIcon} label={t("shareLabel")} onClick={share}/>
 
         <button className="btn bs" style={{width:"100%",marginTop:16}} onClick={onClose}>{t("close")}</button>
+
+        {/* デバッグパネル（開発中のみ） */}
+        <div style={{marginTop:16,borderTop:`1px solid ${T.soft}`,paddingTop:12}}>
+          <div style={{fontSize:10,color:T.text+"44",marginBottom:8,textAlign:"center"}}>DEBUG</div>
+          <div style={{display:"flex",gap:8,marginBottom:8}}>
+            <button onClick={()=>onTestNotif&&onTestNotif("exchange")} style={{flex:1,padding:"8px 0",borderRadius:10,border:`1px solid ${T.soft}`,background:"none",fontSize:11,color:T.text,cursor:"pointer"}}>交換テスト</button>
+            <button onClick={()=>onTestNotif&&onTestNotif("photo")} style={{flex:1,padding:"8px 0",borderRadius:10,border:`1px solid ${T.soft}`,background:"none",fontSize:11,color:T.text,cursor:"pointer"}}>写真テスト</button>
+          </div>
+          <div style={{background:T.soft+"44",borderRadius:10,padding:"8px 10px",maxHeight:120,overflowY:"auto"}}>
+            {debugLog.length===0&&<div style={{fontSize:10,color:T.text+"44",textAlign:"center"}}>ログなし</div>}
+            {debugLog.map((l,i)=>(
+              <div key={i} style={{fontSize:10,color:T.text+"88",fontFamily:"monospace",marginBottom:2}}>
+                <span style={{color:T.text+"44"}}>{l.time} </span>{l.msg}
+              </div>
+            ))}
+          </div>
+        </div>
 
       </div>
     </div>
@@ -800,7 +813,7 @@ function NotifyModal({T,state,onSave,onClose}){
   const [sf,setSf]=useState({...state.settings});
 
   // 縦スクロールピッカー
-    const timingOpts=[{v:"0",l:t("sameDayOpt")},{v:"1440",l:t("dayBeforeOpt")},{v:"2880",l:t("twoDaysBeforeOpt")}];
+    const timingOpts=[{v:0,l:t("sameDayOpt")},{v:1440,l:t("dayBeforeOpt")},{v:2880,l:t("twoDaysBeforeOpt")}];
   const hours=Array.from({length:24},(_,i)=>({v:i,l:`${i}${t("obHoursUnit")}`}));
   const DOW_OPTS=[
     {v:"exchange",l:t("onChangeDayOpt")},
@@ -833,7 +846,7 @@ function NotifyModal({T,state,onSave,onClose}){
           <div>
             <div style={{fontSize:11,color:T.text+"77",marginBottom:10}}>{t("notifyTimingLabel")}</div>
             <div style={{display:"flex",gap:10}}>
-              <select value={f.notifyBefore} onChange={e=>setF(x=>({...x,notifyBefore:parseInt(e.target.value,10)}))} style={{flex:1}}>
+              <select value={f.notifyBefore} onChange={e=>setF(x=>({...x,notifyBefore:parseInt(e.target.value)}))} style={{flex:1}}>
                 {timingOpts.map(o=><option key={o.v} value={o.v}>{o.l}</option>)}
               </select>
               <select value={f.exchangeNotifyHour} onChange={e=>setF(x=>({...x,exchangeNotifyHour:parseInt(e.target.value)}))} style={{flex:1}}>

@@ -68,7 +68,7 @@
     async showInterstitialIfReady(forceShow=false) {
       if (!this._isNative()) return;
       this._interCount++;
-      if (!forceShow && this._interCount % 4 !== 0) return;
+      if (!forceShow && this._interCount % 6 !== 0) return;
       try {
         await Capacitor.Plugins.AdMob.showInterstitial();
         setTimeout(() => this.prepareInterstitial(), 1000);
@@ -215,6 +215,62 @@
       }catch(e){console.warn("設定を開けません",e);}
     }
   };
+  </script>
+  <script>
+  // 通知タップ処理 + 全イベントキャプチャ（デバッグ兼用）
+  (function() {
+    // 全dispatchEventをキャプチャ
+    const _orig = window.dispatchEvent.bind(window);
+    window.dispatchEvent = function(e) {
+      try {
+        if(window._debugNotifId && e && e.type && e.type !== "mousemove" && e.type !== "pointermove" && e.type !== "touchmove") {
+          window._debugNotifId('evt:' + e.type);
+        }
+      } catch(err) {}
+      return _orig(e);
+    };
+
+    // pendingNotifTap: React準備前にタップされた場合の保存場所
+    window._pendingNotifTap = null;
+
+    function handleNotifId(id) {
+      if(window._debugNotifId) window._debugNotifId("notif_id:" + id);
+      const type = (id === 2001 || id === "2001") ? "exchange"
+                 : (id === 3001 || id === "3001") ? "photo"
+                 : null;
+      if(!type) return;
+      // pendingに保存（コールドスタート対策）
+      window._pendingNotifTap = type;
+      // イベントも発火（起動中・バックグラウンドのケース）
+      _orig(new CustomEvent("NotificationTap", {detail: {type}}));
+      if(window._debugNotifId) window._debugNotifId("dispatched:" + type);
+    }
+
+    function registerListeners() {
+      if(typeof Capacitor === "undefined" || !Capacitor.isNativePlatform?.()) return;
+      const plugin = Capacitor.Plugins.LocalNotifications;
+      if(!plugin) { setTimeout(registerListeners, 500); return; }
+
+      plugin.addListener("localNotificationActionPerformed", function(event) {
+        const id = event?.notification?.id ?? event?.id;
+        if(window._debugNotifId) window._debugNotifId("actionPerformed:" + JSON.stringify(event).slice(0,100));
+        handleNotifId(id);
+      });
+
+      plugin.addListener("localNotificationReceived", function(event) {
+        const id = event?.id;
+        if(window._debugNotifId) window._debugNotifId("received:" + id);
+      });
+
+      if(window._debugNotifId) window._debugNotifId("listeners_OK");
+    }
+
+    if(document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", function() { setTimeout(registerListeners, 1000); });
+    } else {
+      setTimeout(registerListeners, 1000);
+    }
+  })();
   </script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
