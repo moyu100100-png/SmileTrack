@@ -387,7 +387,7 @@ function App(){
       scheduleExchangeNotif(stateWithExch);
       schedulePhotoNotif(stateWithExch);
     }
-  },[]);
+  },[state.startDate, state.notifyBefore, state.exchangeNotifyHour, state.totalPieces, state.intervalDays]);
 
   const update=useCallback(patch=>setState(s=>({...s,...patch})),[]);
   const T=THEMES[state.themeName]||THEMES.blush||Object.values(THEMES)[0];
