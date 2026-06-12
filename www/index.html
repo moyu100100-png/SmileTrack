@@ -216,6 +216,36 @@
     }
   };
   </script>
+  <script>
+  (function() {
+    window._pendingNotifTap = null;
+
+    function handleNotifId(id) {
+      const type = (id === 2001 || id === "2001") ? "exchange"
+                 : (id === 3001 || id === "3001") ? "photo"
+                 : null;
+      if(!type) return;
+      window._pendingNotifTap = type;
+      window.dispatchEvent(new CustomEvent("NotificationTap", {detail: {type}}));
+    }
+
+    function registerListeners() {
+      if(typeof Capacitor === "undefined" || !Capacitor.isNativePlatform?.()) return;
+      const plugin = Capacitor.Plugins.LocalNotifications;
+      if(!plugin) { setTimeout(registerListeners, 500); return; }
+      plugin.addListener("localNotificationActionPerformed", function(event) {
+        const id = event?.notification?.id ?? event?.id;
+        handleNotifId(id);
+      });
+    }
+
+    if(document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", function() { setTimeout(registerListeners, 1000); });
+    } else {
+      setTimeout(registerListeners, 1000);
+    }
+  })();
+  </script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
