@@ -378,9 +378,10 @@ function App(){
     // nextExchangeDateを計算してからスケジュール
     const list = buildPieceList(state);
     if(list.length && state.startDate){
-      const info = getCurrentPieceInfo(state, todayStr);
-      const daysLeft = info.interval - info.dayNum + 1;
-      const exchMs = new Date(todayStr+"T00:00:00").getTime() + (daysLeft - 1)*86400000; // 通知用は表示用より1日戻す
+      const info0 = getCurrentPieceInfo(state, todayStr);
+      const isExchangeDay0 = (info0.dayNum === 1 && info0.pieceIdx !== 0);
+      const daysTo0 = isExchangeDay0 ? 0 : getDaysToNextExchange(state, todayStr);
+      const exchMs = new Date(todayStr+"T00:00:00").getTime() + daysTo0*86400000;
       const exchDate = new Date(exchMs);
       const exchStr = `${exchDate.getFullYear()}-${String(exchDate.getMonth()+1).padStart(2,"0")}-${String(exchDate.getDate()).padStart(2,"0")}`;
       const stateWithExch = {...state, nextExchangeDate: exchStr};
@@ -675,8 +676,9 @@ function App(){
         const list=buildPieceList(state);
         if(list.length&&state.startDate){
           const info=getCurrentPieceInfo(state,todayStr);
-          const daysLeft=info.interval-info.dayNum+1;
-          const exchMs=new Date(todayStr+"T00:00:00").getTime()+(daysLeft-1)*86400000; // 通知用は表示用より1日戻す
+          const isExchangeDay=( info.dayNum===1 && info.pieceIdx!==0);
+          const daysTo=isExchangeDay ? 0 : getDaysToNextExchange(state,todayStr);
+          const exchMs=new Date(todayStr+"T00:00:00").getTime()+daysTo*86400000;
           const exchDate=new Date(exchMs);
           const exchStr=`${exchDate.getFullYear()}-${String(exchDate.getMonth()+1).padStart(2,"0")}-${String(exchDate.getDate()).padStart(2,"0")}`;
           const stateWithExch={...state,...f,nextExchangeDate:exchStr};
