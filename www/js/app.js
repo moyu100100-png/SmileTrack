@@ -420,9 +420,10 @@ function App(){
       if(type==="exchange"){
         // 交換日までの日数を計算
         const today=todayISO();
-        const daysTo=getDaysToNextExchange(state,today);
-        // daysTo=0:今日交換日, 1:明日交換日(前日通知), 2:明後日(2日前通知)
-        const days=daysTo<=0?0:daysTo===1?1:2;
+        const info=getCurrentPieceInfo(state,today);
+        const isFirstPieceFirstDay=(info.pieceIdx===0&&info.dayNum===1);
+        const isExchangeDay=(info.dayNum===1&&!isFirstPieceFirstDay);
+        const days=isExchangeDay?0:info.dayNum===info.interval?1:2;
         setNotifTapExchange(days);
       } else if(type==="photo"){
         setNotifTapPhoto(true);
