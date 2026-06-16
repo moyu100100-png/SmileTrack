@@ -801,7 +801,7 @@ function NotifyModal({T,state,onSave,onClose}){
 
   // 縦スクロールピッカー
     const timingOpts=[{v:"0",l:t("sameDayOpt")},{v:"1440",l:t("dayBeforeOpt")},{v:"2880",l:t("twoDaysBeforeOpt")}];
-  const hours=Array.from({length:24},(_,i)=>({v:i,l:`${i}${t("obHoursUnit")}`}));
+  const hours=Array.from({length:24},(_,i)=>({v:i,l:`${i}${t("hourUnit")||"時"}`}));
   const DOW_OPTS=[
     {v:"exchange",l:t("onChangeDayOpt")},
     {v:"0",l:t("sunday")},{v:"1",l:t("monday")},{v:"2",l:t("tuesdayLabel")},
@@ -833,7 +833,7 @@ function NotifyModal({T,state,onSave,onClose}){
           <div>
             <div style={{fontSize:11,color:T.text+"77",marginBottom:10}}>{t("notifyTimingLabel")}</div>
             <div style={{display:"flex",gap:10}}>
-              <select value={String(f.notifyBefore)} onChange={e=>setF(x=>({...x,notifyBefore:parseInt(e.target.value,10)}))} style={{flex:1}}>
+              <select value={f.notifyBefore} onChange={e=>setF(x=>({...x,notifyBefore:parseInt(e.target.value,10)}))} style={{flex:1}}>
                 {timingOpts.map(o=><option key={o.v} value={o.v}>{o.l}</option>)}
               </select>
               <select value={f.exchangeNotifyHour} onChange={e=>setF(x=>({...x,exchangeNotifyHour:parseInt(e.target.value)}))} style={{flex:1}}>

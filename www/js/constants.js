@@ -293,7 +293,7 @@ function scheduleExchangeNotif(state){
   }
 
   if(rawMs){
-    const msg = actualBefore===0 ? t("todayEx") : actualBefore===1440 ? t("tomorrowEx") : `${actualBefore/1440}${t("dayUnit")}${t("daysToEx")}`;
+    const msg = actualBefore===0 ? t("notifTodayEx") : actualBefore===1440 ? t("notifTomorrowEx") : `${actualBefore/1440}${t("dayUnit")}${t("daysToEx")}`;
     Notif.schedule(2001,t("schedule"),msg,rawMs);
   }
 }
