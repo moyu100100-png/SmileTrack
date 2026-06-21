@@ -249,6 +249,21 @@ function useTick(ms=1000, active=true){
 }
 
 function App(){
+
+  // todayStr（0:00始まり固定）
+  const getTodayStr = useCallback(()=>{
+    const now=new Date();
+    const pad=n=>String(n).padStart(2,"0");
+    return `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+  },[]);
+
+  const [todayStr,setTodayStr]=useState(getTodayStr);
+  // 1分ごとにtodayStrだけ更新（日付切替検知）
+  useEffect(()=>{
+    const id=setInterval(()=>setTodayStr(getTodayStr()),60000);
+    return()=>clearInterval(id);
+  },[getTodayStr]);
+
   // 起動時: localStorageから復元（なければdefaultState）
   const [state,setState]=useState(()=>{
     const saved=lsLoad();
@@ -520,20 +535,6 @@ function App(){
     return()=>clearTimeout(id);
   },[state]);
   const dayStartHour = 0;
-
-  // todayStr（0:00始まり固定）
-  const getTodayStr = useCallback(()=>{
-    const now=new Date();
-    const pad=n=>String(n).padStart(2,"0");
-    return `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
-  },[]);
-
-  const [todayStr,setTodayStr]=useState(getTodayStr);
-  // 1分ごとにtodayStrだけ更新（日付切替検知）
-  useEffect(()=>{
-    const id=setInterval(()=>setTodayStr(getTodayStr()),60000);
-    return()=>clearInterval(id);
-  },[getTodayStr]);
 
   // 今日のdayStart境界（ミリ秒）
   const getDayStartMs=useCallback((ds)=>{
