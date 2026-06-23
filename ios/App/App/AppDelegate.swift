@@ -2,6 +2,7 @@ import UIKit
 import Capacitor
 import UserNotifications
 import AppTrackingTransparency
+import WebKit
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
@@ -38,7 +39,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationWillResignActive(_ application: UIApplication) {}
     func applicationDidEnterBackground(_ application: UIApplication) {}
-    func applicationWillEnterForeground(_ application: UIApplication) {}
+    func applicationWillEnterForeground(_ application: UIApplication) {
+        // フォアグラウンド復帰時にWebViewが死んでいたらリロード
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.reloadWebViewIfNeeded()
+        }
+    }
     func applicationWillTerminate(_ application: UIApplication) {}
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
@@ -60,6 +66,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         if let webView = (self.window?.rootViewController as? CAPBridgeViewController)?.webView {
             let js = "window.dispatchEvent(new CustomEvent('AlarmAction', {detail: {action: '\(action)'}}))"
             webView.evaluateJavaScript(js, completionHandler: nil)
+        }
+    }
+
+    func reloadWebViewIfNeeded() {
+        guard let webView = (self.window?.rootViewController as? CAPBridgeViewController)?.webView else { return }
+        // URLがnilまたはabout:blankになっていたらリロード
+        let currentURL = webView.url?.absoluteString ?? ""
+        if currentURL.isEmpty || currentURL == "about:blank" {
+            if let appURL = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "public") {
+                webView.loadFileURL(appURL, allowingReadAccessTo: appURL.deletingLastPathComponent())
+            }
+        }
+    }
+}
+
+// WebViewのコンテンツプロセスが終了した時（iOS 26対策）
+extension AppDelegate: WKNavigationDelegate {
+    func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        // WebViewのプロセスが死んだら即リロード
+        DispatchQueue.main.async {
+            webView.reload()
         }
     }
 }

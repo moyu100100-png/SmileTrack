@@ -242,3 +242,12 @@ function makeHomeSVG(t) {
   ].join("");
 }
 
+
+function useTick(ms=1000, active=true){
+  const [,setTick]=useState(0);
+  useEffect(()=>{
+    if(!active) return;
+    const id=setInterval(()=>setTick(t=>t+1),ms);
+    return()=>clearInterval(id);
+  },[ms,active]);
+}

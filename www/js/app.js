@@ -239,15 +239,6 @@ function OnboardingScreen({T,onComplete}){
 
 // ── APP SHELL ────────────────────────────────────────────────────────────────
 // ── カスタムフック: 必要なコンポーネントだけが毎秒tickする ──────────────────
-function useTick(ms=1000, active=true){
-  const [,setTick]=useState(0);
-  useEffect(()=>{
-    if(!active) return;
-    const id=setInterval(()=>setTick(t=>t+1),ms);
-    return()=>clearInterval(id);
-  },[ms,active]);
-}
-
 function App(){
 
   // todayStr（0:00始まり固定）
